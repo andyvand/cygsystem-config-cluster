@@ -185,13 +185,13 @@
         <choice>
          <!-- APC, Brocade, McData -->
          <group>
-          <attribute name="ipaddress"/>
+          <attribute name="ipaddr"/>
           <attribute name="login"/>
           <attribute name="passwd"/>
          </group>
          <!-- WTI, Vixel -->
          <group>
-          <attribute name="ipaddress"/>
+          <attribute name="ipaddr"/>
           <attribute name="passwd"/>
          </group>
          <!-- ILO -->
@@ -217,5 +217,65 @@
       </element>
     </zeroOrMore>
   </element>
+
+  <optional>
+   <element name="rm">
+    <optional>
+     <element name="failoverdomains">
+     </element>
+    </optional>
+    <optional>
+     <element name="resources">
+      <zeroOrMore>
+       <element name="script">
+       </element>
+      </zeroOrMore>
+      <zeroOrMore>
+       <element name="ip">
+        
+       </element>
+      </zeroOrMore>
+      <zeroOrMore>
+       <element name="fs">
+       </element>
+      </zeroOrMore>
+      <zeroOrMore>
+       <element name="netfs">
+       </element>
+      </zeroOrMore>
+      <zeroOrMore>
+       <element name="clusterfs">
+       </element>
+      </zeroOrMore>
+      <zeroOrMore>
+       <element name="nfsclient">
+       </element>
+      </zeroOrMore>
+      <zeroOrMore>
+       <element name="nfsexport">
+       </element>
+      </zeroOrMore>
+     </element>
+    </optional>
+    <zeroOrMore>
+     <element name="service">
+     </element>
+    </zeroOrMore>
+   </element>
+  </optional>
+
+  <define name="IP">
+   <choice>
+    <group>
+      <attribute name="ref"/>
+    </group>
+    <group>
+     <attribute name="address"/>
+     <attribute name="monitor_link"/>
+    </group>
+    <group>
+    </group>
+  </choice>
+   </choice> 
 
 </element>

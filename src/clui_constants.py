@@ -44,3 +44,5 @@ RC_PROPS=_("Properties for %s Resource: %s")
 
 MODIFIED_FILE=_("<modified>")
 NEW_CONFIG=_("<New Configuration>")
+
+XML_CONFIG_ERROR=_("<span>A problem was encountered while reading configuration file <b>%s</b> . Details or the error appear below. Click the \'Cancel\' button to quit the application. Click the \'New\' button to create a new configuration file. To continue anyway (Not Recommended!), click the \'Ok\' button.</span>") 

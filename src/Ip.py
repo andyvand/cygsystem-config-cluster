@@ -13,4 +13,10 @@ class Ip(BaseResource):
     BaseResource.__init__(self)
     self.TAG_NAME = TAG_NAME
     self.resource_type = RESOURCE_TYPE
-    self.addAttribute("name"," ")
+
+  def getName(self):
+    try:
+      return self.attr_hash["address"]
+    except KeyError, e:
+      return ""
+ 

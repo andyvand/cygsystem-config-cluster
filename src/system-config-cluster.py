@@ -77,6 +77,7 @@ class basecluster:
 
     self.model_builder = None
     self.glade_xml = glade_xml
+    self.command_handler = CommandHandler()
     self.init_widgets()
 
     ##First check for existence of cluster.conf
@@ -99,6 +100,19 @@ class basecluster:
       self.mgmt_tab.hide()
       MessageLibrary.simpleInfoMessage(NOT_CLUSTER_MEMBER)
       self.propagate_button.hide()
+      #try:
+      #  self.command_handler.check_xml(CLUSTER_CONF_PATH)
+      #except CommandError, e:
+      #  self.bad_xml_label.set_text(XML_CONFIG_ERROR % CLUSTER_CONF_PATH)
+      #  self.bad_xml_text.get_buffer().set_text(e.getMessage())
+      #  retval = self.bad_xml_dlg.run()
+      #  if retval == gtk.RESPONSE_CANCEL:
+      #    gtk.main_quit()
+      #  elif retval == gtk.RESPONSE_APPLY:
+      #    #make new cfg file
+      #    self.no_conf_dlg.run()
+      #  else:  #Proceed anyway...
+      #    self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
     else:
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
@@ -264,6 +278,9 @@ class basecluster:
     self.glade_xml.get_widget('no_conf_open').connect('clicked',self.on_no_conf_open)
     self.propagate_button = self.glade_xml.get_widget('propagate')
     self.propagate_button.connect('clicked', self.propagate)
+    self.bad_xml_dlg = self.glade_xml.get_widget('bad_xml_dlg')
+    self.bad_xml_label = self.glade_xml.get_widget('bad_xml_label')
+    self.bad_xml_text = self.glade_xml.get_widget('bad_xml_text')
 
   def propagate(self):
     retval = self.warningMessage(CONFIRM_PROPAGATE)

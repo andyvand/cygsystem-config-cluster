@@ -9,6 +9,8 @@ import rhpl.executil
 import gettext
 _ = gettext.gettext
 
+PATH_TO_RELAXNG_FILE = "../misc/cluster.ng"
+
 PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the following error:\n %s")
 
 PROPAGATE_ERROR=_("Propagation of configuration file failed with the following error:\n %s")
@@ -260,6 +262,18 @@ class CommandHandler:
     return res
 
 
+  def check_xml(self, file):
+    err = ""
+    args = list()
+    args.append("/usr/bin/xmllint")
+    args.append("--relaxng")
+    args.append(PATH_TO_RELAXNG_FILE)
+    args.append(file)
+    try:
+      out,err,res = rhpl.executil.execWithCaptureErrorStatus("/usr/bin/xmllint",args)
+    except RuntimeError, e:
+      raise CommandError("FATAL", str(e))
 
-
+    if res != 0:
+      raise CommandError("FATAL", err)
 

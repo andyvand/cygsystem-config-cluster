@@ -396,6 +396,8 @@ class ServiceController:
     else:
       self.current_service.addChild(rf)
     self.model_builder.setModified()
+    self.prep_service_tree()
+    self.shared_rc_panel.hide()
                                                                                 
   def on_shared_rc_cancel(self, button):
     self.shared_rc_panel.hide()
