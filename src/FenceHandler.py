@@ -48,6 +48,41 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_egenera":_("Egenera SAN Controller"),
               "fence_manual":_("Manual Fencing") }
 
+FENCE_FD_ATTRS = {"fence_apc":["name","ipaddress","login","password"],
+              "fence_wti":["name","ipaddress","password"],
+              "fence_brocade":["name","ipaddress","login","password"],
+              "fence_vixel":["name","ipaddress","password"],
+              "fence_gnbd":["name","server"],
+              "fence_ilo":["name","hostname","login","password"],
+              "fence_xcat":["name","path"],
+              "fence_mcdata":["name","ipaddress","login","password"],
+              "fence_egenera":["name","cserver"],
+              "fence_manual":["name"] }
+
+FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
+              "fence_wti":["port"],
+              "fence_brocade":["port"],
+              "fence_vixel":["port"],
+              "fence_gnbd":["ipaddress"],
+              "fence_ilo":["port"],
+              "fence_xcat":["nodename"],
+              "fence_mcdata":["port"],
+              "fence_egenera":["lpan","pserver"],
+              "fence_manual":[] }
+
+PRETTY_NAME_ATTRS = {"port":_("Port"),
+                     "switch":_("Switch"),
+                     "ipaddress":_("IP Address"),
+                     "nodename":_("Nodename"),
+                     "lpan":_("LPAN"),
+                     "pserver":_("PServer"),
+                     "login":_("Login"),
+                     "password":_("Password"),
+                     "name":_("Name"),
+                     "server":_("Server"),
+                     "hostname":_("Hostname"),
+                     "path":_("Path"),
+                     "cserver":_("CServer") }  
 
 class FenceHandler:
   def __init__(self, fi_proxy_widget, fd_proxy_widget, model_builder):

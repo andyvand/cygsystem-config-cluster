@@ -67,6 +67,12 @@ class FaildomController:
     self.no_nodes_notice = self.glade_xml.get_widget('no_nodes_notice')
     self.treeview_window = self.glade_xml.get_widget('scrolledwindow3')
 
+    self.restricted_cbox = self.glade_xml.get_widget('checkbutton1')
+    self.restricted_cbox.connect('toggled',self.on_restricted_cbox_change)
+
+    self.priority_cbox = self.glade_xml.get_widget('checkbutton2')
+    self.priority_cbox.connect('toggled',self.on_priority_cbox_change)
+
     self.faildom_panel = self.glade_xml.get_widget('faildom_panel')
     self.glade_xml.get_widget('faildom_panel_close').connect('clicked',self.on_faildom_panel_close)
 
@@ -98,15 +104,16 @@ class FaildomController:
     else:
       #set delete button annd spinner sensitive
       self.del_from_faildom.set_sensitive(TRUE)
-      self.priority_label.set_sensitive(TRUE)
-      obj = model.get_value(iter, OBJ_COL)
-      priority_val = obj.getPriorityLevel()
-      if priority_val > 1:
-        self.priority_up.set_sensitive(TRUE)
-        self.priority_down.set_sensitive(TRUE)
-      else:
-        self.priority_up.set_sensitive(FALSE)
-        self.priority_down.set_sensitive(TRUE)
+      if self.priority_cbox.get_active() == TRUE:
+        self.priority_label.set_sensitive(TRUE)
+        obj = model.get_value(iter, OBJ_COL)
+        priority_val = obj.getPriorityLevel()
+        if priority_val > 1:
+          self.priority_up.set_sensitive(TRUE)
+          self.priority_down.set_sensitive(TRUE)
+        else:
+          self.priority_up.set_sensitive(FALSE)
+          self.priority_down.set_sensitive(TRUE)
         
       
       #get selection value for priority and set 
@@ -114,19 +121,20 @@ class FaildomController:
   def on_priority_up(self, button):
     selection = self.faildom_treeview.get_selection()
     model,iter = selection.get_selected()
-    obj = model.get_value(iter, OBJ_COL)
-    obj.raisePriorityLevel()
-    self.prep_faildom_panel(self.current_faildom)
-    self.select_faildomnode(obj.getName())
-    pass
+    if iter != None:
+      obj = model.get_value(iter, OBJ_COL)
+      obj.raisePriorityLevel()
+      self.prep_faildom_panel(self.current_faildom)
+      self.select_faildomnode(obj.getName())
 
   def on_priority_down(self, button):
     selection = self.faildom_treeview.get_selection()
     model,iter = selection.get_selected()
-    obj = model.get_value(iter, OBJ_COL)
-    obj.lowerPriorityLevel()
-    self.prep_faildom_panel(self.current_faildom)
-    self.select_faildomnode(obj.getName())
+    if iter != None:
+      obj = model.get_value(iter, OBJ_COL)
+      obj.lowerPriorityLevel()
+      self.prep_faildom_panel(self.current_faildom)
+      self.select_faildomnode(obj.getName())
 
   def on_del_from_faildom(self, button):
     selection = self.faildom_treeview.get_selection()
@@ -159,11 +167,52 @@ class FaildomController:
       selection.select_range(path,path)
       
 
+  def on_priority_cbox_change(self, cb):
+    selected = self.priority_cbox.get_active()
+    if selected == TRUE:
+      self.priority_down.set_sensitive(TRUE)
+      self.priority_up.set_sensitive(TRUE)
+      self.priority_label.set_sensitive(TRUE)
+      self.current_faildom.addAttribute("ordered","1")
+    else:
+      self.priority_down.set_sensitive(FALSE)
+      self.priority_up.set_sensitive(FALSE)
+      self.priority_label.set_sensitive(FALSE)
+      self.current_faildom.addAttribute("ordered","0")
+    
+  def on_restricted_cbox_change(self, cb):
+    selected = self.restricted_cbox.get_active()
+    if selected == TRUE:
+      self.current_faildom.addAttribute("restricted","1")
+    else:
+      self.current_faildom.addAttribute("restricted","0")
+
 
   def prep_faildom_panel(self, faildom):
     self.current_faildom = faildom
     if self.current_faildom != None:  
       self.faildom_name_label.set_markup("<span><b>" + faildom.getName() + "</b></span>")
+
+      #Set checkboxes for restricted and prioritized
+      val = self.current_faildom.getAttribute("restricted")
+      if val != None:
+        if int(val) > 0:
+          self.restricted_cbox.set_active(TRUE)
+        else:
+          self.restricted_cbox.set_active(FALSE)
+      else:
+        self.restricted_cbox.set_active(FALSE)
+   
+
+      val = self.current_faildom.getAttribute("ordered")
+      if val != None:
+        if int(val) > 0:
+          self.priority_cbox.set_active(TRUE)
+        else:
+          self.priority_cbox.set_active(FALSE)
+      else:
+        self.priority_cbox.set_active(FALSE)
+
       self.prep_optionmenu()
       self.prep_faildom_tree()
 

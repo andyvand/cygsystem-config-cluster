@@ -122,7 +122,7 @@ class ConfigTab:
       self.clear_all_buttonpanels()
       self.fencedevices_p.show()
     elif type == FENCE_DEVICE_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
+      self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.fencedevice_p.show()
     elif type == MANAGED_RESOURCES_TYPE:

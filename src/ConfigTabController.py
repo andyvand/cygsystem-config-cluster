@@ -79,6 +79,8 @@ EDIT_FENCE=_("Edit Properties for Fence: %s")
 
 FENCE_PANEL_LABEL=_("<span size=\"11000\">Fence Configuration for Cluster Node: <b> %s</b></span>")
 
+NEED_CLUSTER_NAME=_("Please provide a name for the cluster")
+
 NODE_UNIQUE_NAME=_("Names for Cluster Nodes must be Unique. Please choose another name for this Node.")
 
 NODE_NAME_REQUIRED=_("Please provide a name for this Cluster Node.")
@@ -190,6 +192,13 @@ class ConfigTabController:
     self.fence_edit_b = self.glade_xml.get_widget('fence_edit_b')
     self.fence_edit_b.connect("clicked",self.on_clusternode_fence_b)
 
+    ##Cluster Props
+    self.glade_xml.get_widget('cluster_edit_b').connect('clicked',self.on_cluster_props_edit)
+    self.glade_xml.get_widget('cancelbutton16').connect('clicked',self.on_cluster_props_edit_cancel)
+    self.glade_xml.get_widget('okbutton16').connect('clicked',self.on_cluster_props_edit_ok)
+    self.cluster_props_dlg = self.glade_xml.get_widget('cluster_props')
+    self.clustername = self.glade_xml.get_widget('clustername')
+
     ##Node Fields
     #Node Props
     self.node_props_name = self.glade_xml.get_widget('entry23')
@@ -297,7 +306,28 @@ class ConfigTabController:
     self.glade_xml.get_widget('okbutton13').connect('clicked',self.on_fi_ok)
     self.glade_xml.get_widget('cancelbutton13').connect('clicked',self.on_fi_cancel)
 
-    
+   
+  def on_cluster_props_edit(self, button):
+    cptr = self.model_builder.getClusterPtr()
+    name = cptr.getName()
+    self.clustername.set_text(name)
+    self.cluster_props_dlg.show()
+
+  def on_cluster_props_edit_ok(self, button):
+    cptr = self.model_builder.getClusterPtr()
+    name = self.clustername.get_text()
+    if name == "":
+      self.errorMessage(NEED_CLUSTER_NAME)
+      return
+    cptr.addAttribute("name",name)
+    apply(self.reset_tree_model)
+    self.cluster_props_dlg.hide()
+
+
+  def on_cluster_props_edit_cancel(self, button):
+    self.clustername.set_text("")
+    self.cluster_props_dlg.hide()
+ 
   def on_clusternode_fence_b(self, button):
     #This method works for either 'Fence this Node' button or 'Fence Panel'
     #First we need to get selection and find out which button is pushed
@@ -380,6 +410,7 @@ class ConfigTabController:
     elif selected_type == F_LEVEL_TYPE:
       self.clear_fence_buttonpanels()
       self.clear_fencepanel_widgets()
+      self.fence_prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(), selected_type)
       self.fence_level_buttons.show()
     else:
       self.clear_fence_buttonpanels()

@@ -14,8 +14,9 @@ from FenceDevice import FenceDevice
 from FenceDevices import FenceDevices
 from Method import Method
 from Device import Device
-from Dlm import Dlm
 from Cman import Cman
+from Gulm import Gulm
+from Lockserver import Lockserver
 from Ip import Ip
 from Script import Script
 from NFSClient import NFSClient
@@ -37,7 +38,8 @@ TAGNAMES={ 'cluster':Cluster,
            'fencedevices':FenceDevices,
            'method':Method,
            'cman':Cman,
-           'dlm':Dlm,
+           'gulm':Gulm,
+           'lockserver':Lockserver,
            'rm':Rm,
            'group':Group,
            'resourcegroup':ResourceGroup,

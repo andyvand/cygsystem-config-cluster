@@ -49,6 +49,11 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue Feb 01 2005 Jim Parsons <jparsons@redhat.com> 0.9.5-1
+  - Many fixes and completions. Added check boxes for restricted
+    and ordered failover domains. Added properties for fences.
+    Fixed bug in fence devices section. Added support for GuLM
+    in UI.
 * Tue Jan 11 2005 Jim Parsons <jparsons@redhat.com> 0.9.4-1
   - Added delete fence device functionality.
 * Mon Jan 10 2005 Jim Parsons <jparsons@redhat.com> 0.9.3-1

@@ -84,12 +84,12 @@
      </attribute>
     </optional>  
     <optional>
-     <attribute name="ltpx_port">
+     <attribute name="ltpxport">
       <data type="positiveInteger"/>
      </attribute>
     </optional>
     <optional>
-     <attribute name="lt_port">
+     <attribute name="ltport">
       <data type="positiveInteger"/>
      </attribute>
     </optional>

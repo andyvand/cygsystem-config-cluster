@@ -51,6 +51,7 @@ CLUSTER_NODE_STR=_("Cluster Node:")
 FENCE_STR=_("Fence: ")
 FENCE_DEVICES_STR=_("Fence Devices")
 FENCE_DEVICE_STR=_("Fence Device:")
+FENCE_LEVEL_STR=_("Fence Level")
 FAILOVER_DOMAINS_STR=_("Failover Domains")
 FAILOVER_DOMAIN_STR=_("Failover Domain:")
 MANAGED_RESOURCES_STR=_("Managed Resources")
@@ -135,6 +136,9 @@ class PropertiesRenderer:
 
     elif type == FAILOVER_DOMAIN_TYPE:
       layout_string = "<span size=\"12000\" foreground=\"" + FAILOVERDOMAIN_COLOR + "\">" + FAILOVER_DOMAIN_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
+
+    elif type == F_LEVEL_TYPE:
+      layout_string = "<span size=\"12000\" foreground=\"" + FENCEDEVICES_COLOR + "\">" + FENCE_LEVEL_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
 
     else:
       layout_string = "<span size=\"12000\">" + FAILOVER_DOMAINS_STR + "</span>"
