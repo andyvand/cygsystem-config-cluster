@@ -19,6 +19,14 @@ class TagObject:
   def addAttribute(self, name, value):
     self.attr_hash[name] = value
 
+  def removeAttribute(self, key):
+    try:
+      del(self.attr_hash[key])
+    except KeyError, e:
+      return FALSE
+
+    return TRUE
+
   def generateXML(self, doc, parent=None):
     #tag = parent.createNode(TAG_NAME)
     #print "TAGNAME is %s" % TAG_NAME

@@ -3,6 +3,7 @@ import string
 import gobject
 import sys
 from clui_constants import *
+from CommandHandler import CommandHandler
 
 import gettext
 _ = gettext.gettext
@@ -23,7 +24,19 @@ except RuntimeError, e:
 import gnome
 import gnome.ui
                                                                                 
-from MgmtTabController import MgmtTabController
+#from MgmtTabController import MgmtTabController
+
+ON_MEMBER=_("On Member: %s")
+
+STATUS=_("Status: %s")
+
+T_NAME=_("Name")
+T_VOTES=_("Votes")
+T_STATUS=_("Status")
+
+NAME_COL = 0
+VOTES_COL = 1
+STATUS_COL = 2
 
 ############################################
 class MgmtTab:
@@ -31,19 +44,56 @@ class MgmtTab:
 
     self.model_builder = model_builder
     self.glade_xml = glade_xml
+    self.command_handler = CommandHandler()
                                                                                 
     #set up tree structure
     self.nodetree = self.glade_xml.get_widget('nodetree')
     self.treemodel = gtk.TreeStore (gobject.TYPE_STRING,
-                                    gobject.TYPE_INT,
-                                    gobject.TYPE_PYOBJECT)
+                                    gobject.TYPE_STRING,
+                                    gobject.TYPE_STRING)
     self.nodetree.set_model(self.treemodel)
-    #self.treeview.set_headers_visible(FALSE)
-                                                                                
-    self.controller = MgmtTabController(self.model_builder,
-                                          self.nodetree,
-                                          self.glade_xml,
-                                          self.reset_tree_model)
-                                                                                
+
+    renderer = gtk.CellRendererText()
+    column1 = gtk.TreeViewColumn("T_NAME",renderer,text=0)
+    self.nodetree.append_column(column1)
+
+    renderer2 = gtk.CellRendererText()
+    column2 = gtk.TreeViewColumn("T_VOTES",renderer2,text=1)
+    self.nodetree.append_column(column2)
+
+    renderer3 = gtk.CellRendererText()
+    column3 = gtk.TreeViewColumn("T_STATUS",renderer3,text=2)
+    self.nodetree.append_column(column3)
 
 
+    self.prep_tree()
+
+    self.clustername = self.glade_xml.get_widget('entry25')
+    self.clustername.set_text(self.command_handler.getClusterName())
+    self.qbox = self.glade_xml.get_widget('checkbutton3')
+    if self.command_handler.isClusterQuorate() == TRUE:
+      self.qbox.set_active(TRUE)
+    else:
+      self.qbox.set_active(FALSE)
+
+    #Now set info labels
+    self.glade_xml.get_widget('label90').set_text(STATUS % self.command_handler.getClusterStatus())
+    self.glade_xml.get_widget('label93').set_text(ON_MEMBER % self.command_handler.getNodeName())
+                                                                                
+#    self.controller = MgmtTabController(self.model_builder,
+#                                          self.nodetree,
+#                                          self.glade_xml,
+#                                          self.reset_tree_model)
+                                                                                
+
+  def prep_tree(self):
+    treemodel = self.nodetree.get_model()
+    treemodel.clear()
+
+    nodes = self.command_handler.getNodesInfo()
+    for node in nodes:
+      iter = treemodel.append(None)
+      name, votes, status = node.getProps()
+      treemodel.set(iter, NAME_COL, name,
+                          VOTES_COL, votes,
+                          STATUS_COL, status) 

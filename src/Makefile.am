@@ -23,9 +23,11 @@ Ip.py \
 IPAddrEntry.py	\
 MessageLibrary.py \
 Method.py \
+MgmtTab.py	\
 ModelBuilder.py \
 NFSClient.py \
 NFSExport.py \
+NodeData.py	\
 PropertiesRenderer.py \
 Service.py	\
 ServiceController.py	\
@@ -83,9 +85,11 @@ install-exec-local:
 	install -m 0640 $(srcdir)/PropertiesRenderer.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/MessageLibrary.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Method.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/MgmtTab.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ModelBuilder.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NFSClient.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NFSExport.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/NodeData.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Service.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ServiceController.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/RefObject.py  $(DESTDIR)$(pkgdatadir)/

@@ -24,4 +24,9 @@ class RefObject(TagObject):
 
   def isRefObject(self):
     return TRUE
-  
+
+  def getName(self):
+    try:
+      return self.attr_hash["ref"]
+    except KeyError, e:
+      return ""

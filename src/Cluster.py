@@ -92,6 +92,16 @@ class Cluster(TagObject):
     self.addAttribute("config_version", str(intversion))
     self.is_cfg_version_dirty = TRUE
 
+  def addAttribute(self, name, value):
+    if name == "config_version":
+      cfg = self.getAttribute("config_version")
+      if cfg != None:
+        if int(value) != int(cfg):
+          self.is_cfg_version_dirty = TRUE
+ 
+    self.attr_hash[name] = value
+
+
   def generateXML(self, doc, parent=None):
     if self.is_cfg_version_dirty == FALSE:
       self.incrementConfigVersion()

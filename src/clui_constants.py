@@ -38,3 +38,6 @@ RESOURCE_COLOR="#00CC00"
 RESOURCEGROUPS_COLOR="#FF6600"
 RESOURCEGROUP_COLOR="#FF8800"
 
+SELECT_RC_TYPE=_("<span><b>Select a Resource Type:</b></span>")
+
+RC_PROPS=_("Properties for %s Resource: %s")

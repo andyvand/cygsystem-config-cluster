@@ -110,10 +110,6 @@ CONFIRM_FI_REMOVE=_("Are you certain that you wish to remove this fence?")
 
 NEED_CONFIG_VERSION=_("Please provide a Config Version")
 
-SELECT_RC_TYPE=_("<span><b>Select a Resource Type:</b></span>")
-
-RC_PROPS=_("Properties for %s Resource: %s")
-
 ###TRANSLATOR: The string below is used as an attr value in an XML file, as well
 ###as a GUI string. Please do not use whitespace in this string. 
 FENCE_LEVEL=_("Fence-Level-%d")
@@ -167,6 +163,7 @@ class ConfigTabController:
     self.rc_panel.connect("delete_event",self.rc_panel_delete)
     self.glade_xml.get_widget('okbutton14').connect('clicked', self.rc_panel_ok)
     self.glade_xml.get_widget('cancelbutton14').connect('clicked', self.rc_panel_cancel)
+
 
     self.setupFencePanel()
     self.setupDialogsandButtons()

@@ -49,6 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Mar 21 2005 Jim Parsons <jparsons@redhat.com> 0.9.15-1
+  - Completion of service cfg ui - mgmt tab nodes
+* Tue Mar 15 2005 Jim Parsons <jparsons@redhat.com> 0.9.14-1
+  - Fixes for bz150894 and 149275
 * Mon Mar 14 2005 Jim Parsons <jparsons@redhat.com> 0.9.12-1
   - Fixes for bz149897, 149123, 149124, 149674, 149676, 149761, 149269, 149670.
     Also added in Service Creation dialog panel.

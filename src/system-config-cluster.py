@@ -94,7 +94,7 @@ class basecluster:
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
     else:
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
-      #self.mgmttab = MgmtTab(glade_xml, self.model_builder)
+      self.mgmttab = MgmtTab(glade_xml, self.model_builder)
 
     self.configtab = ConfigTab(glade_xml, self.model_builder)
 

@@ -22,8 +22,7 @@ RC_OPTS = {"ip":_("IP Address"),
            "script":_("Script"),
            "nfsclient":_("NFS Client"),
            "nfsexport":_("NFS Export"),
-           "fs":_("File System"),
-           "group":_("Resource Group") }
+           "fs":_("File System") }
 
 class ResourceHandler:
   def __init__(self, rc_proxy_widget, model_builder):
@@ -52,15 +51,13 @@ class ResourceHandler:
                              "script":self.pop_script,
                              "nfsclient":self.pop_nfsclient,
                              "nfsexport":self.pop_nfsexport,
-                             "fs":self.pop_fs,
-                             "group":self.pop_group }
+                             "fs":self.pop_fs }
 
     self.rc_validate_hash = {"ip":self.val_ip,
                              "script":self.val_script,
                              "nfsclient":self.val_nfsclient,
                              "nfsexport":self.val_nfsexport,
-                             "fs":self.val_fs,
-                             "group":self.val_group }
+                             "fs":self.val_fs }
 
     self.process_widgets()
 
@@ -115,22 +112,7 @@ class ResourceHandler:
           break
     self.fs_optionmenu.set_history(y) 
 
-  def pop_group(self, attrs):
-    self.group_name.set_text(attrs["name"])
-    domain = attrs["domain"]
-    y = (-1)
-    menu = self.group_optionmenu.get_menu()
-    for item in menu.get_children():
-      y = y + 1
-      children = item.get_children()
-      if children:
-        if item.get_children()[0].get_text() == domain:
-          break
-    self.group_optionmenu.set_history(y) 
-
- 
   def clear_rc_forms(self):
-    self.populate_group_optionmenu()
 
     self.ip.clear()
     self.monitor_link.set_active(TRUE)
@@ -147,8 +129,6 @@ class ResourceHandler:
     self.fs_name.set_text("")
     self.fs_mnt.set_text("")
     self.fs_device.set_text("")
-
-    self.group_name.set_text("")
 
   #### Validation Methods
   def validate_resource(self, tagname, name=None):
@@ -262,9 +242,6 @@ class ResourceHandler:
 
     return fields
 
-  def val_group(self, name):
-    pass
-
   def process_widgets(self):
     #self.fileselector = self.rc_xml.get_widget('fileselection1')
 
@@ -288,27 +265,6 @@ class ResourceHandler:
     self.fs_optionmenu = self.rc_xml.get_widget('optionmenu2')
     self.fs_mnt = self.rc_xml.get_widget('entry12')
     self.fs_device = self.rc_xml.get_widget('fs_dev')
-
-    self.group_name = self.rc_xml.get_widget('entry10')
-    self.group_optionmenu = self.rc_xml.get_widget('optionmenu1')
-
-  def populate_group_optionmenu(self):
-    menu = gtk.Menu()
-    faildoms = self.model_builder.getFailoverDomains()
-    if len(faildoms) == 0:
-      m = gtk.MenuItem(NONE_PLACEHOLDER)
-      m.show()
-      menu.append(m)
-    else:
-      m = gtk.MenuItem(NONE_PLACEHOLDER)
-      m.show()
-      menu.append(m)
-      for fdom in faildoms:
-        m = gtk.MenuItem(fdom.getName())
-        m.show()
-        menu.append(m)
-
-    self.group_optionmenu.set_menu(menu)
 
   def set_model(self, model_builder):
     self.model_builder = model_builder

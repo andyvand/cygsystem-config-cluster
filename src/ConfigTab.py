@@ -41,8 +41,8 @@ RESOURCES=_("Resources")
 RESOURCE=_("Resource")
 IPADDRESS=_("IP Address")
 
-ONE_SERVICE=_("One Service is configured for this cluster")
-NUM_SERVICES=_("%d Services are configured for this cluster")
+ONE_SERVICE=_("One Service is configured \n for this cluster")
+NUM_SERVICES=_("%d Services are configured \n for this cluster")
 
 FENCE_CONFIGURATION=_("Fence Configuration for this Cluster Node")
 
