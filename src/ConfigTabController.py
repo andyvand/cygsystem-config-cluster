@@ -43,7 +43,7 @@ from Lockserver import Lockserver
 from ResourceHandler import ResourceHandler
 from PropertiesRenderer import PropertiesRenderer
 
-PIXMAP_DIR = "./pixmaps/"
+PIXMAP_DIR = "/usr/share/system-config-cluster/pixmaps/"
 INSTALLDIR = "/usr/share/system-config-cluster/"
 
  

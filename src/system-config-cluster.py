@@ -51,6 +51,7 @@ except RuntimeError, e:
 from ConfigTab import ConfigTab
 from ModelBuilder import ModelBuilder
 from clui_constants import *
+from MgmtTab import MgmtTab
 
 import gnome
 import gnome.ui
@@ -102,6 +103,7 @@ class basecluster:
     self.glade_xml.signal_autoconnect(
       {
         "on_quit1_activate" : self.quit,
+        "on_quit2_activate" : self.quit,
         "on_open1_activate" : self.open,
         "on_new1_activate" : self.new,
         "on_save1_activate" : self.save,

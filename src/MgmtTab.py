@@ -54,15 +54,15 @@ class MgmtTab:
     self.nodetree.set_model(self.treemodel)
 
     renderer = gtk.CellRendererText()
-    column1 = gtk.TreeViewColumn("T_NAME",renderer,text=0)
+    column1 = gtk.TreeViewColumn(T_NAME,renderer,text=0)
     self.nodetree.append_column(column1)
 
     renderer2 = gtk.CellRendererText()
-    column2 = gtk.TreeViewColumn("T_VOTES",renderer2,text=1)
+    column2 = gtk.TreeViewColumn(T_VOTES,renderer2,text=1)
     self.nodetree.append_column(column2)
 
     renderer3 = gtk.CellRendererText()
-    column3 = gtk.TreeViewColumn("T_STATUS",renderer3,text=2)
+    column3 = gtk.TreeViewColumn(T_STATUS,renderer3,text=2)
     self.nodetree.append_column(column3)
 
 
@@ -93,7 +93,7 @@ class MgmtTab:
     nodes = self.command_handler.getNodesInfo()
     for node in nodes:
       iter = treemodel.append(None)
-      name, votes, status = node.getProps()
+      name, votes, status = node.getNodeProps()
       treemodel.set(iter, NAME_COL, name,
                           VOTES_COL, votes,
                           STATUS_COL, status) 
