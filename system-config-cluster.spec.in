@@ -49,8 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Thu Mar 31 2005 Jim Parsons <jparsons@redhat.com> 0.9.28-1
+  - Fixed nits. 
 * Thu Mar 31 2005 Jim Parsons <jparsons@redhat.com> 0.9.27-1
-  - Fixed colored text issue. Finally. Also fixes for nits. 
+  - Fixed nits. 
 * Wed Mar 30 2005 Jim Parsons <jparsons@redhat.com> 0.9.26-1
   - Fixed colored text issue. Finally. Also fixes for nits. 
 * Wed Mar 30 2005 Jim Parsons <jparsons@redhat.com> 0.9.25-1
