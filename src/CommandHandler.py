@@ -177,17 +177,23 @@ class CommandHandler:
     lines = out.splitlines()
    
     y = 0 
+    found_groups_tag = FALSE
     #First, run through lines and look for "<groups>" tag
     for line in lines:
       if line.find("<groups>") != (-1):
+        found_groups_tag = TRUE
         break
       y = y + 1
+
+    if found_groups_tag == FALSE:
+      return dataobjs  #no services visible
+
 
     #y now holds index into line list for <groups> tag
     #We need to add one more to y before beginning to start with serices
     y = y + 1
 
-    while lines[y].find("</groups>") != (-1):
+    while lines[y].find("</groups>") == (-1):
       servicelist.append(lines[y])
       y = y + 1
 
@@ -198,30 +204,30 @@ class CommandHandler:
 
       namestr = words[1]
       start = namestr.find("\"")
-      end = namestr.find("\"")
+      end = namestr.rfind("\"")
       name = namestr[start+1:end]
       
       statestr = words[3]
       start = statestr.find("\"")
-      end = namestr.find("\"")
+      end = statestr.rfind("\"")
       state = statestr[start+1:end]
       
       ownstr = words[4]
       start = ownstr.find("\"")
-      end = ownstr.find("\"")
+      end = ownstr.rfind("\"")
       owner = ownstr[start+1:end]
       
       lownstr = words[5]
       start = lownstr.find("\"")
-      end = lownstr.find("\"")
+      end = lownstr.rfind("\"")
       lastowner = lownstr[start+1:end]
       
       resstr = words[6]
       start = resstr.find("\"")
-      end = resstr.find("\"")
+      end = resstr.rfind("\"")
       restarts = resstr[start+1:end]
       
-      dataobjs.append(ServiceData(name,state,owner.lastowner,restarts))
+      dataobjs.append(ServiceData(name,state,owner,lastowner,restarts))
 
     return dataobjs
 

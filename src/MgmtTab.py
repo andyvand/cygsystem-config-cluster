@@ -32,6 +32,12 @@ ON_MEMBER=_("On Member: %s")
 
 STATUS=_("Status: %s")
 
+NO_SERVICES=_("No Services Currently Defined")
+
+T_NAME=_("Name")
+T_VOTES=_("Votes")
+T_STATUS=_("Status")
+
 S_NAME=_("Service Name")
 S_STATE=_("State")
 S_OWNER=_("Owner")
@@ -64,7 +70,7 @@ class MgmtTab:
     self.nodetree.set_model(self.treemodel)
 
     renderer = gtk.CellRendererText()
-    column1 = gtk.TreeViewColumn(T_NAME,renderer,text=0)
+    column1 = gtk.TreeViewColumn(T_NAME,renderer,markup=0)
     self.nodetree.append_column(column1)
 
     renderer2 = gtk.CellRendererText()
@@ -83,15 +89,16 @@ class MgmtTab:
     self.streemodel = gtk.TreeStore (gobject.TYPE_STRING,
                                     gobject.TYPE_STRING,
                                     gobject.TYPE_STRING,
+                                    gobject.TYPE_STRING,
                                     gobject.TYPE_STRING)
     self.servicetree.set_model(self.streemodel)
 
     srenderer = gtk.CellRendererText()
-    scolumn1 = gtk.TreeViewColumn(S_NAME,srenderer,text=0)
+    scolumn1 = gtk.TreeViewColumn(S_NAME,srenderer,markup=0)
     self.servicetree.append_column(scolumn1)
 
     srenderer2 = gtk.CellRendererText()
-    scolumn2 = gtk.TreeViewColumn(S_STATE,srenderer2,text=1)
+    scolumn2 = gtk.TreeViewColumn(S_STATE,srenderer2,markup=1)
     self.servicetree.append_column(scolumn2)
 
     srenderer3 = gtk.CellRendererText()
@@ -140,7 +147,8 @@ class MgmtTab:
     for node in nodes:
       iter = treemodel.append(None)
       name, votes, status = node.getNodeProps()
-      treemodel.set(iter, NAME_COL, name,
+      name_str = "<span size=\"10000\"><b>" + name + "</b></span>"
+      treemodel.set(iter, NAME_COL, name_str,
                           VOTES_COL, votes,
                           STATUS_COL, status) 
 
@@ -154,11 +162,21 @@ class MgmtTab:
       retval = MessageLibrary.errorMessage(e.getMessage())
       return
 
-    for service in services:
+    if len(services) == 0:
       iter = treemodel.append(None)
-      name, state, owner, lastowner, restarts = service.getServiceProps()
-      treemodel.set(iter, S_NAME_COL, name,
-                          S_STATE_COL, state,
-                          S_OWNER_COL, owner,
-                          S_LASTOWNER_COL, lastowner,
-                          S_RESTARTS_COL, restarts) 
+      treemodel.set(iter, S_NAME_COL, "<span foreground=\"red\"><b>" + NO_SERVICES + "</b></span>")
+    else:
+      for service in services:
+        iter = treemodel.append(None)
+        name, state, owner, lastowner, restarts = service.getServiceProps()
+        name_str = "<span size=\"10000\"><b>" + name + "</b></span>"
+        if state == "started":
+          color = "green"
+        else:
+          color = "red"
+        state_str = "<span foreground=\"" + color + "\">" + state + "</span>"
+        treemodel.set(iter, S_NAME_COL, name_str,
+                            S_STATE_COL, state_str,
+                            S_OWNER_COL, owner,
+                            S_LASTOWNER_COL, lastowner,
+                            S_RESTARTS_COL, restarts) 

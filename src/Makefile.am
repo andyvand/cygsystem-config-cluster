@@ -32,6 +32,7 @@ NodeData.py	\
 PropertiesRenderer.py \
 Service.py	\
 ServiceController.py	\
+ServiceData.py	\
 RefObject.py	\
 ResourceHandler.py \
 Resources.py \
@@ -94,6 +95,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/NodeData.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Service.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ServiceController.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/ServiceData.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/RefObject.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ResourceHandler.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Resources.py  $(DESTDIR)$(pkgdatadir)/

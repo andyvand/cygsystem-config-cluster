@@ -49,6 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue Mar 29 2005 Jim Parsons <jparsons@redhat.com> 0.9.23-1
+  - Fixes in services interface. 
+* Tue Mar 29 2005 Jim Parsons <jparsons@redhat.com> 0.9.22-1
+  - Added new class file 
 * Tue Mar 29 2005 Jim Parsons <jparsons@redhat.com> 0.9.21-1
   - Fix for bz149272 and services tree view complete 
 * Mon Mar 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.19-1
