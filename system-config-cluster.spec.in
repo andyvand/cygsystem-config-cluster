@@ -49,6 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Mar 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.19-1
+  - Fix for bz149672 and propagate error
+* Mon Mar 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.18-1
+  - Added Exception Handler for getNodesInfo and reworded 'save changes?'
 * Mon Mar 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.17-1
   - Fixes for bz149123, 149885, 149660, 149508, 149488, 149897,
     150895, 150813, 149124, 149662, 149128, 149508, 149545, 149707
