@@ -3,6 +3,8 @@ ClusterNode.py	\
 ClusterNodes.py \
 Cluster.py	\
 Cman.py		\
+CommandHandler.py	\
+CommandError.py	\
 ConfigTabController.py  \
 ConfigTab.py  \
 Device.py \
@@ -60,6 +62,8 @@ install-exec-local:
 	install -m 0640 $(srcdir)/Cman.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ConfigTabController.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ConfigTab.py $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/CommandHandler.py $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/CommandError.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Device.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Gulm.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Lockserver.py $(DESTDIR)$(pkgdatadir)/

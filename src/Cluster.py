@@ -42,8 +42,8 @@ class Cluster(TagObject):
         continue
    
     if special_kid != None:
-      chilluns = special_kid.getChildren() #Should be clusternodes...
-      numkids = len(chilluns) #numkids == number of nodes in cluster
+      cnodes = special_kid.getChildren() #Should be clusternodes...
+      numkids = len(cnodes) #numkids == number of nodes in cluster
 
     ###Here we walk through list of children an inefficient second time,
     ###But there will only be a few children here, and searching for
