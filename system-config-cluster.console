@@ -1,0 +1,3 @@
+USER=root
+PROGRAM=/usr/share/system-config-cluster/system-config-cluster.py
+SESSION=true

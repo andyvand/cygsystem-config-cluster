@@ -1,0 +1,111 @@
+<element name="cluster">
+  <attribute name="name"/>
+  <element name="cman"/>
+  <element name="dlm"/>
+  <element name="clusternodes">
+    <zeroOrMore>
+      <element name="clusternode">
+        <attribute name="name"/>
+        <attribute name="votes"/>
+        <zeroOrMore>
+          <element name="fence">
+            <element name="method">
+              <attribute name="name/">
+              <element name="device">
+                <attribute name="name"/>
+                <optional>
+                  <attribute name="port"/>
+                  <attribute name="switch"/>
+                  <attribute name="XCAT"/>
+                  <attribute name="LPAN"/>
+                  <attribute name="PServer"/>
+                </optional>
+              </element>
+            </element>
+          </element>
+        </zeroOrMore>
+      </element>
+    </zeroOrMore>
+  </element>
+
+  <element name="fence_devices">
+    <zeroOrMore>
+      <element name="fence_device">
+        <attribute name="name"/>
+        <attribute name="agent"/>
+        <optional>
+          <attribute name="login"/>
+          <attribute name="password"/>
+          <attribute name="ipaddress"/>
+          <attribute name="server"/>
+          <attribute name="hostname"/>
+          <attribute name="CServer"/>
+          <attribute name="RPowerPath"/>
+        </optional>
+      </element>
+    </zeroOrMore>
+  </element>
+
+  <element name="rm">
+    <element name="failoverdomains">
+      <zeroOrMore>
+        <element name="failoverdomain">
+          <attribute name="name"/>
+          <optional>
+            <attribute name="ordered"/>
+            <attribute name="restricted"/>
+          </optional>
+          <oneOrMore>
+            <element name="failoverdomainnode">
+              <attribute name="name"/>
+              <optional>
+                <attribute name="priority"/>
+              </optional>
+            </element>
+          </oneOrMore>
+        </element>
+      </zeroOrMore>
+    </element>
+
+    <element name="resources">
+      <optional>
+        <element name="group">
+          <attribute name="name"/>
+          <optional>
+            <attribute name="domain"/>
+          </optional>
+        </element>
+
+        <ref name="script-element"/>
+        <ref name="ip-element"/>
+    </element>
+
+    <zeroOrMore>
+      <element name="resourcegroup">
+        <optional>
+          <ref name="script-element"/> 
+          <ref name="ip-element"/> 
+          <ref name="nfsclient-element"/> 
+          <ref name="nfsexport-element"/> 
+          <ref name="fs-element"/> 
+        </optional>
+      </element>
+    </zeroOrMore>
+
+  </element>
+</element>
+
+<define name="script-element">
+  <optional>
+    <attribute name="ref"/>
+    <attribute name="name"/>
+    <attribute name="file"/>
+  </optional>
+</define>
+<define name="ip-element">
+  <optional>
+    <attribute name="ref"/>
+    <attribute name="address"/>
+    <attribute name="monitor-link"/>
+  </optional>
+</define>

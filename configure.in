@@ -1,0 +1,19 @@
+AC_INIT(system-config-cluster.spec.in)
+AM_INIT_AUTOMAKE(system-config-cluster, 0.9.1)
+AM_PATH_PYTHON(2.3)
+
+ALL_LINGUAS=""
+
+dnl prevent to copy po/Makefile.in.in
+GETTEXT_PACKAGE=system-config-cluster
+AC_SUBST(GETTEXT_PACKAGE)
+AM_GLIB_GNU_GETTEXT
+AC_PROG_INTLTOOL
+AC_PROG_LN_S
+
+AC_OUTPUT([
+Makefile
+src/Makefile
+po/Makefile.in
+system-config-cluster.spec
+])

@@ -1,0 +1,53 @@
+# -*- RPM-SPEC -*-
+Summary: system-config-cluster is a utility which allows you to manage cluster configuration in a graphical setting.
+Name: @PACKAGE@
+Version: @VERSION@
+Release: 1.0
+URL: http://www.redhat.com/ 
+Source0: %{name}-%{version}.tar.gz
+License: GPL
+Group: Applications/System
+BuildArch: noarch
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
+Requires: /sbin/chkconfig
+Requires: gnome-python2, pygtk2, pygtk2-libglade, gnome-python2-canvas 
+Requires: rhpl >= 0.148.2
+Requires: python >= 2.3
+
+%description
+system-config-cluster is a utility which allows you to manage cluster configuuration in a graphical setting.
+
+%prep
+%setup -q
+
+%build
+%configure
+make
+
+%install
+rm -rf %{buildroot}
+%makeinstall
+
+#Uncomment this when translations are done
+#%find_lang %name
+
+%clean
+rm -rf %{buildroot}
+
+#Replace the files line with the one commented out when translations are done
+#%files -f %{name}.lang
+%files
+
+%defattr(-,root,root)
+%doc COPYING
+#%doc docs/ReleaseNotes
+#%doc docs/html/*
+%{_sbindir}/*
+%{_bindir}/*
+%{_datadir}/system-config-cluster
+%config %{_sysconfdir}/pam.d/system-config-cluster
+%config %{_sysconfdir}/security/console.apps/system-config-cluster
+
+%changelog
+* Tue Jan 04 2005 Jim Parsons <jparsons@redhat.com> 0.9.1-1
+  - Initial copy

@@ -1,0 +1,10 @@
+This application, system-config-cluster, is a GUI for Cluster management.
+It is very much an alpha grade application in this release. Please
+file any bugs that you discover against the package at 
+bugzilla.redhat.com and select the system-config-cluster app.
+
+Notes on building system-config-cluster:
+You will need automake-1.7 and aclocal-1.7
+type './autogen.sh'
+type 'make'
+type 'make srpm'
