@@ -129,6 +129,7 @@ class FaildomController:
     if iter != None:
       obj = model.get_value(iter, OBJ_COL)
       obj.raisePriorityLevel()
+      self.model_builder.setModified()
       self.prep_faildom_panel(self.current_faildom)
       self.select_faildomnode(obj.getName())
 
@@ -138,6 +139,7 @@ class FaildomController:
     if iter != None:
       obj = model.get_value(iter, OBJ_COL)
       obj.lowerPriorityLevel()
+      self.model_builder.setModified()
       self.prep_faildom_panel(self.current_faildom)
       self.select_faildomnode(obj.getName())
 
@@ -149,6 +151,7 @@ class FaildomController:
     #call into faildom and del faildomnode object
     if self.current_faildom != None:
       self.current_faildom.removeChild(obj)
+      self.model_builder.setModified()
       self.prep_faildom_panel(self.current_faildom)
 
   def select_faildomnode(self, name):
@@ -180,19 +183,23 @@ class FaildomController:
       self.priority_label.set_sensitive(TRUE)
       self.current_faildom.addAttribute("ordered","1")
       self.column2.set_visible(TRUE)
+      self.model_builder.setModified()
     else:
       self.priority_down.set_sensitive(FALSE)
       self.priority_up.set_sensitive(FALSE)
       self.priority_label.set_sensitive(FALSE)
       self.current_faildom.addAttribute("ordered","0")
       self.column2.set_visible(FALSE)
+      self.model_builder.setModified()
     
   def on_restricted_cbox_change(self, cb):
     selected = self.restricted_cbox.get_active()
     if selected == TRUE:
       self.current_faildom.addAttribute("restricted","1")
+      self.model_builder.setModified()
     else:
       self.current_faildom.addAttribute("restricted","0")
+      self.model_builder.setModified()
 
 
   def prep_faildom_panel(self, faildom):

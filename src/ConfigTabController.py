@@ -986,6 +986,7 @@ class ConfigTabController:
         for k in returnlist.keys():
           f_obj.addAttribute(k, returnlist[k])
           ##Reset TRee
+        self.model_builder.setModified()
         args = list()
         args.append( FENCE_DEVICES_TYPE) 
         apply(self.reset_tree_model, args)
@@ -1002,6 +1003,7 @@ class ConfigTabController:
         fd_obj.addAttribute("agent", agent_type)
         ptr = self.model_builder.getFenceDevicePtr()
         ptr.addChild(fd_obj)
+        self.model_builder.setModified()
         args = list()
         args.append(FENCE_DEVICES_TYPE)
         apply(self.reset_tree_model, args)
@@ -1159,6 +1161,7 @@ class ConfigTabController:
         self.rc_panel.hide()
         for k in returnlist.keys():
           r_obj.addAttribute(k, returnlist[k])
+        self.model_builder.setModified()
         args = list()
         args.append( RESOURCES_TYPE)
         apply(self.reset_tree_model, args)
@@ -1174,6 +1177,7 @@ class ConfigTabController:
           newobj.addAttribute(x,returnlist[x])
         ptr = self.model_builder.getResourcesPtr()
         ptr.addChild(newobj)
+        self.model_builder.setModified()
         args = list()
         args.append(RESOURCES_TYPE) 
         apply(self.reset_tree_model, args)
@@ -1225,6 +1229,9 @@ class ConfigTabController:
 
   def on_svc_edit_close(self, button):
     self.svc_mgmt.hide()
+    args = list()
+    args.append( RESOURCE_GROUPS_TYPE)
+    apply(self.reset_tree_model, args)
 
   #This method identifies the service to be removed, and then
   #searches beneath the <rm> tag for it, and deletes it...simple.

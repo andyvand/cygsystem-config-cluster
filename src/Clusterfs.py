@@ -13,3 +13,5 @@ class Clusterfs(BaseResource):
     BaseResource.__init__(self)
     self.TAG_NAME = TAG_NAME
     self.resource_type = RESOURCE_TYPE
+    #only fstype supported right now is gfs
+    self.addAttribute("fstype","gfs")

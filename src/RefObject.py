@@ -14,8 +14,6 @@ class RefObject(TagObject):
     else:
       self.addAttribute("ref", self.obj_ptr.getName())
 
-    self.addAttribute("test","TRUE")
-
   def getObj(self):
     return self.obj_ptr
 

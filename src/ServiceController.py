@@ -353,7 +353,7 @@ class ServiceController:
         self.svc_rc_panel.hide()
         for k in returnlist.keys():
           r_obj.addAttribute(k, returnlist[k])
-          self.model_builder.setModified()
+        self.model_builder.setModified()
         self.prep_service_tree()
                                                                                 
     else: #New...

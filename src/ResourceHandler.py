@@ -322,6 +322,8 @@ class ResourceHandler:
     fields["mountpoint"] = mntp
     host = self.netfs_host.get_text()
     fields["host"] = host
+    export = self.netfs_export.get_text()
+    fields["export"] = export 
     if self.netfs_fstype.get_active() == TRUE:
       fstype = "nfs"
     else:

@@ -142,7 +142,7 @@ class basecluster:
     if (path == "") or (path == None) or (mod == TRUE):
       retval = MessageLibrary.warningMessage(UNSAVED)
       if retval == gtk.RESPONSE_YES:
-        return
+        return gtk.TRUE
       else:
         gtk.main_quit()
 
@@ -212,6 +212,7 @@ class basecluster:
     else:
       try:
         self.model_builder.exportModel(filepath)
+        self.glade_xml.get_widget("filename_entry").set_text(filepath)
       except IOError, e:
         MessageLibrary.errorMessage("Something ugly happened when attempting to write output file")
     popup.destroy()
@@ -220,6 +221,7 @@ class basecluster:
     #Ask what type of lockserver to employ
     self.lock_method_dlg.show()
     self.model_builder = ModelBuilder(self.lock_type)
+    self.glade_xml.get_widget("filename_entry").set_text(NEW_CONFIG)
     self.configtab.set_model(self.model_builder)
 
   def lock_ok(self, button):
