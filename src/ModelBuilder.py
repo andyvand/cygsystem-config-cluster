@@ -31,6 +31,7 @@ from FailoverDomainNode import FailoverDomainNode
 from Rm import Rm
 from CommandHandler import CommandHandler
 from CommandError import CommandError
+from clui_constants import *
 
 TAGNAMES={ 'cluster':Cluster,
            'clusternodes':ClusterNodes,
@@ -70,9 +71,10 @@ RESOURCEGROUP="resourcegroup"
 ###-----------------------------------
 
 class ModelBuilder:
-  def __init__(self, filename=None):
+  def __init__(self, lock_type, filename=None):
     self.filename = filename
     self.cluster_ptr = None
+    self.GULM_ptr = None
     self.clusternodes_ptr = None
     self.failoverdomains_ptr = None
     self.fencedevices_ptr = None
@@ -80,8 +82,12 @@ class ModelBuilder:
     self.resources_ptr = None
     self.command_handler = CommandHandler()
 
+    print "lock type is: %s" % lock_type
     if filename == None:
-      self.object_tree = self.buildModelTemplate()
+      if lock_type == DLM_TYPE:
+        self.object_tree = self.buildDLMModelTemplate()
+      else:
+        self.object_tree = self.buildGULMModelTemplate()
     else:
       try:
         self.parent = minidom.parse(self.filename)
@@ -136,16 +142,49 @@ class ModelBuilder:
 
     return (new_object)
 
-  def buildModelTemplate(self):
+  def buildDLMModelTemplate(self):
     obj_tree = Cluster()
     self.cluster_ptr = obj_tree
 
     obj_tree.addAttribute("name","alpha_cluster")
+    obj_tree.addAttribute("config_version","1")
     cns = ClusterNodes()
     obj_tree.addChild(cns)
     self.clusternodes_ptr = cns
 
     obj_tree.addChild(Cman())
+
+    fds = FenceDevices()
+    obj_tree.addChild(fds)
+    self.fencedevices_ptr = fds
+
+    rm = Rm()
+    obj_tree.addChild(rm)
+    self.resourcemanager_ptr = rm
+
+    fdoms = FailoverDomains()
+    self.failoverdomains_ptr = fdoms
+    rm.addChild(fdoms)
+
+    rcs = Resources()
+    rm.addChild(rcs)
+    self.resources_ptr = rcs
+
+    return obj_tree
+    
+  def buildGULMModelTemplate(self):
+    obj_tree = Cluster()
+    self.cluster_ptr = obj_tree
+
+    obj_tree.addAttribute("name","alpha_cluster")
+    obj_tree.addAttribute("config_version","1")
+    cns = ClusterNodes()
+    obj_tree.addChild(cns)
+    self.clusternodes_ptr = cns
+
+    gulm = Gulm()
+    self.GULM_ptr = gulm
+    obj_tree.addChild(gulm)
 
     fds = FenceDevices()
     obj_tree.addChild(fds)
@@ -253,6 +292,9 @@ class ModelBuilder:
         
   def getClusterPtr(self):
     return self.cluster_ptr
+
+  def getGULMPtr(self):
+    return self.GULM_ptr
         
    
 if __name__ == "__main__":

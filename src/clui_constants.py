@@ -1,6 +1,8 @@
 import gettext
 _ = gettext.gettext
 
+DLM_TYPE = 0
+GULM_TYPE = 1
 
 CLUSTER_TYPE=1
 CLUSTER_NODES_TYPE=2

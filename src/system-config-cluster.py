@@ -50,6 +50,7 @@ except RuntimeError, e:
                                                                                 
 from ConfigTab import ConfigTab
 from ModelBuilder import ModelBuilder
+from clui_constants import *
 
 import gnome
 import gnome.ui
@@ -63,19 +64,36 @@ ABOUT_VERSION=_("%s %s") % ('system-config-cluster',VERSION)
 class basecluster:
   def __init__(self, glade_xml, app):
 
-    if os.path.exists(CLUSTER_CONF_PATH):
-      self.model_builder = ModelBuilder(CLUSTER_CONF_PATH)
-    else:
-      self.model_builder = ModelBuilder()
-     
     self.glade_xml = glade_xml
 
+    self.configtab = ConfigTab(glade_xml, ModelBuilder(DLM_TYPE))
+
+    #This block sets up a dialog to determine which type of locking
+    #is desired for a new config file.
+    self.lock_type = DLM_TYPE  #Default Value
+    self.radio_dlm = self.glade_xml.get_widget('radio_dlm')
+    self.lock_method_dlg = self.glade_xml.get_widget('lock_method')
+    self.glade_xml.get_widget('okbutton17').connect('clicked', self.lock_ok)
+
+    if os.path.exists(CLUSTER_CONF_PATH):
+      self.model_builder = ModelBuilder(self.lock_type, CLUSTER_CONF_PATH)
+      self.configtab.set_model(self.model_builder)
+    else:
+      #new config, so run lockserver druid
+      self.lock_method_dlg.show_all()
+      retval = self.lock_method_dlg.run()
+      self.lock_method_dlg.destroy()
+      print "RETVAL is %s" % retval
+      self.model_builder = ModelBuilder(self.lock_type)
+      self.configtab.set_model(self.model_builder)
+     
     self.notebook = self.glade_xml.get_widget('notebook1')
     self.nodetree = self.glade_xml.get_widget('nodetree')
     mgmtpageidx = self.notebook.page_num(self.nodetree)
     self.mgmt_tab = self.notebook.get_nth_page(mgmtpageidx)
 
-    self.configtab = ConfigTab(glade_xml, self.model_builder)
+    #self.configtab = ConfigTab(glade_xml, self.model_builder)
+
 
     #Check to see if running app on an active cluster node.
     #If not, hide mgmt tab
@@ -163,8 +181,23 @@ class basecluster:
     popup.destroy()
 
   def new(self, *args):
-    self.model_builder = ModelBuilder()
+    #Ask what type of lockserver to employ
+    self.lock_method_dlg.show()
+    self.model_builder = ModelBuilder(self.lock_type)
     self.configtab.set_model(self.model_builder)
+
+  def lock_ok(self, button):
+    if self.radio_dlm.get_active() == TRUE:
+      self.lock_type = DLM_TYPE
+    else:
+      self.lock_type = GULM_TYPE
+
+    self.lock_method_dlg.hide()
+
+  def lock_method_delete(self, *args):
+    self.lock_type = DLM_TYPE
+    self.lock_method_dlg.hide()
+    return gtk.TRUE
     
 
 
