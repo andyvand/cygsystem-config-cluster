@@ -37,6 +37,7 @@ from FailoverDomain import FailoverDomain
 from Device import Device
 from Method import Method
 from Fence import Fence
+from Lockserver import Lockserver
 from ResourceHandler import ResourceHandler
 from PropertiesRenderer import PropertiesRenderer
 
@@ -159,6 +160,8 @@ class ConfigTabController:
     self.rc_dlg_label = self.glade_xml.get_widget('rc_dlg_label')
     self.rc_panel = self.glade_xml.get_widget('rc_panel')
     self.rc_panel.connect("delete_event",self.rc_panel_delete)
+    self.glade_xml.get_widget('okbutton14').connect('clicked', self.rc_panel_ok)
+    self.glade_xml.get_widget('cancelbutton14').connect('clicked', self.rc_panel_cancel)
 
     self.setupFencePanel()
     self.setupDialogsandButtons()
@@ -175,6 +178,7 @@ class ConfigTabController:
     self.node_props_ok.connect("clicked",self.on_node_props_ok)
     self.node_props_cancel = self.glade_xml.get_widget('cancelbutton11')
     self.node_props_cancel.connect("clicked",self.on_node_props_cancel)
+    self.gulm_lockserver = self.glade_xml.get_widget('gulm_lockserver')
 
     self.fence_panel = self.glade_xml.get_widget('fence_panel')
     self.fence_panel.connect("delete_event", self.fence_panel_delete)
@@ -657,6 +661,12 @@ class ConfigTabController:
     self.node_props_flag = NODE_NEW
     self.node_props_name.set_text("")
     self.node_props_votes.set_text("")
+    if self.model_builder.getLockType() == GULM_TYPE:
+      self.gulm_lockserver.show()
+      self.gulm_lockserver.set_active(FALSE)
+    else:
+      self.gulm_lockserver.hide()
+
     self.node_props.show()
    
   def on_node_props_ok(self, button):
@@ -692,11 +702,19 @@ class ConfigTabController:
       cn.addAttribute(NAME_ATTR,nameattr)
       cn.addAttribute(VOTES_ATTR,votesattr)
       self.model_builder.addNode(cn)
+
+      if self.model_builder.getLockType() == GULM_TYPE:
+        if self.gulm_lockserver.get_active() == TRUE:
+          ls = Lockserver()
+          ls.addAttribute(NAME_ATTR,nameattr)
+          self.model_builder.getGULMPtr().addChild(ls)
+
     else:
       selection = self.treeview.get_selection()
       model,iter = selection.get_selected()
       nd = model.get_value(iter, OBJ_COL)
       ndname = nd.getName()
+      islockserver = self.model_builder.isNodeLockserver(ndname)
       if (ndname != nameattr): #indicates user changed name string
         nds = self.model_builder.getNodes()
         for n in nds:
@@ -704,8 +722,23 @@ class ConfigTabController:
             self.errorMessage(NODE_UNIQUE_NAME)
             self.node_props_name.set_text("ndname")
             return 
+        if self.model_builder.getLockType() == GULM_TYPE:
+          if islockserver and (self.gulm_lockserver.get_active() == TRUE):
+            lsn = self.model_builder.getLockServer(ndname)
+            lsn.addAttribute(NAME_ATTR,nameattr)
         nd.addAttribute(NAME_ATTR,nameattr)
       nd.addAttribute(VOTES_ATTR,votesattr) 
+
+      if self.model_builder.getLockType() == GULM_TYPE:
+        if islockserver and (self.gulm_lockserver.get_active() == FALSE):
+          gptr = self.model_builder.getGULMPtr()
+          gptr.removeChild(self.model_builder.getLockServer(nd.getName()))
+        elif (islockserver == FALSE) and (self.gulm_lockserver.get_active() == TRUE):
+          ls = Lockserver()
+          ls.addAttribute(NAME_ATTR,nameattr)
+          gptr = self.model_builder.getGULMPtr()
+          gptr.addChild(ls)
+
     apply(self.reset_tree_model)
 
       
@@ -738,6 +771,11 @@ class ConfigTabController:
     if status == NODE_NEW:
       self.node_props_name.set_text("")
       self.node_props_votes.set_text("")
+      if self.model_builder.getLockType() == GULM_TYPE:
+        self.gulm_lockserver.show()
+        self.gulm_lockserver.set_active(FALSE)
+      else:
+        self.gulm_lockserver.hide()
     else:
       selection = self.treeview.get_selection()
       model,iter = selection.get_selected()
@@ -748,6 +786,15 @@ class ConfigTabController:
         self.node_props_votes.set_text(attrs[VOTES_ATTR]) 
       except KeyError, e:
         print " Error looking up key in Nodes attr hash"
+
+      if self.model_builder.getLockType() == GULM_TYPE:
+        self.gulm_lockserver.show()
+        if self.model_builder.isNodeLockserver(attrs[NAME_ATTR]):
+          self.gulm_lockserver.set_active(TRUE)
+        else:
+          self.gulm_lockserver.set_active(FALSE)
+      else:
+        self.gulm_lockserver.hide()
 
     self.node_props.show()
 
@@ -1024,6 +1071,44 @@ class ConfigTabController:
     rc_ptr = self.model_builder.getResourcesPtr()
     rc_ptr.removeChild(obj)
     apply(self.reset_tree_model)
+
+  def rc_panel_ok(self, button):
+    print "IN RC_PANEL_OK"
+    #first, find out if this is for edited props, or a new device
+    selection = self.treeview.get_selection()
+    model,iter = selection.get_selected()
+    type = model.get_value(iter, TYPE_COL)
+    if type == RESOURCE_TYPE:  #edit
+      r_obj = model.get_value(iter, OBJ_COL)
+      tagname = r_obj.getTagName()
+      if tagname == "ip":
+        returnlist = self.rc_handler.validate_resource(tagname, r_obj.getAttribute("address"))
+      else:
+        returnlist = self.rc_handler.validate_resource(tagname, r_obj.getName())
+      if returnlist != None:
+        self.rc_panel.hide()
+        for k in returnlist.keys():
+          r_obj.addAttribute(k, returnlist[k])
+        apply(self.reset_tree_model)
+
+    else: #New...
+      print "In El;se Clause" 
+      dex = self.rc_options.get_history()
+      tagname = self.rc_optionmenu_hash[dex]
+      newobj = self.model_builder.createObjectFromTagname(tagname)
+      returnlist = self.rc_handler.validate_resource(tagname, None)
+      print "after returnlist return"
+      if returnlist != None:
+        self.rc_panel.hide()
+        for x in returnlist.keys():
+          newobj.addAttribute(x,returnlist[x])
+          ptr = self.model_builder.getResourcesPtr()
+          ptr.addChild(newobj)
+          apply(self.reset_tree_model)
+
+  def rc_panel_cancel(self, button):
+    self.rc_panel.hide()
+    self.rc_handler.clear_rc_forms()
 
   def on_f_props_expose_event(self, widget, event):
      self.fence_prop_renderer.do_render()

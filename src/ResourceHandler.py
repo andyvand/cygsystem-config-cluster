@@ -9,6 +9,7 @@ from gtk import TRUE, FALSE
 import MessageLibrary
 import ModelBuilder
 from ValidationError import ValidationError
+from IPAddrEntry import IP
 
 INSTALLDIR="/usr/share/system-config-cluster"
 
@@ -73,31 +74,65 @@ class ResourceHandler:
     apply(self.rc_populate_hash[tagname], attrs)
 
   def pop_ip(self, attrs):
-    pass
+    addr = attrs["address"]
+    self.ip.setAddrFromString(addr)
+    monitor = attrs["monitor_link"]
+    if (monitor == None) or (monitor == FALSE) or (monitor == "no"):
+      self.monitor_link.set_active(FALSE)
+    else:
+      self.monitor_link.set_active(TRUE)
 
   def pop_script(self, attrs):
-    pass
+    self.script_name.set_text(attrs["name"])
+    self.script_filepath.set_text(attrs["file"])
 
   def pop_nfsclient(self, attrs):
-    pass
+    self.nfsc_name.set_text(attrs["name"])
+    self.nfsc_target.set_text(attrs["target"])
+    if attrs["options"] == "rw":
+      self.nfsc_rw.set_active(TRUE)
+      self.nfsc_ro.set_active(FALSE)
+    else:
+      self.nfsc_ro.set_active(TRUE)
+      self.nfsc_rw.set_active(FALSE)
 
   def pop_nfsexport(self, attrs):
-    pass
+    self.nfse_name.set_text(attrs["name"])
 
   def pop_fs(self, attrs):
-    pass
+    self.fs_name.set_text(attrs["name"])
+    self.fs_mnt.set_text(attrs["mountpoint"])
+    self.fs_device.set_text(attrs["device"])
+   
+    type = attrs["fstype"] 
+    y = (-1)
+    menu = self.fs_optionmenu.get_menu()
+    for item in menu.get_children():
+      y = y + 1
+      children = item.get_children()
+      if children:
+        if item.get_children()[0].get_text() == type:
+          break
+    self.fs_optionmenu.set_history(y) 
 
   def pop_group(self, attrs):
-    pass
+    self.group_name.set_text(attrs["name"])
+    domain = attrs["domain"]
+    y = (-1)
+    menu = self.group_optionmenu.get_menu()
+    for item in menu.get_children():
+      y = y + 1
+      children = item.get_children()
+      if children:
+        if item.get_children()[0].get_text() == domain:
+          break
+    self.group_optionmenu.set_history(y) 
 
  
   def clear_rc_forms(self):
     self.populate_group_optionmenu()
 
-    self.ip0.set_text("")
-    self.ip1.set_text("")
-    self.ip2.set_text("")
-    self.ip3.set_text("")
+    self.ip.clear()
     self.monitor_link.set_active(TRUE)
 
     self.script_name.set_text("")
@@ -128,19 +163,56 @@ class ResourceHandler:
     return returnlist 
 
   def val_ip(self, name):
-    pass
+    addr = self.ip.getAddrAsString()
+    monitor = self.monitor_link.get_active()
+    fields = {}
+    fields["address"]= addr
+    if monitor:
+      fields["monitor_link"] = "1"
+    else:
+      fields["monitor_link"] = "0"
+
+    return fields
 
   def val_script(self, name):
-    pass
+    filepath = self.script_filepath.get_text()
+    
+    fields = {}
+    
+    fields["name"] = name
+    fields["file"] = filepath
+
+    return fields
 
   def val_nfsclient(self, name):
-    pass
+    fields = {}
+    target = self.nfsc_name.get_text()
+    opt = self.nfsc_rw.get_active()
+    if opt == TRUE:
+      option = "rw"
+    else:
+      option = "ro"
+
+    fields["name"] = name
+    fields["target"] = target
+    fields["options"] = option
+
+    return fields
 
   def val_nfsexport(self, name):
-    pass
+    fields = {}
+    fields["name"] = name
 
   def val_fs(self, name):
-    pass
+    fields = {}
+    fields["name"] = name
+    mntp = self.fs_mnt.get_text()
+    fields["mountpoint"] = mntp
+    device = self.fs_device.et_text()
+    fields["device"] = device
+    fstypelabel = self.fs_optionmenu.get_children()[0]
+    fstype = fstypelabel.get_text()
+    fields["fstype"] = fstype
 
   def val_group(self, name):
     pass
@@ -148,10 +220,9 @@ class ResourceHandler:
   def process_widgets(self):
     #self.fileselector = self.rc_xml.get_widget('fileselection1')
 
-    self.ip0 = self.rc_xml.get_widget('entry1')
-    self.ip1 = self.rc_xml.get_widget('entry2')
-    self.ip2 = self.rc_xml.get_widget('entry3')
-    self.ip3 = self.rc_xml.get_widget('entry4')
+    self.ip = IP()
+    self.ip.show_all()
+    self.rc_xml.get_widget('ip_proxy').add(self.ip)
     self.monitor_link = self.rc_xml.get_widget('checkbutton1')
 
     self.script_name = self.rc_xml.get_widget('entry5')
@@ -163,6 +234,7 @@ class ResourceHandler:
     self.nfsc_name = self.rc_xml.get_widget('entry8')
     self.nfsc_target = self.rc_xml.get_widget('entry9')
     self.nfsc_rw = self.rc_xml.get_widget('radiobutton1')
+    self.nfsc_ro = self.rc_xml.get_widget('radiobutton2')
 
     self.fs_name = self.rc_xml.get_widget('entry11')
     self.fs_optionmenu = self.rc_xml.get_widget('optionmenu2')

@@ -68,11 +68,13 @@ FENCEDEVICES_PTR_STR="fencedevices"
 RESOURCEMANAGER_PTR_STR="rm"
 RESOURCES_PTR_STR="resources"
 RESOURCEGROUP="resourcegroup"
+GULM_TAG_STR="gulm"
 ###-----------------------------------
 
 class ModelBuilder:
   def __init__(self, lock_type, filename=None):
     self.filename = filename
+    self.lock_type = DLM_TYPE
     self.cluster_ptr = None
     self.GULM_ptr = None
     self.clusternodes_ptr = None
@@ -82,11 +84,12 @@ class ModelBuilder:
     self.resources_ptr = None
     self.command_handler = CommandHandler()
 
-    print "lock type is: %s" % lock_type
     if filename == None:
       if lock_type == DLM_TYPE:
+        self.lock_type = DLM_TYPE
         self.object_tree = self.buildDLMModelTemplate()
       else:
+        self.lock_type = GULM_TYPE
         self.object_tree = self.buildGULMModelTemplate()
     else:
       try:
@@ -131,6 +134,10 @@ class ModelBuilder:
         self.resourcemanager_ptr = new_object
       elif parent_node.nodeName == RESOURCES_PTR_STR:
         self.resources_ptr = new_object
+      elif parent_node.nodeName == GULM_TAG_STR:
+        self.GULM_ptr = new_object
+        self.lock_type = GULM_TYPE
+
     else:
       return None
 
@@ -295,6 +302,30 @@ class ModelBuilder:
 
   def getGULMPtr(self):
     return self.GULM_ptr
+
+  def getLockServer(self, name):
+    children = self.GULM_ptr.getChildren()
+    for child in children:
+      if child.getName() == name:
+        return child
+
+    return None
+
+  def createObjectFromTagname(self,tagname):
+    newobj = apply(TAGNAMES[tagname])
+    return newobj
+
+  def getLockType(self):
+    return self.lock_type
+
+  def isNodeLockserver(self,name):
+    gptr = self.getGULMPtr()
+    children = gptr.getChildren()
+    for child in children:
+      if child.getName() == name:
+        return TRUE
+
+    return FALSE
         
    
 if __name__ == "__main__":

@@ -33,4 +33,12 @@ def infoMessage( message):
     dlg.destroy()
     return rc
                                                                                 
+def simpleInfoMessage( message):
+    dlg = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+                            message)
+    dlg.show_all()
+    rc = dlg.run()
+    dlg.destroy()
+    return rc
+                                                                                
  

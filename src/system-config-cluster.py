@@ -60,51 +60,42 @@ gnome.app_version = VERSION
 FORMALNAME=_("system-config-cluster")
 ABOUT_VERSION=_("%s %s") % ('system-config-cluster',VERSION)
  
+NO_CONF_PRESENT=_("The cluster configuration file, '/etc/cluster/cluster.conf' does not exist on this system. This application will help you build an initial configuration file, or you can open an existing configuration file in another location by selecting 'Open' in the file drop down menu.") 
+
+NOT_CLUSTER_MEMBER=_("Because this node is not currently part of a cluster, the management tab for this application is not available.")
 ###############################################
 class basecluster:
   def __init__(self, glade_xml, app):
 
+    self.model_builder = None
     self.glade_xml = glade_xml
+    self.init_widgets()
 
-    self.configtab = ConfigTab(glade_xml, ModelBuilder(DLM_TYPE))
+    ##First check for existence of cluster.conf
+    ##then, make model builder and check for cluster
+    ##this determines what to put in message dlg
 
-    #This block sets up a dialog to determine which type of locking
-    #is desired for a new config file.
-    self.lock_type = DLM_TYPE  #Default Value
-    self.radio_dlm = self.glade_xml.get_widget('radio_dlm')
-    self.lock_method_dlg = self.glade_xml.get_widget('lock_method')
-    self.glade_xml.get_widget('okbutton17').connect('clicked', self.lock_ok)
+    conf_exists = os.path.exists(CLUSTER_CONF_PATH)
 
-    if os.path.exists(CLUSTER_CONF_PATH):
-      self.model_builder = ModelBuilder(self.lock_type, CLUSTER_CONF_PATH)
-      self.configtab.set_model(self.model_builder)
-    else:
-      #new config, so run lockserver druid
-      self.lock_method_dlg.show_all()
-      retval = self.lock_method_dlg.run()
-      self.lock_method_dlg.destroy()
-      print "RETVAL is %s" % retval
-      self.model_builder = ModelBuilder(self.lock_type)
-      self.configtab.set_model(self.model_builder)
-     
-    self.notebook = self.glade_xml.get_widget('notebook1')
-    self.nodetree = self.glade_xml.get_widget('nodetree')
-    mgmtpageidx = self.notebook.page_num(self.nodetree)
-    self.mgmt_tab = self.notebook.get_nth_page(mgmtpageidx)
+    mb = ModelBuilder(1)
+    is_cluster_member = mb.isClusterMember()
 
-    #self.configtab = ConfigTab(glade_xml, self.model_builder)
-
-
-    #Check to see if running app on an active cluster node.
-    #If not, hide mgmt tab
-    is_cluster_member = self.model_builder.isClusterMember()
-
-    if is_cluster_member == TRUE:
-      self.mgmttab = MgmtTab(glade_xml, self.model_builder)
-      pass
-    else:
+    if (conf_exists == FALSE):
       #hide mgmt tab
       self.mgmt_tab.hide()
+      self.no_conf_label.set_text(NO_CONF_PRESENT + "\n\n" + NOT_CLUSTER_MEMBER)
+      #self.no_conf_dlg.show()
+      self.no_conf_dlg.run()
+    elif ((conf_exists == TRUE) and (is_cluster_member == FALSE)):
+      self.mgmt_tab.hide()
+      MessageLibrary.simpleInfoMessage(NOT_CLUSTER_MEMBER)
+      self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
+    else:
+      self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
+      self.mgmttab = MgmtTab(glade_xml, self.model_builder)
+
+    self.configtab = ConfigTab(glade_xml, self.model_builder)
+
 
     self.glade_xml.signal_autoconnect(
       {
@@ -152,8 +143,27 @@ class basecluster:
       popup.destroy()
       return
     else:
-      self.model_builder = ModelBuilder(filepath)
+      self.model_builder = ModelBuilder(DLM_TYPE, filepath)
       self.configtab.set_model(self.model_builder)
+      popup.destroy()
+
+  def open_limited(self, *args):
+    #offer fileselection
+    popup = gtk.FileSelection()
+    popup.set_filename(CLUSTER_CONF_DIR_PATH)
+    popup.hide_fileop_buttons()
+    popup.set_select_multiple(FALSE)
+    popup.show_all()
+    rc = popup.run()
+    filepath = popup.get_filename()
+    if os.path.isdir(filepath):
+      popup.destroy()
+      return
+    if not rc == gtk.RESPONSE_OK:
+      popup.destroy()
+      return
+    else:
+      self.model_builder = ModelBuilder(DLM_TYPE, filepath)
       popup.destroy()
 
   def save(self, *args):
@@ -198,8 +208,32 @@ class basecluster:
     self.lock_type = DLM_TYPE
     self.lock_method_dlg.hide()
     return gtk.TRUE
+
+  def on_no_conf_create(self, button):
+    self.no_conf_dlg.hide()
+    self.lock_method_dlg.show_all()
+    retval = self.lock_method_dlg.run()
+    self.lock_method_dlg.destroy()
+    self.model_builder = ModelBuilder(self.lock_type)
+    
+  def on_no_conf_open(self, button):
+    self.no_conf_dlg.hide()
+    self.open_limited(None)
     
 
+  def init_widgets(self):
+    self.notebook = self.glade_xml.get_widget('notebook1')
+    self.nodetree = self.glade_xml.get_widget('nodetree')
+    mgmtpageidx = self.notebook.page_num(self.nodetree)
+    self.mgmt_tab = self.notebook.get_nth_page(mgmtpageidx)
+    self.lock_type = DLM_TYPE  #Default Value
+    self.radio_dlm = self.glade_xml.get_widget('radio_dlm')
+    self.lock_method_dlg = self.glade_xml.get_widget('lock_method')
+    self.glade_xml.get_widget('okbutton17').connect('clicked', self.lock_ok)
+    self.no_conf_dlg = self.glade_xml.get_widget('no_conf')
+    self.no_conf_label = self.glade_xml.get_widget('no_conf_label')
+    self.glade_xml.get_widget('no_conf_create').connect('clicked',self.on_no_conf_create)
+    self.glade_xml.get_widget('no_conf_open').connect('clicked',self.on_no_conf_open)
 
 
 #############################################################
@@ -217,7 +251,7 @@ def runFullGUI():
     app = glade_xml.get_widget('system-config-cluster')
     baseapp = basecluster(glade_xml, app)
     app.show()
-    app.connect("destroy", lambda w: gtk.mainquit())
+    app.connect("destroy", lambda w: gtk.main_quit())
     gtk.main()
                                                                                 
                                                                                 

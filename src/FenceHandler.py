@@ -279,41 +279,41 @@ class FenceHandler:
   #Populate form methods for Fence Devices
   def pop_apc_fd(self, attrs):
     self.apc_fd_name.set_text(attrs["name"]) 
-    self.apc_fd_ip.set_text(attrs["ipaddress"])
+    self.apc_fd_ip.set_text(attrs["ipaddr"])
     self.apc_fd_login.set_text(attrs["login"])
-    self.apc_fd_passwd.set_text(attrs["password"])
+    self.apc_fd_passwd.set_text(attrs["passwd"])
 
  
   def pop_wti_fd(self, attrs):
-    self.wti_fd_ip.set_text(attrs["ipaddress"])
+    self.wti_fd_ip.set_text(attrs["ipaddr"])
     self.wti_fd_name.set_text(attrs["name"])
-    self.wti_fd_passwd.set_text(attrs["password"])
+    self.wti_fd_passwd.set_text(attrs["passwd"])
  
   def pop_brocade_fd(self, attrs):
     self.brocade_fd_name.set_text(attrs["name"])
-    self.brocade_fd_ip.set_text(attrs["ipaddress"])
+    self.brocade_fd_ip.set_text(attrs["ipaddr"])
     self.brocade_fd_login.set_text(attrs["login"])
-    self.brocade_fd_passwd.set_text(attrs["password"])
+    self.brocade_fd_passwd.set_text(attrs["passwd"])
 
  
   def pop_ilo_fd(self, attrs):
     self.ilo_fd_name.set_text(attrs["name"])
     self.ilo_fd_login.set_text(attrs["login"])
-    self.ilo_fd_passwd.set_text(attrs["password"])
+    self.ilo_fd_passwd.set_text(attrs["passwd"])
     self.ilo_fd_hostname.set_text(attrs["hostname"])
 
  
   def pop_vixel_fd(self, attrs):
     self.vixel_fd_name.set_text(attrs["name"])
-    self.vixel_fd_ip.set_text(attrs["ipaddress"])
-    self.vixel_fd_passwd.set_text(attrs["password"])
+    self.vixel_fd_ip.set_text(attrs["ipaddr"])
+    self.vixel_fd_passwd.set_text(attrs["passwd"])
 
  
   def pop_mcdata_fd(self, attrs):
     self.mcdata_fd_name.set_text(attrs["name"])
-    self.mcdata_fd_ip.set_text(attrs["ipaddress"])
+    self.mcdata_fd_ip.set_text(attrs["ipaddr"])
     self.mcdata_fd_login.set_text(attrs["login"])
-    self.mcdata_fd_passwd.set_text(attrs["password"])
+    self.mcdata_fd_passwd.set_text(attrs["passwd"])
 
  
   def pop_manual_fd(self, attrs):
