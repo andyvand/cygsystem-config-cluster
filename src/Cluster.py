@@ -17,6 +17,7 @@ class Cluster(TagObject):
   def __init__(self):
     TagObject.__init__(self)
     self.TAG_NAME = TAG_NAME
+    self.is_cfg_version_dirty = FALSE
 
   def getProperties(self):
     stringbuf = ""
@@ -82,9 +83,32 @@ class Cluster(TagObject):
 
   def setConfigVersion(self, version):
     self.addAttribute(version)
+    self.is_cfg_version_dirty = TRUE
 
   def incrementConfigVersion(self):
     version = self.getAttribute("config_version")
     intversion = int(version)
     intversion = intversion + 1
     self.addAttribute("config_version", str(intversion))
+    self.is_cfg_version_dirty = TRUE
+
+  def generateXML(self, doc, parent=None):
+    if self.is_cfg_version_dirty == FALSE:
+      self.incrementConfigVersion()
+    else:
+      self.is_cfg_version_dirty = FALSE
+    tag = doc.createElement(self.TAG_NAME)
+    if parent != None:
+      parent.appendChild(tag)
+    else:
+      doc.appendChild(tag)
+    #tag = parent.createChildElement(TAG_NAME)
+    self.exportAttributes(tag)
+    #parent.appendChild(tag)
+    if len(self.children) > 0:
+      for child in self.children:
+        if child == None:
+          continue
+        child.generateXML(doc, tag)
+                                                                                
+

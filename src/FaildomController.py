@@ -2,6 +2,7 @@ from FailoverDomainNode import FailoverDomainNode
 from FailoverDomain import FailoverDomain
 import gobject
 from gtk import TRUE, FALSE
+from clui_constants import *
 
 import gettext
 _ = gettext.gettext
@@ -285,7 +286,9 @@ class FaildomController:
       for child in children:
         child.setPriorityLevel(1)
     self.faildom_panel.hide() 
-    apply(self.reset_tree_model)
+    args = list()
+    args.append(FAILOVER_DOMAINS_TYPE)
+    apply(self.reset_tree_model, args)
 
   def set_model(self, model_builder):
     self.model_builder = model_builder

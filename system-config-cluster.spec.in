@@ -49,6 +49,11 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Mar 14 2005 Jim Parsons <jparsons@redhat.com> 0.9.12-1
+  - Fixes for bz149897, 149123, 149124, 149674, 149676, 149761, 149269, 149670.
+    Also added in Service Creation dialog panel.
+* Thu Mar 10 2005 Jim Parsons <jparsons@redhat.com> 0.9.11-1
+  - Added IPAddrEntry to dist. Changed name of ResourceGroup to Service
 * Thu Mar 10 2005 Jim Parsons <jparsons@redhat.com> 0.9.10-1
   - Added Command Handler code
 * Wed Mar 02 2005 Jim Parsons <jparsons@redhat.com> 0.9.9-1

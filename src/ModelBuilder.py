@@ -24,7 +24,7 @@ from NFSExport import NFSExport
 from Fs import Fs
 from Resources import Resources
 from Service import Service
-from Group import Group
+from RefObject import RefObject
 from FailoverDomain import FailoverDomain
 from FailoverDomains import FailoverDomains
 from FailoverDomainNode import FailoverDomainNode
@@ -44,7 +44,6 @@ TAGNAMES={ 'cluster':Cluster,
            'gulm':Gulm,
            'lockserver':Lockserver,
            'rm':Rm,
-           'group':Group,
            'service':Service,
            'resources':Resources,
            'failoverdomain':FailoverDomain,
@@ -99,6 +98,7 @@ class ModelBuilder:
 
       self.object_tree = self.buildModel(None)
       self.resolve_fence_instance_types()
+      self.resolve_references()
 
 
   def buildModel(self, parent_node):
@@ -232,6 +232,69 @@ class ModelBuilder:
         for child in children:
           child.setAgentType(agent_hash[child.getName()])
 
+  ##This method builds RefObject containers for appropriate
+  ##entities after the object tree is built. 
+  def resolve_references(self):
+    reset_list_sentinel = TRUE
+    while(reset_list_sentinel == TRUE):
+      reset_list_sentinel = FALSE
+      resource_children = self.resourcemanager_ptr.getChildren()
+      for r_child in resource_children:
+        if r_child.getTagName() == SERVICE:
+         reset_list_sentinel = self.find_references(r_child)
+         if reset_list_sentinel == TRUE:
+           break
+                                                                                
+  def find_references(self, entity, parent=None):
+    result = FALSE
+    if (entity.getAttribute("ref") != None) and (entity.isRefObject() == FALSE):
+      result = self.transform_reference(entity, parent)
+      return result
+                                                                                
+    children = entity.getChildren()
+    if len(children) > 0:
+      for child in children:
+        result = self.find_references(child, entity)
+        if result == TRUE:
+          return result
+                                                                                
+    return result
+                                                                                
+  def transform_reference(self, entity, parent):
+    result = FALSE
+    #This entity has a "ref" attr...need to walk through resources list
+    #and look for a match
+    recs = self.resources_ptr.getChildren()
+    for rec in recs:
+      if rec.getTagName() == entity.getTagName():
+        if entity.getTagName() == "ip":
+          if entity.getAttribute("ref") == rec.getAttribute("address"):
+            rf = RefObject(rec)
+            kids = entity.getChildren()
+            for kid in kids:
+              rf.addChild(kid)
+            result = TRUE
+            break
+        else:
+          if entity.getAttribute("ref") == rec.getName():
+            rf = RefObject(rec)
+            kids = entity.getChildren()
+            for kid in kids:
+              rf.addChild(kid)
+            result = TRUE
+            break
+                                                                                
+    if result == FALSE:
+      return result
+                                                                                
+    if parent == None:  #Must be a service
+      self.resourcemanager_ptr.addChild(rf)
+      self.resourcemanager_ptr.removeChild(entity)
+      return TRUE
+    else:
+      parent.addChild(rf)
+      parent.removeChild(entity)
+      return TRUE
 
   def testexportModel(self, *args):
     self.exportModel("/tmp/cluster.conf")
@@ -296,7 +359,10 @@ class ModelBuilder:
 
   def getResourcesPtr(self):
     return self.resources_ptr
-        
+  
+  def getResourceManagerPtr(self):
+    return self.resourcemanager_ptr
+      
   def getClusterNodesPtr(self):
     return self.clusternodes_ptr
         

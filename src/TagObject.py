@@ -1,4 +1,5 @@
 import string
+from gtk import TRUE, FALSE
 
 TAG_NAME = "document"
 
@@ -64,3 +65,6 @@ class TagObject:
 
   def getProperties(self):
     return ""
+
+  def isRefObject(self):
+    return FALSE

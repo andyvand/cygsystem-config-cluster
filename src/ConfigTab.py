@@ -41,6 +41,9 @@ RESOURCES=_("Resources")
 RESOURCE=_("Resource")
 IPADDRESS=_("IP Address")
 
+ONE_SERVICE=_("One Service is configured for this cluster")
+NUM_SERVICES=_("%d Services are configured for this cluster")
+
 FENCE_CONFIGURATION=_("Fence Configuration for this Cluster Node")
 
 
@@ -58,6 +61,14 @@ class ConfigTab:
                                     gobject.TYPE_PYOBJECT)
     self.treeview.set_model(self.treemodel)
     self.treeview.set_headers_visible(FALSE)
+
+    #placeholder iters for easy selection
+    self.cluster_iter = None
+    self.clusternodes_iter = None
+    self.failoverdomains_iter = None
+    self.fencedevices_iter = None
+    self.resources_iter = None
+    self.services_iter = None
 
     self.controller = ConfigTabController(self.model_builder, 
                                           self.treeview,
@@ -137,13 +148,19 @@ class ConfigTab:
       self.clear_all_buttonpanels()
       self.faildom_p.show()
     elif type == RESOURCE_GROUPS_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
+      services_list = self.model_builder.getServices()
+      num_services = len(services_list)
+      if num_services == 1:
+        props = ONE_SERVICE
+      else:
+        props = NUM_SERVICES % num_services
+      self.prop_renderer.render_to_layout_area(props, "",type) 
       self.clear_all_buttonpanels()
-      self.resourcegroups_p.show()
+      self.services_p.show()
     elif type == RESOURCE_GROUP_TYPE:
       self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
       self.clear_all_buttonpanels()
-      self.resourcegroup_p.show()
+      self.service_p.show()
     elif type == RESOURCES_TYPE:
       self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
       self.clear_all_buttonpanels()
@@ -168,8 +185,8 @@ class ConfigTab:
     self.fencedevice_p.hide()
     self.faildoms_p.hide()
     self.faildom_p.hide()
-    self.resourcegroups_p.hide()
-    self.resourcegroup_p.hide()
+    self.services_p.hide()
+    self.service_p.hide()
     self.resources_p.hide()
     self.resource_p.hide()
 
@@ -182,17 +199,36 @@ class ConfigTab:
     self.fencedevice_p = self.glade_xml.get_widget('fencedevice_p')
     self.faildoms_p = self.glade_xml.get_widget('faildoms_p')
     self.faildom_p = self.glade_xml.get_widget('faildom_p')
-    self.resourcegroups_p = self.glade_xml.get_widget('resourcegroups_p')
-    self.resourcegroup_p = self.glade_xml.get_widget('resourcegroup_p')
+    self.services_p = self.glade_xml.get_widget('services_p')
+    self.service_p = self.glade_xml.get_widget('service_p')
     self.resources_p = self.glade_xml.get_widget('resources_p')
     self.resource_p = self.glade_xml.get_widget('resource_p')
 
   def reset_tree_model(self, *in_args):
+    selection = self.treeview.get_selection()
     args = list()
     for a in in_args:
       args.append(a)
 
+    type = args[0]
+
     self.prepare_tree()
+    self.prop_renderer.clear_layout_area()
+
+    if type == CLUSTER_TYPE:
+      selection.select_iter(self.cluster_iter)
+    elif type == CLUSTER_NODES_TYPE:
+      selection.select_iter(self.clusternodes_iter)
+    elif type == FENCE_DEVICES_TYPE:
+      selection.select_iter(self.fencedevices_iter)
+    elif type == FAILOVER_DOMAINS_TYPE:
+      selection.select_iter(self.failoverdomains_iter)
+    elif type == RESOURCE_GROUPS_TYPE:
+      selection.select_iter(self.services_iter)
+    elif type == RESOURCES_TYPE:
+      selection.select_iter(self.resources_iter)
+    else: #default, choose root
+      selection.select_iter(self.cluster_iter)
 
 
   def prepare_tree(self):
@@ -204,6 +240,7 @@ class ConfigTab:
 
     ###CLUSTER
     cluster_iter = treemodel.append(None)
+    self.cluster_iter = cluster_iter
     cluster_str = "<span size=\"11000\"><b>" + CLUSTER + "</b></span>"
     cluster_ptr = self.model_builder.getClusterPtr()
     treemodel.set(cluster_iter, NAME_COL, cluster_str,
@@ -212,6 +249,7 @@ class ConfigTab:
 
     ###CLUSTER_NODES
     cn_iter = treemodel.append(cluster_iter)
+    self.clusternodes_iter = cn_iter
     cn_str = "<span size=\"10000\" foreground=\"" + CLUSTERNODES_COLOR + "\"><b>" + CLUSTERNODES + "</b></span>"
     cn_ptr = self.model_builder.getClusterNodesPtr()
     treemodel.set(cn_iter, NAME_COL, cn_str,
@@ -237,6 +275,7 @@ class ConfigTab:
     fencedevs = self.model_builder.getFenceDevices()
     fencedev_ptr = self.model_builder.getFenceDevicePtr()
     fds_iter = treemodel.append(cluster_iter)
+    self.fencedevices_iter = fds_iter
     fds_str = "<span size=\"10000\" foreground=\"" + FENCEDEVICES_COLOR + "\"><b>" + FENCEDEVICES + "</b></span>"
     treemodel.set(fds_iter, NAME_COL, fds_str,
                             TYPE_COL, FENCE_DEVICES_TYPE,
@@ -262,6 +301,7 @@ class ConfigTab:
 
     ###FAILOVER DOMAINS
     fdoms_iter = treemodel.append(mr_iter)
+    self.failoverdomains_iter = fdoms_iter
     fdoms_str = "<span size=\"10000\" foreground=\"" + FAILOVERDOMAINS_COLOR + "\"><b>" + FAILOVER_DOMAINS + "</b></span>"
     fdoms_ptr = self.model_builder.getFailoverDomainPtr()
     treemodel.set(fdoms_iter, NAME_COL, fdoms_str,
@@ -277,6 +317,7 @@ class ConfigTab:
 
     ###RESOURCES
     resources_iter = treemodel.append(mr_iter)
+    self.resources_iter = resources_iter
     rc_ptr = self.model_builder.getResourcesPtr()
     resources_str = "<span size=\"10000\" foreground=\"" + RESOURCES_COLOR + "\"><b>" + RESOURCES + "</b></span>"
     treemodel.set(resources_iter, NAME_COL, resources_str,
@@ -295,6 +336,7 @@ class ConfigTab:
 
     ###RESOURCE GROUPS
     rgrps_iter = treemodel.append(mr_iter)
+    self.services_iter = rgrps_iter
     rgrps_str = "<span size=\"10000\" foreground=\"" + RESOURCEGROUPS_COLOR + "\"><b>" + SERVICES + "</b></span>"
     treemodel.set(rgrps_iter, NAME_COL, rgrps_str,
                               TYPE_COL, RESOURCE_GROUPS_TYPE)

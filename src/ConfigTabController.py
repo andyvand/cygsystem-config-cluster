@@ -33,6 +33,8 @@ from clui_constants import *
 from FenceHandler import FenceHandler
 from FenceDevice import FenceDevice
 from FaildomController import FaildomController
+from ServiceController import ServiceController
+from Service import Service
 from FailoverDomain import FailoverDomain
 from Device import Device
 from Method import Method
@@ -98,6 +100,8 @@ CONFIRM_FAILDOM_REMOVE=_("Are you certain that you wish to remove Failover Domai
 
 CONFIRM_RC_REMOVE=_("Are you certain that you wish to remove resource %s ?")
 
+CONFIRM_SVC_REMOVE=_("Are you certain that you wish to remove service %s ?")
+
 CONFIRM_LEVEL_REMOVE=_("Are you certain that you wish to remove this fence level and all fences contained within it??")
 
 CONFIRM_LEVEL_REMOVE_EMPTY=_("Are you certain that you wish to remove this fence level?")
@@ -124,6 +128,7 @@ class ConfigTabController:
     self.reset_tree_model = reset_tree_model
 
     self.faildom_controller = FaildomController(self.glade_xml,self.model_builder,reset_tree_model)
+    self.service_controller = ServiceController(self.glade_xml,self.model_builder,reset_tree_model)
 
     if not os.path.exists(PIXMAP_DIR):
       PIXMAPS = INSTALLDIR + PIXMAP_DIR
@@ -224,6 +229,18 @@ class ConfigTabController:
     self.add_faildom_dlg.connect("delete_event", self.add_faildom_dlg_delete)
     self.glade_xml.get_widget('on_faildom_add_cancel').connect('clicked',self.on_faildom_add_cancel)
     self.glade_xml.get_widget('on_faildom_add_ok').connect('clicked',self.on_faildom_add_ok)
+
+    #Services and Service button panels
+    self.svc_add_dlg = self.glade_xml.get_widget('svc_add_dlg')
+    self.glade_xml.get_widget('okbutton18').connect("clicked",self.on_svc_add_ok)
+    self.glade_xml.get_widget('cancelbutton18').connect("clicked",self.on_svc_add_cancel)
+    self.svc_name = self.glade_xml.get_widget('svc_name')
+    self.svc_mgmt = self.glade_xml.get_widget('service_manager')
+    self.glade_xml.get_widget('button21').connect('clicked',self.on_svc_edit_close)
+    self.svc_treeview = self.glade_xml.get_widget('svc_treeview')
+    self.glade_xml.get_widget('service_add_b').connect('clicked',self.on_svc_add)
+    self.glade_xml.get_widget('service_edit_b').connect('clicked',self.on_svc_edit)
+    self.glade_xml.get_widget('service_delete_b').connect('clicked',self.on_svc_del)
 
 
 
@@ -337,7 +354,9 @@ class ConfigTabController:
 
     cptr.addAttribute("name",name)
     cptr.addAttribute("config_version",version)
-    apply(self.reset_tree_model)
+    args = list()
+    args.append(CLUSTER_TYPE)
+    apply(self.reset_tree_model, args)
     self.cluster_props_dlg.hide()
 
 
@@ -661,6 +680,7 @@ class ConfigTabController:
     self.node_props_flag = NODE_NEW
     self.node_props_name.set_text("")
     self.node_props_name.grab_focus()
+    self.node_props_name.set_activates_default(gtk.TRUE)
     self.node_props_votes.set_text("")
     if self.model_builder.getLockType() == GULM_TYPE:
       self.gulm_lockserver.show()
@@ -668,6 +688,7 @@ class ConfigTabController:
     else:
       self.gulm_lockserver.hide()
 
+    self.node_props.set_default_response(gtk.RESPONSE_OK)
     self.node_props.show()
    
   def on_node_props_ok(self, button):
@@ -682,6 +703,12 @@ class ConfigTabController:
       self.node_props_votes.set_text("")
       return
 
+    intvote = int(votesattr)
+    if (intvote < 0) or (intvote > 255):
+      self.errorMessage(VOTES_ONLY_DIGITS)
+      self.node_props_votes.set_text("")
+      return
+
     #New Node: get selection...get list nodes...check for unique name
     #existing node: check for diff between current name - if so, get list 
     #and check for unique
@@ -690,6 +717,7 @@ class ConfigTabController:
       self.errorMessage(NODE_NAME_REQUIRED)
       self.node_props_name.set_text("")
       return
+
 
     if self.node_props_flag == NODE_NEW:
       nds = self.model_builder.getNodes()
@@ -739,8 +767,9 @@ class ConfigTabController:
           ls.addAttribute(NAME_ATTR,nameattr)
           gptr = self.model_builder.getGULMPtr()
           gptr.addChild(ls)
-
-    apply(self.reset_tree_model)
+    args = list()
+    args.append(CLUSTER_NODES_TYPE)
+    apply(self.reset_tree_model, args)
 
       
     self.node_props_flag = NODE_NEW
@@ -752,7 +781,9 @@ class ConfigTabController:
 
   def on_clusternode_edit_b(self, button):
     self.node_props_flag = NODE_EXISTING
+    self.node_props_votes.set_activates_default(gtk.TRUE)
     self.prep_clusternode_edit_dialog(NODE_EXISTING)
+    self.node_props.set_default_response(gtk.RESPONSE_OK)
     self.node_props.show()
 
   def on_clusternode_delete_b(self, button):
@@ -766,7 +797,9 @@ class ConfigTabController:
 
     self.model_builder.deleteNode(nd)
     self.node_props_flag = NODE_NEW
-    apply(self.reset_tree_model)
+    args = list()
+    args.append(CLUSTER_NODES_TYPE)
+    apply(self.reset_tree_model, args)
 
   def prep_clusternode_edit_dialog(self, status):
     if status == NODE_NEW:
@@ -859,7 +892,9 @@ class ConfigTabController:
         return
       fd_ptr = self.model_builder.getFenceDevicePtr()
       fd_ptr.removeChild(obj)
-      apply(self.reset_tree_model)
+      args = list()
+      args.append(FENCE_DEVICES_TYPE)
+      apply(self.reset_tree_model, args)
       return
     else:
       treemodel = self.fd_delete_treeview.get_model()
@@ -891,7 +926,9 @@ class ConfigTabController:
     model = self.fd_delete_treeview.get_model()
     model.foreach(self.remove_fence_from_node, None)
     self.fd_delete.hide()
-    apply(self.reset_tree_model)
+    args = list()
+    args.append(FENCE_DEVICES_TYPE)
+    apply(self.reset_tree_model, args)
 
   def remove_fence_from_node(self, model,path,iter, *args):
     node = model.get_value(iter, 1)
@@ -932,7 +969,9 @@ class ConfigTabController:
         for k in returnlist.keys():
           f_obj.addAttribute(k, returnlist[k])
           ##Reset TRee
-        apply(self.reset_tree_model)
+        args = list()
+        args.append( FENCE_DEVICES_TYPE) 
+        apply(self.reset_tree_model, args)
 
     else: #new device
       fd_obj = FenceDevice()
@@ -946,7 +985,9 @@ class ConfigTabController:
         fd_obj.addAttribute("agent", agent_type)
         ptr = self.model_builder.getFenceDevicePtr()
         ptr.addChild(fd_obj)
-        apply(self.reset_tree_model)
+        args = list()
+        args.append(FENCE_DEVICES_TYPE)
+        apply(self.reset_tree_model, args)
 
   def prep_fd_options(self):
    
@@ -1013,7 +1054,9 @@ class ConfigTabController:
     ###XXX-FIX should be wrapped in exception handler
     faildoms_ptr = self.model_builder.getFailoverDomainPtr()
     faildoms_ptr.removeChild(obj)
-    apply(self.reset_tree_model)
+    args = list()
+    args.append(FAILOVER_DOMAINS_TYPE)
+    apply(self.reset_tree_model, args)
 
   def rc_optionmenu_change(self, widget):
     rc_idx = self.rc_options.get_history()
@@ -1074,7 +1117,9 @@ class ConfigTabController:
       return
     rc_ptr = self.model_builder.getResourcesPtr()
     rc_ptr.removeChild(obj)
-    apply(self.reset_tree_model)
+    args = list()
+    args.append(RESOURCES_TYPE)
+    apply(self.reset_tree_model, args)
 
   def rc_panel_ok(self, button):
     #first, find out if this is for edited props, or a new device
@@ -1092,7 +1137,9 @@ class ConfigTabController:
         self.rc_panel.hide()
         for k in returnlist.keys():
           r_obj.addAttribute(k, returnlist[k])
-        apply(self.reset_tree_model)
+        args = list()
+        args.append( RESOURCES_TYPE)
+        apply(self.reset_tree_model, args)
 
     else: #New...
       dex = self.rc_options.get_history()
@@ -1105,11 +1152,74 @@ class ConfigTabController:
           newobj.addAttribute(x,returnlist[x])
           ptr = self.model_builder.getResourcesPtr()
           ptr.addChild(newobj)
-          apply(self.reset_tree_model)
+          args = list()
+          args.append(RESOURCES_TYPE) 
+          apply(self.reset_tree_model, args)
 
   def rc_panel_cancel(self, button):
     self.rc_panel.hide()
     self.rc_handler.clear_rc_forms()
+
+  def on_svc_add(self, button):
+    #launch dialog for service name field
+    self.svc_name.set_text("")
+    self.svc_add_dlg.show()
+
+  def on_svc_add_ok(self, button):
+    svcs = self.model_builder.getServices()
+    svc_name = self.svc_name.get_text().strip()
+    if svc_name == "":
+      self.errorMessage(SERVICE_NAME_REQUIRED)
+      return
+    for svc in svcs:
+      if svc.getName().strip() == svc_name:
+        self.svc_name.select_region(0, (-1))
+        self.errorMessage(UNIQUE_SERVICE_NAME % svc_name)
+        return
+
+    #Made it past unique name check -- ready to add service
+    service = Service()
+    service.addAttribute("name",svc_name)
+    rm_ptr = self.model_builder.getResourceManagerPtr()
+    rm_ptr.addChild(service)
+    self.svc_add_dlg.hide()
+    self.svc_name.set_text("")
+    self.service_controller.prep_service_panel(service)
+    self.svc_mgmt.show()
+
+  def on_svc_add_cancel(self, button):
+    self.svc_add_dlg.hide()
+
+  def on_svc_edit(self, button):
+    #1) find out which service to edit
+    selection = self.treeview.get_selection()
+    model,iter = selection.get_selected()
+    obj = model.get_value(iter, OBJ_COL)
+    #2) populate interface
+    self.service_controller.prep_service_panel(obj)
+    #3) show dialog
+    self.svc_mgmt.show()
+
+  def on_svc_edit_close(self, button):
+    self.svc_mgmt.hide()
+
+  #This method identifies the service to be removed, and then
+  #searches beneath the <rm> tag for it, and deletes it...simple.
+  def on_svc_del(self, button):
+    selection = self.treeview.get_selection()
+    model,iter = selection.get_selected()
+    obj = model.get_value(iter, OBJ_COL)
+    retval = self.warningMessage(CONFIRM_SVC_REMOVE % obj.getName())
+    if (retval == gtk.RESPONSE_NO):
+      return
+    rm_ptr = self.model_builder.getResourceManagerPtr()
+    rm_ptr.removeChild(obj)
+    args = list()
+    args.append(RESOURCE_GROUPS_TYPE)
+    apply(self.reset_tree_model, args)
+
+
+
 
   def on_f_props_expose_event(self, widget, event):
      self.fence_prop_renderer.do_render()
@@ -1118,6 +1228,7 @@ class ConfigTabController:
     self.model_builder = model_builder
     self.treeview = treeview
     self.faildom_controller.set_model(self.model_builder)
+    self.service_controller.set_model(self.model_builder)
     self.fence_handler.set_model(self.model_builder)
     self.rc_handler.set_model(self.model_builder)
 

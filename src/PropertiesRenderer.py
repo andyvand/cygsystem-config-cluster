@@ -57,8 +57,8 @@ FAILOVER_DOMAIN_STR=_("Failover Domain:")
 MANAGED_RESOURCES_STR=_("Managed Resources")
 RESOURCES_STR=_("Resources")
 RESOURCE_STR=_("Resource:")
-RESOURCE_GROUPS_STR=_("Resource Groups")
-RESOURCE_GROUP_STR=_("Resource Group %s")
+SERVICES_STR=_("Services")
+SERVICE_STR=_("Service: ")
                                                                                 
 ##############################################################
 
@@ -136,6 +136,12 @@ class PropertiesRenderer:
 
     elif type == FAILOVER_DOMAIN_TYPE:
       layout_string = "<span size=\"12000\" foreground=\"" + FAILOVERDOMAIN_COLOR + "\">" + FAILOVER_DOMAIN_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
+
+    elif type == RESOURCE_GROUPS_TYPE:
+      layout_string = "<span size=\"12000\" foreground=\"" + RESOURCEGROUPS_COLOR + "\">" + SERVICES_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
+
+    elif type == RESOURCE_GROUP_TYPE:
+      layout_string = "<span size=\"12000\" foreground=\"" + RESOURCEGROUP_COLOR + "\">" + SERVICE_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
 
     elif type == F_LEVEL_TYPE:
       layout_string = "<span size=\"12000\" foreground=\"" + FENCEDEVICES_COLOR + "\">" + FENCE_LEVEL_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"

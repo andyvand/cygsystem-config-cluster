@@ -19,7 +19,6 @@ FenceDevices.py \
 FenceHandler.py \
 Fence.py \
 Fs.py \
-Group.py \
 Ip.py \
 IPAddrEntry.py	\
 MessageLibrary.py \
@@ -29,6 +28,8 @@ NFSClient.py \
 NFSExport.py \
 PropertiesRenderer.py \
 Service.py	\
+ServiceController.py	\
+RefObject.py	\
 ResourceHandler.py \
 Resources.py \
 Rm.py \
@@ -77,7 +78,6 @@ install-exec-local:
 	install -m 0640 $(srcdir)/FenceHandler.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fence.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fs.py  $(DESTDIR)$(pkgdatadir)/
-	install -m 0640 $(srcdir)/Group.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Ip.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/IPAddrEntry.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/PropertiesRenderer.py  $(DESTDIR)$(pkgdatadir)/
@@ -87,6 +87,8 @@ install-exec-local:
 	install -m 0640 $(srcdir)/NFSClient.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NFSExport.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Service.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/ServiceController.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/RefObject.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ResourceHandler.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Resources.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Rm.py  $(DESTDIR)$(pkgdatadir)/

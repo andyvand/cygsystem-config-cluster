@@ -160,9 +160,11 @@ class basecluster:
     filepath = popup.get_filename()
     if os.path.isdir(filepath):
       popup.destroy()
+      self.model_builder = ModelBuilder(DLM_TYPE, None)
       return
     if not rc == gtk.RESPONSE_OK:
       popup.destroy()
+      self.model_builder = ModelBuilder(DLM_TYPE, None)
       return
     else:
       self.model_builder = ModelBuilder(DLM_TYPE, filepath)
