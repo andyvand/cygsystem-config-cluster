@@ -3,6 +3,7 @@ import string
 from gtk import TRUE, FALSE
 from CommandError import CommandError
 from NodeData import NodeData
+from ServiceData import ServiceData
 import rhpl.executil
 
 import gettext
@@ -155,6 +156,72 @@ class CommandHandler:
       words = line.split()
       nd = NodeData(words[1],words[3],words[4])
       dataobjs.append(nd)
+
+    return dataobjs
+
+  def getServicesInfo(self):
+    dataobjs = list()
+    args = list()
+    args.append("/sbin/clustat")
+    args.append("-x")
+    cmdstr = ' '.join(args)
+    try:
+      out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/clustat",args)
+    except RuntimeError, e:
+      return FALSE
+
+    if res != 0:
+      raise CommandError("FATAL", NODES_INFO_ERROR % err)
+
+    servicelist = list()
+    lines = out.splitlines()
+   
+    y = 0 
+    #First, run through lines and look for "<groups>" tag
+    for line in lines:
+      if line.find("<groups>") != (-1):
+        break
+      y = y + 1
+
+    #y now holds index into line list for <groups> tag
+    #We need to add one more to y before beginning to start with serices
+    y = y + 1
+
+    while lines[y].find("</groups>") != (-1):
+      servicelist.append(lines[y])
+      y = y + 1
+
+    #servicelist now holds all services
+
+    for service in servicelist:
+      words = service.split()
+
+      namestr = words[1]
+      start = namestr.find("\"")
+      end = namestr.find("\"")
+      name = namestr[start+1:end]
+      
+      statestr = words[3]
+      start = statestr.find("\"")
+      end = namestr.find("\"")
+      state = statestr[start+1:end]
+      
+      ownstr = words[4]
+      start = ownstr.find("\"")
+      end = ownstr.find("\"")
+      owner = ownstr[start+1:end]
+      
+      lownstr = words[5]
+      start = lownstr.find("\"")
+      end = lownstr.find("\"")
+      lastowner = lownstr[start+1:end]
+      
+      resstr = words[6]
+      start = resstr.find("\"")
+      end = resstr.find("\"")
+      restarts = resstr[start+1:end]
+      
+      dataobjs.append(ServiceData(name,state,owner.lastowner,restarts))
 
     return dataobjs
 

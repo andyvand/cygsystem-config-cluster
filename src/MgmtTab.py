@@ -32,13 +32,21 @@ ON_MEMBER=_("On Member: %s")
 
 STATUS=_("Status: %s")
 
-T_NAME=_("Name")
-T_VOTES=_("Votes")
-T_STATUS=_("Status")
+S_NAME=_("Service Name")
+S_STATE=_("State")
+S_OWNER=_("Owner")
+S_LASTOWNER=_("Previous Owner")
+S_RESTARTS=_("Restarts")
 
 NAME_COL = 0
 VOTES_COL = 1
 STATUS_COL = 2
+
+S_NAME_COL = 0
+S_STATE_COL = 1
+S_OWNER_COL = 2
+S_LASTOWNER_COL = 3
+S_RESTARTS_COL = 4
 
 ############################################
 class MgmtTab:
@@ -48,7 +56,7 @@ class MgmtTab:
     self.glade_xml = glade_xml
     self.command_handler = CommandHandler()
                                                                                 
-    #set up tree structure
+    #set up node tree structure
     self.nodetree = self.glade_xml.get_widget('nodetree')
     self.treemodel = gtk.TreeStore (gobject.TYPE_STRING,
                                     gobject.TYPE_STRING,
@@ -69,6 +77,37 @@ class MgmtTab:
 
 
     self.prep_tree()
+
+    #set up services tree structure
+    self.servicetree = self.glade_xml.get_widget('servicetree')
+    self.streemodel = gtk.TreeStore (gobject.TYPE_STRING,
+                                    gobject.TYPE_STRING,
+                                    gobject.TYPE_STRING,
+                                    gobject.TYPE_STRING)
+    self.servicetree.set_model(self.streemodel)
+
+    srenderer = gtk.CellRendererText()
+    scolumn1 = gtk.TreeViewColumn(S_NAME,srenderer,text=0)
+    self.servicetree.append_column(scolumn1)
+
+    srenderer2 = gtk.CellRendererText()
+    scolumn2 = gtk.TreeViewColumn(S_STATE,srenderer2,text=1)
+    self.servicetree.append_column(scolumn2)
+
+    srenderer3 = gtk.CellRendererText()
+    scolumn3 = gtk.TreeViewColumn(S_OWNER,srenderer3,text=2)
+    self.servicetree.append_column(scolumn3)
+
+    srenderer4 = gtk.CellRendererText()
+    scolumn4 = gtk.TreeViewColumn(S_LASTOWNER,srenderer4,text=3)
+    self.servicetree.append_column(scolumn4)
+
+    srenderer5 = gtk.CellRendererText()
+    scolumn5 = gtk.TreeViewColumn(S_RESTARTS,srenderer5,text=4)
+    self.servicetree.append_column(scolumn5)
+
+    self.prep_service_tree()
+
 
     self.clustername = self.glade_xml.get_widget('entry25')
     self.clustername.set_text(self.command_handler.getClusterName())
@@ -104,3 +143,22 @@ class MgmtTab:
       treemodel.set(iter, NAME_COL, name,
                           VOTES_COL, votes,
                           STATUS_COL, status) 
+
+  def prep_service_tree(self):
+    treemodel = self.servicetree.get_model()
+    treemodel.clear()
+
+    try:
+      services = self.command_handler.getServicesInfo()
+    except CommandError, e:
+      retval = MessageLibrary.errorMessage(e.getMessage())
+      return
+
+    for service in services:
+      iter = treemodel.append(None)
+      name, state, owner, lastowner, restarts = service.getServiceProps()
+      treemodel.set(iter, S_NAME_COL, name,
+                          S_STATE_COL, state,
+                          S_OWNER_COL, owner,
+                          S_LASTOWNER_COL, lastowner,
+                          S_RESTARTS_COL, restarts) 

@@ -49,8 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
-* Mon Mar 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.20-1
-  - Fix for bz149754, 149436, and 149438 
+* Tue Mar 29 2005 Jim Parsons <jparsons@redhat.com> 0.9.21-1
+  - Fix for bz149272 and services tree view complete 
 * Mon Mar 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.19-1
   - Fix for bz149672 and propagate error
 * Mon Mar 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.18-1
