@@ -23,7 +23,7 @@ from NFSClient import NFSClient
 from NFSExport import NFSExport
 from Fs import Fs
 from Resources import Resources
-from ResourceGroup import ResourceGroup
+from Service import Service
 from Group import Group
 from FailoverDomain import FailoverDomain
 from FailoverDomains import FailoverDomains
@@ -45,7 +45,7 @@ TAGNAMES={ 'cluster':Cluster,
            'lockserver':Lockserver,
            'rm':Rm,
            'group':Group,
-           'resourcegroup':ResourceGroup,
+           'service':Service,
            'resources':Resources,
            'failoverdomain':FailoverDomain,
            'failoverdomains':FailoverDomains,
@@ -67,7 +67,7 @@ FAILDOMS_PTR_STR="failoverdomains"
 FENCEDEVICES_PTR_STR="fencedevices"
 RESOURCEMANAGER_PTR_STR="rm"
 RESOURCES_PTR_STR="resources"
-RESOURCEGROUP="resourcegroup"
+SERVICE="service"
 GULM_TAG_STR="gulm"
 ###-----------------------------------
 
@@ -282,11 +282,11 @@ class ModelBuilder:
   def getFailoverDomainPtr(self):
     return self.failoverdomains_ptr
         
-  def getResourceGroups(self):
+  def getServices(self):
     rg_list = list()
     kids = self.resourcemanager_ptr.getChildren()
     for kid in kids:
-      if kid.getTagName() == RESOURCEGROUP:
+      if kid.getTagName() == SERVICE:
         rg_list.append(kid)
 
     return rg_list

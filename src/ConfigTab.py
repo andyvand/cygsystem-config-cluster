@@ -35,8 +35,8 @@ FENCEDEVICE=_("Fence Device")
 MANAGED_RESOURCES=_("Managed Resources")
 FAILOVER_DOMAINS=_("Failover Domains")
 FAILOVER_DOMAIN=_("Failover Domain")
-RESOURCE_GROUPS=_("Resource Groups")
-RESOURCE_GROUP=_("Resource Group")
+SERVICES=_("Services")
+SERVICE=_("Service")
 RESOURCES=_("Resources")
 RESOURCE=_("Resource")
 IPADDRESS=_("IP Address")
@@ -251,7 +251,7 @@ class ConfigTab:
     ###MANAGED RESOURCES
     faildoms = self.model_builder.getFailoverDomains()
 
-    rgroups = self.model_builder.getResourceGroups()
+    rgroups = self.model_builder.getServices()
 
     resources = self.model_builder.getResources()
 
@@ -295,13 +295,13 @@ class ConfigTab:
 
     ###RESOURCE GROUPS
     rgrps_iter = treemodel.append(mr_iter)
-    rgrps_str = "<span size=\"10000\" foreground=\"" + RESOURCEGROUPS_COLOR + "\"><b>" + RESOURCE_GROUPS + "</b></span>"
+    rgrps_str = "<span size=\"10000\" foreground=\"" + RESOURCEGROUPS_COLOR + "\"><b>" + SERVICES + "</b></span>"
     treemodel.set(rgrps_iter, NAME_COL, rgrps_str,
                               TYPE_COL, RESOURCE_GROUPS_TYPE)
 
     for rgroup in rgroups:
       try:
-        rgroup_str = "<span>" + RESOURCE_GROUP + " " + rgroup.getName() + "</span>"
+        rgroup_str = "<span>" + SERVICE + " " + rgroup.getName() + "</span>"
       except KeyError, e:
         continue
       rgroup_iter = treemodel.append(rgrps_iter)

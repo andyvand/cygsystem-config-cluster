@@ -1202,7 +1202,7 @@
 				      <child>
 					<widget class="GtkLabel" id="label13">
 					  <property name="visible">True</property>
-					  <property name="label" translatable="yes">Create a Resource Group</property>
+					  <property name="label" translatable="yes">Create a Service</property>
 					  <property name="use_underline">True</property>
 					  <property name="use_markup">False</property>
 					  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1289,7 +1289,7 @@
 				      <child>
 					<widget class="GtkLabel" id="label14">
 					  <property name="visible">True</property>
-					  <property name="label" translatable="yes">Edit Resource Group Properties</property>
+					  <property name="label" translatable="yes">Edit Service Properties</property>
 					  <property name="use_underline">True</property>
 					  <property name="use_markup">False</property>
 					  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1363,7 +1363,7 @@
 				      <child>
 					<widget class="GtkLabel" id="label15">
 					  <property name="visible">True</property>
-					  <property name="label" translatable="yes">Delete Resource Group</property>
+					  <property name="label" translatable="yes">Delete Service</property>
 					  <property name="use_underline">True</property>
 					  <property name="use_markup">False</property>
 					  <property name="justify">GTK_JUSTIFY_LEFT</property>
