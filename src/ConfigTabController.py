@@ -1150,11 +1150,11 @@ class ConfigTabController:
         self.rc_panel.hide()
         for x in returnlist.keys():
           newobj.addAttribute(x,returnlist[x])
-          ptr = self.model_builder.getResourcesPtr()
-          ptr.addChild(newobj)
-          args = list()
-          args.append(RESOURCES_TYPE) 
-          apply(self.reset_tree_model, args)
+        ptr = self.model_builder.getResourcesPtr()
+        ptr.addChild(newobj)
+        args = list()
+        args.append(RESOURCES_TYPE) 
+        apply(self.reset_tree_model, args)
 
   def rc_panel_cancel(self, button):
     self.rc_panel.hide()
