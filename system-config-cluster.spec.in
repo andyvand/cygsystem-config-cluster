@@ -49,6 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Mar 30 2005 Jim Parsons <jparsons@redhat.com> 0.9.25-1
+  - Version bump. 
 * Tue Mar 29 2005 Jim Parsons <jparsons@redhat.com> 0.9.24-1
   - Added support for Netfs and Clusterfs. Removed regression code. 
 * Tue Mar 29 2005 Jim Parsons <jparsons@redhat.com> 0.9.23-1
