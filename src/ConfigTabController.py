@@ -38,7 +38,11 @@ from Device import Device
 from Method import Method
 from ResourceHandler import ResourceHandler
 from PropertiesRenderer import PropertiesRenderer
-                                                                                
+
+PIXMAP_DIR = "./pixmaps/"
+INSTALLDIR = "/usr/share/system-config-cluster/"
+
+ 
 FENCE_PIX_COL=0
 FENCE_NAME_COL=1
 FENCE_TYPE_COL=2
@@ -107,8 +111,12 @@ class ConfigTabController:
 
     self.faildom_controller = FaildomController(self.glade_xml,self.model_builder)
 
-    self.node_pixbuf = gtk.gdk.pixbuf_new_from_file("./pixmaps/node.png")
-    self.fence_pixbuf = gtk.gdk.pixbuf_new_from_file("./pixmaps/fence.png")
+    if not os.path.exists(PIXMAP_DIR):
+      PIXMAPS = INSTALLDIR + PIXMAP_DIR
+    else:
+      PIXMAPS = PIXMAP_DIR
+    self.node_pixbuf = gtk.gdk.pixbuf_new_from_file(PIXMAPS + "node.png")
+    self.fence_pixbuf = gtk.gdk.pixbuf_new_from_file(PIXMAPS + "fence.png")
 
     self.fence_props_area = self.glade_xml.get_widget('drawingarea2')
     #self.fence_props_area.connect('expose-event',self.on_f_props_expose_event)

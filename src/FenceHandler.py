@@ -6,6 +6,8 @@ from ValidationError import ValidationError
 import MessageLibrary
 import ModelBuilder
 
+INSTALLDIR="/usr/share/system-config-cluster"
+
 FD_PROVIDE_NAME = _("A unique name must be provided for each Fence Device")
 
 FD_PROVIDE_PATH = _("An xCAT path must be provided for each xCAT Fence Device")
@@ -56,8 +58,8 @@ class FenceHandler:
     self.fd_proxy_widget = fd_proxy_widget
     self.model_builder = model_builder
     gladepath = "fence.glade"
-    #if not os.path.exists(gladepath):
-    #  gladepath = "%s/%s" % (INSTALLDIR,gladepath)
+    if not os.path.exists(gladepath):
+      gladepath = "%s/%s" % (INSTALLDIR,gladepath)
                                                                                 
     #gtk.glade.bindtextdomain(PROGNAME)
     self.fence_xml = gtk.glade.XML (gladepath, domain="NULL")

@@ -10,6 +10,8 @@ import MessageLibrary
 import ModelBuilder
 from ValidationError import ValidationError
 
+INSTALLDIR="/usr/share/system-config-cluster"
+
 NONE_PLACEHOLDER=_("None")
 
 #ADDING A NEW RESOURCE: RC form should be named the same as its tagname in
@@ -27,6 +29,9 @@ class ResourceHandler:
     self.rc_proxy_widget = rc_proxy_widget
     self.model_builder = model_builder
     gladepath = "resources.glade"
+    if not os.path.exists(gladepath):
+      gladepath = "%s/%s" % (INSTALLDIR,gladepath)
+
     self.rc_xml = gtk.glade.XML(gladepath, domain="NULL")
     
     #generate hash table for rc_type -->  rc form
