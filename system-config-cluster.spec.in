@@ -49,8 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
-* Wed Mar 02 2005 Jim Parsons <jparsons@redhat.com> 0.9.8-1
-  - Fixed bz149255...refactored failovver domain ui
+* Thu Mar 10 2005 Jim Parsons <jparsons@redhat.com> 0.9.10-1
+  - Added Command Handler code
+* Wed Mar 02 2005 Jim Parsons <jparsons@redhat.com> 0.9.9-1
+  - Fixed bz149264 and 149287
 * Wed Mar 02 2005 Jim Parsons <jparsons@redhat.com> 0.9.7-1
   - Aded selection method for choosing gulm lockservers
 * Fri Feb 18 2005 Jim Parsons <jparsons@redhat.com> 0.9.6-1
