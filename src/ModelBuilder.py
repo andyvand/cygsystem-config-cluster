@@ -305,6 +305,9 @@ class ModelBuilder:
     self.exportModel("/tmp/cluster.conf")
 
   def exportModel(self, filename=None):
+
+    self.perform_final_check()
+
     if filename == None:
       filename = self.filename
 
@@ -454,7 +457,21 @@ class ModelBuilder:
     else:
       self.isModified = modified
                                                                                 
+  def perform_final_check(self):
+    self.dual_power_fence_check()
 
+  def dual_power_fence_check(self):
+    #if 2 or more power controllers reside in the same fence level,
+    #duplicate entries must be made for every controller with an
+    #attribute for option set first for off, then for on.
+
+    #for every node:
+      #for every fence level:
+        #examine every fence
+        #If fence is of power type, add to 'found' list for that level
+        #If 'found' list is longer than 1, write out extra objs
+
+    pass
         
    
 if __name__ == "__main__":

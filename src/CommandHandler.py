@@ -10,7 +10,9 @@ _ = gettext.gettext
 
 PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the following error:\n %s")
 
-NODES_INFO_ERROR=_("A problem was encountered when atempting to get information about the nodes in the cluster. The following error message was received from the cman_tool: %s")
+PROPAGATE_ERROR=_("Propagation of configuration file failed with the following error:\n %s")
+
+NODES_INFO_ERROR=_("A problem was encountered when attempting to get information about the nodes in the cluster. The following error message was received from the cman_tool: %s")
 
 class CommandHandler:
 
@@ -156,7 +158,21 @@ class CommandHandler:
 
     return dataobjs
 
-  def propagateConfig(self, version):
+  def propagateConfig(self, file):
+    args = list()
+    args.append("/sbin/ccs_tool")
+    args.append("update")
+    args.append(file)
+    cmdstr = ' '.join(args)
+    try:
+      out,err,res = rhpl.executil.execWithCaptureErrorStatus("/sbin/ccs_tool",args)
+    except RuntimeError, e:
+      raise CommandError("FATAL",PROPAGATE_ERROR % (err))
+
+    return res
+
+
+  def propagateCmanConfig(self, version):
     args = list()
     args.append("/sbin/cman_tool")
     args.append("version")
@@ -166,10 +182,9 @@ class CommandHandler:
     try:
       out,err,res = rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
-      raise CommandError("FATAL",PROPAGATE_ERROR % (version, err))
+      raise CommandError("FATAL",PROPAGATE_ERROR2 % (version, err))
 
     return res
-
 
 
 

@@ -269,13 +269,20 @@ class basecluster:
       return
     #1 save file to /etc/cluster/cluster.conf
     self.model_builder.exportModel(CLUSTER_CONF_PATH)
-    #2 call cman_tool -r with config version
-    cptr = self.model_builder.getClusterPtr()
-    version = cptr.getConfigVersion()
+    #2 call ccs_tool
     try:
-      self.command_handler.propagateConfig(version)
+      self.command_handler.propagateConfig(CLUSTER_CONF_PATH)
     except CommandError, e:
       self.MessageLibrary.errorMessage(e.getMessage())
+    #3 call cman_tool -r with config version
+    ltype = self.model_builder.getLockType()
+    if ltype == DLM_TYPE:
+      cptr = self.model_builder.getClusterPtr()
+      version = cptr.getConfigVersion()
+      try:
+        self.command_handler.propagateCManConfig(version)
+      except CommandError, e:
+        self.MessageLibrary.errorMessage(e.getMessage())
 
 
 #############################################################
