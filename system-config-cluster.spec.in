@@ -49,6 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Fri Feb 18 2005 Jim Parsons <jparsons@redhat.com> 0.9.6-1
+  - Added dialog choice for locking type
 * Tue Feb 01 2005 Jim Parsons <jparsons@redhat.com> 0.9.5-1
   - Many fixes and completions. Added check boxes for restricted
     and ordered failover domains. Added properties for fences.

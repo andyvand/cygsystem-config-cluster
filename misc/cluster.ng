@@ -187,18 +187,18 @@
          <group>
           <attribute name="ipaddress"/>
           <attribute name="login"/>
-          <attribute name="password"/>
+          <attribute name="passwd"/>
          </group>
          <!-- WTI, Vixel -->
          <group>
           <attribute name="ipaddress"/>
-          <attribute name="password"/>
+          <attribute name="passwd"/>
          </group>
          <!-- ILO -->
          <group>
           <attribute name="hostname"/>
           <attribute name="login"/>
-          <attribute name="password"/>
+          <attribute name="passwd"/>
          </group>
          <!-- GNBD -->
          <group>
