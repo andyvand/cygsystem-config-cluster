@@ -24,9 +24,6 @@ FI_PROVIDE_ELPAN = _("A LPAN value must be provided for this Egenera Fence")
 FI_PROVIDE_EPSERVER = _("A PServer value must be provided for this Egenera Fence")
 
 
-
-
-
 #ADDING A NEW FENCE: fence instance form should be named the same as its agent
 #in gladefile. Then add agent name to this list.
 #
@@ -45,7 +42,7 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_brocade":_("Brocade Switch"),
               "fence_vixel":_("Vixel SAN Switch"),
               "fence_gnbd":_("Global Network Block Device"),
-              "fence_rib":_("HP Riloe Device"),
+              "fence_ilo":_("HP Riloe Device"),
               "fence_xcat":_("xCAT"),
               "fence_mcdata":_("McDATA SAN Switch"),
               "fence_egenera":_("Egenera SAN Controller"),
@@ -96,7 +93,7 @@ class FenceHandler:
               "fence_brocade":self.pop_brocade,
               "fence_vixel":self.pop_vixel,
               "fence_gnbd":self.pop_gnbd,
-              "fence_rib":self.pop_rib,
+              "fence_ilo":self.pop_ilo,
               "fence_xcat":self.pop_xcat,
               "fence_mcdata":self.pop_mcdata,
               "fence_egenera":self.pop_egenera,
@@ -107,7 +104,7 @@ class FenceHandler:
               "fence_brocade":self.pop_brocade_fd,
               "fence_vixel":self.pop_vixel_fd,
               "fence_gnbd":self.pop_gnbd_fd,
-              "fence_rib":self.pop_rib_fd,
+              "fence_ilo":self.pop_ilo_fd,
               "fence_xcat":self.pop_xcat_fd,
               "fence_mcdata":self.pop_mcdata_fd,
               "fence_egenera":self.pop_egenera_fd,
@@ -118,7 +115,7 @@ class FenceHandler:
               "fence_brocade":self.val_brocade,
               "fence_vixel":self.val_vixel,
               "fence_gnbd":self.val_gnbd,
-              "fence_rib":self.val_rib,
+              "fence_ilo":self.val_ilo,
               "fence_xcat":self.val_xcat,
               "fence_mcdata":self.val_mcdata,
               "fence_egenera":self.val_egenera,
@@ -129,7 +126,7 @@ class FenceHandler:
               "fence_brocade":self.val_brocade_fd,
               "fence_vixel":self.val_vixel_fd,
               "fence_gnbd":self.val_gnbd_fd,
-              "fence_rib":self.val_rib_fd,
+              "fence_ilo":self.val_ilo_fd,
               "fence_xcat":self.val_xcat_fd,
               "fence_mcdata":self.val_mcdata_fd,
               "fence_egenera":self.val_egenera_fd,
@@ -159,8 +156,8 @@ class FenceHandler:
   def pop_brocade(self, attrs):
     self.brocade_port.set_text(attrs["port"])
  
-  def pop_rib(self, attrs):
-    self.rib_port.set_text(attrs["port"])
+  def pop_ilo(self, attrs):
+    self.ilo_port.set_text(attrs["port"])
  
   def pop_vixel(self, attrs):
     self.vixel_port_text(attrs["port"])
@@ -188,7 +185,7 @@ class FenceHandler:
     self.brocade_port.set_text("")
     self.vixel_port.set_text("")
     self.gnbd_ip.set_text("") 
-    self.rib_port.set_text("")
+    self.ilo_port.set_text("")
     self.xcat_nodename.set_text("")
     self.mcdata_port.set_text("")
     self.egenera_lpan.set_text("")
@@ -207,10 +204,10 @@ class FenceHandler:
     self.brocade_fd_ip.set_text("")
     self.brocade_fd_login.set_text("")
     self.brocade_fd_passwd.set_text("")
-    self.rib_fd_name.set_text("")
-    self.rib_fd_login.set_text("")
-    self.rib_fd_passwd.set_text("")
-    self.rib_fd_hostname.set_text("")
+    self.ilo_fd_name.set_text("")
+    self.ilo_fd_login.set_text("")
+    self.ilo_fd_passwd.set_text("")
+    self.ilo_fd_hostname.set_text("")
     self.vixel_fd_name.set_text("")
     self.vixel_fd_ip.set_text("")
     self.vixel_fd_passwd.set_text("")
@@ -246,11 +243,11 @@ class FenceHandler:
     self.brocade_fd_passwd.set_text(attrs["password"])
 
  
-  def pop_rib_fd(self, attrs):
-    self.rib_fd_name.set_text(attrs["name"])
-    self.rib_fd_login.set_text(attrs["login"])
-    self.rib_fd_passwd.set_text(attrs["password"])
-    self.rib_fd_hostname.set_text(attrs["hostname"])
+  def pop_ilo_fd(self, attrs):
+    self.ilo_fd_name.set_text(attrs["name"])
+    self.ilo_fd_login.set_text(attrs["login"])
+    self.ilo_fd_passwd.set_text(attrs["password"])
+    self.ilo_fd_hostname.set_text(attrs["hostname"])
 
  
   def pop_vixel_fd(self, attrs):
@@ -292,7 +289,7 @@ class FenceHandler:
     self.brocade_port = self.fence_xml.get_widget('entry4') 
     self.vixel_port = self.fence_xml.get_widget('entry5') 
     self.gnbd_ip = self.fence_xml.get_widget('entry6') 
-    self.rib_port = self.fence_xml.get_widget('entry7') 
+    self.ilo_port = self.fence_xml.get_widget('entry7') 
     self.xcat_nodename = self.fence_xml.get_widget('entry8') 
     self.mcdata_port = self.fence_xml.get_widget('entry9') 
     self.egenera_lpan = self.fence_xml.get_widget('entry10') 
@@ -320,10 +317,10 @@ class FenceHandler:
     self.gnbd_fd_name = self.fence_xml.get_widget('entry26')
     self.gnbd_fd_server = self.fence_xml.get_widget('entry27')
 
-    self.rib_fd_name = self.fence_xml.get_widget('entry28')
-    self.rib_fd_login = self.fence_xml.get_widget('entry29')
-    self.rib_fd_passwd = self.fence_xml.get_widget('entry30')
-    self.rib_fd_hostname = self.fence_xml.get_widget('entry31')
+    self.ilo_fd_name = self.fence_xml.get_widget('entry28')
+    self.ilo_fd_login = self.fence_xml.get_widget('entry29')
+    self.ilo_fd_passwd = self.fence_xml.get_widget('entry30')
+    self.ilo_fd_hostname = self.fence_xml.get_widget('entry31')
 
     self.xcat_fd_name = self.fence_xml.get_widget('entry32')
     self.xcat_fd_path = self.fence_xml.get_widget('entry33')
@@ -366,10 +363,10 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
 
     fields = {}
-    fields["name"] = self.wti_fd_name.get_text()
-    fields["ipaddress"] = self.wti_fd_ip.get_text()
-    fields["login"] = self.wti_fd_login.get_text()
-    fields["password"] = self.wti_fd_passwd.get_text()
+    fields["name"] = self.apc_fd_name.get_text()
+    fields["ipaddress"] = self.apc_fd_ip.get_text()
+    fields["login"] = self.apc_fd_login.get_text()
+    fields["password"] = self.apc_fd_passwd.get_text()
 
     return fields
  
@@ -419,26 +416,26 @@ class FenceHandler:
     return fields
  
  
-  def val_rib_fd(self, name):
-    if self.rib_fd_name.get_text() == "":
+  def val_ilo_fd(self, name):
+    if self.ilo_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
-    if name != self.rib_fd_name.get_text():
-      res = self.check_unique_fd_name(self.rib_fd_name.get_text())
+    if name != self.ilo_fd_name.get_text():
+      res = self.check_unique_fd_name(self.ilo_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
 
-    if self.rib_fd_login.get_text() == "":
+    if self.ilo_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.rib_fd_passwd.get_text() == "":
+    if self.ilo_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
-    if self.rib_fd_hostname.get_text() == "":
+    if self.ilo_fd_hostname.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_HOSTNAME)
 
     fields = {}
-    fields["name"] = self.rib_fd_name.get_text()
-    fields["hostname"] = self.rib_fd_hostname.get_text()
-    fields["login"] = self.rib_fd_login.get_text()
-    fields["password"] = self.rib_fd_passwd.get_text()
+    fields["name"] = self.ilo_fd_name.get_text()
+    fields["hostname"] = self.ilo_fd_hostname.get_text()
+    fields["login"] = self.ilo_fd_login.get_text()
+    fields["password"] = self.ilo_fd_passwd.get_text()
 
     return fields
  
@@ -611,12 +608,12 @@ class FenceHandler:
 
     return fields
 
-  def val_rib(self):
-    if self.rib_port.get_text() == "":
+  def val_ilo(self):
+    if self.ilo_port.get_text() == "":
       raise ValidationError('FATAL', FI_PROVIDE_PORT)
 
     fields = {}
-    fields["port"] = self.rib_port.get_text()
+    fields["port"] = self.ilo_port.get_text()
 
     return fields
 
@@ -649,3 +646,6 @@ class FenceHandler:
 
   def getFENCE_OPTS(self):
     return FENCE_OPTS
+
+  def set_model(self, model_builder):
+    self.model_builder = model_builder

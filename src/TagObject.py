@@ -54,7 +54,10 @@ class TagObject:
     return self.children
 
   def getName(self):
-    return self.attr_hash["name"]
+    try:
+      return self.attr_hash["name"]
+    except KeyError, e:
+      return ""
 
   def getTagName(self):
     return self.TAG_NAME

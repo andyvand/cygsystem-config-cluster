@@ -81,6 +81,17 @@ class ConfigTab:
 
     self.prepare_tree()
 
+  def clearall(self):
+    treemodel = self.treeview.get_model()
+    treemodel.clear()
+    self.clear_all_buttonpanels()
+    self.treeview.hide()
+
+  def set_model(self, model_builder):
+    self.model_builder = model_builder
+    self.prepare_tree()
+    self.controller.set_model(self.model_builder, self.treeview)
+
   def on_tree_selection_changed(self, *args):
     selection = self.treeview.get_selection()
     model,iter = selection.get_selected()
@@ -91,11 +102,11 @@ class ConfigTab:
     obj = model.get_value(iter, OBJ_COL)
 
     if type == CLUSTER_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
+      self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.cluster_p.show()
     elif type == CLUSTER_NODES_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getTagName(),type) 
+      self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.clusternode_p.show()
     elif type == CLUSTER_NODE_TYPE:
@@ -118,9 +129,8 @@ class ConfigTab:
       self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
       self.clear_all_buttonpanels()
     elif type == FAILOVER_DOMAINS_TYPE:
-      p_str = "A WHOLE bunch o' properties:\nSuch as:\n1)Big\n2)Shiny\n3)Durable"
+      self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
-      self.prop_renderer.render_to_layout_area(p_str, obj.getTagName(),type) 
       self.faildoms_p.show()
     elif type == FAILOVER_DOMAIN_TYPE:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
@@ -226,85 +236,81 @@ class ConfigTab:
 
     fencedevs = self.model_builder.getFenceDevices()
     fencedev_ptr = self.model_builder.getFenceDevicePtr()
-    if len(fencedevs) > 0:
-      fds_iter = treemodel.append(cluster_iter)
-      fds_str = "<span size=\"10000\" foreground=\"" + FENCEDEVICES_COLOR + "\"><b>" + FENCEDEVICES + "</b></span>"
-      treemodel.set(fds_iter, NAME_COL, fds_str,
-                              TYPE_COL, FENCE_DEVICES_TYPE,
-                              OBJ_COL, fencedev_ptr) 
-      for fd in fencedevs:
-        fd_iter = treemodel.append(fds_iter) 
-        fd_str = "<span>" + fd.getName() + "</span>"
-        treemodel.set(fd_iter, NAME_COL, fd_str,
-                               TYPE_COL, FENCE_DEVICE_TYPE,
-                               OBJ_COL,  fd)
+    fds_iter = treemodel.append(cluster_iter)
+    fds_str = "<span size=\"10000\" foreground=\"" + FENCEDEVICES_COLOR + "\"><b>" + FENCEDEVICES + "</b></span>"
+    treemodel.set(fds_iter, NAME_COL, fds_str,
+                            TYPE_COL, FENCE_DEVICES_TYPE,
+                            OBJ_COL, fencedev_ptr) 
+    for fd in fencedevs:
+      fd_iter = treemodel.append(fds_iter) 
+      fd_str = "<span>" + fd.getName() + "</span>"
+      treemodel.set(fd_iter, NAME_COL, fd_str,
+                             TYPE_COL, FENCE_DEVICE_TYPE,
+                             OBJ_COL,  fd)
 
     ###MANAGED RESOURCES
     faildoms = self.model_builder.getFailoverDomains()
-    l_faildoms = len(faildoms)
 
     rgroups = self.model_builder.getResourceGroups()
-    l_rgroups = len(rgroups)
 
     resources = self.model_builder.getResources()
-    l_resources = len(resources)
 
-    if(l_faildoms > 0) or (l_rgroups > 0) or (l_resources > 0):
-      mr_iter = treemodel.append(cluster_iter)
-      mr_str = "<span size=\"10000\"><b>" + MANAGED_RESOURCES + "</b></span>"
-      treemodel.set(mr_iter, NAME_COL, mr_str,
-                             TYPE_COL, MANAGED_RESOURCES_TYPE)
+    mr_iter = treemodel.append(cluster_iter)
+    mr_str = "<span size=\"10000\"><b>" + MANAGED_RESOURCES + "</b></span>"
+    treemodel.set(mr_iter, NAME_COL, mr_str,
+                           TYPE_COL, MANAGED_RESOURCES_TYPE)
 
     ###FAILOVER DOMAINS
-    if(l_faildoms > 0):
-      fdoms_iter = treemodel.append(mr_iter)
-      fdoms_str = "<span size=\"10000\" foreground=\"" + FAILOVERDOMAINS_COLOR + "\"><b>" + FAILOVER_DOMAINS + "</b></span>"
-      fdoms_ptr = self.model_builder.getFailoverDomainPtr()
-      treemodel.set(fdoms_iter, NAME_COL, fdoms_str,
-                                TYPE_COL, FAILOVER_DOMAINS_TYPE,
-                                OBJ_COL, fdoms_ptr)
+    fdoms_iter = treemodel.append(mr_iter)
+    fdoms_str = "<span size=\"10000\" foreground=\"" + FAILOVERDOMAINS_COLOR + "\"><b>" + FAILOVER_DOMAINS + "</b></span>"
+    fdoms_ptr = self.model_builder.getFailoverDomainPtr()
+    treemodel.set(fdoms_iter, NAME_COL, fdoms_str,
+                              TYPE_COL, FAILOVER_DOMAINS_TYPE,
+                              OBJ_COL, fdoms_ptr)
 
-      for faildom in faildoms:
-        fdom_iter = treemodel.append(fdoms_iter)
-        fdom_str = "<span>" + faildom.getName() + "</span>"
-        treemodel.set(fdom_iter, NAME_COL, fdom_str,
-                                 TYPE_COL,FAILOVER_DOMAIN_TYPE,
-                                 OBJ_COL, faildom)
+    for faildom in faildoms:
+      fdom_iter = treemodel.append(fdoms_iter)
+      fdom_str = "<span>" + faildom.getName() + "</span>"
+      treemodel.set(fdom_iter, NAME_COL, fdom_str,
+                               TYPE_COL,FAILOVER_DOMAIN_TYPE,
+                               OBJ_COL, faildom)
 
     ###RESOURCES
-    if(l_resources > 0):
-      resources_iter = treemodel.append(mr_iter)
-      rc_ptr = self.model_builder.getResourcesPtr()
-      resources_str = "<span size=\"10000\" foreground=\"" + RESOURCES_COLOR + "\"><b>" + RESOURCES + "</b></span>"
-      treemodel.set(resources_iter, NAME_COL, resources_str,
-                                TYPE_COL, RESOURCES_TYPE,
-                                OBJ_COL, rc_ptr)
+    resources_iter = treemodel.append(mr_iter)
+    rc_ptr = self.model_builder.getResourcesPtr()
+    resources_str = "<span size=\"10000\" foreground=\"" + RESOURCES_COLOR + "\"><b>" + RESOURCES + "</b></span>"
+    treemodel.set(resources_iter, NAME_COL, resources_str,
+                              TYPE_COL, RESOURCES_TYPE,
+                              OBJ_COL, rc_ptr)
 
-      for resource in resources:
-        resource_iter = treemodel.append(resources_iter)
-        if resource.getTagName() == "ip":
-          resource_str = "<span>" + RESOURCE + " " + IPADDRESS + "</span>"
-        else:
-          resource_str = "<span>" + RESOURCE + " " + resource.getName() + "</span>"
-        treemodel.set(resource_iter, NAME_COL, resource_str,
-                                 TYPE_COL,RESOURCE_TYPE,
-                                 OBJ_COL, resource)
+    for resource in resources:
+      resource_iter = treemodel.append(resources_iter)
+      if resource.getTagName() == "ip":
+        resource_str = "<span>" + RESOURCE + " " + IPADDRESS + "</span>"
+      else:
+        resource_str = "<span>" + RESOURCE + " " + resource.getName() + "</span>"
+      treemodel.set(resource_iter, NAME_COL, resource_str,
+                               TYPE_COL,RESOURCE_TYPE,
+                               OBJ_COL, resource)
 
     ###RESOURCE GROUPS
-    if(l_rgroups > 0):
-      rgrps_iter = treemodel.append(mr_iter)
-      rgrps_str = "<span size=\"10000\" foreground=\"" + RESOURCEGROUPS_COLOR + "\"><b>" + RESOURCE_GROUPS + "</b></span>"
-      treemodel.set(rgrps_iter, NAME_COL, rgrps_str,
-                                TYPE_COL, RESOURCE_GROUPS_TYPE)
+    rgrps_iter = treemodel.append(mr_iter)
+    rgrps_str = "<span size=\"10000\" foreground=\"" + RESOURCEGROUPS_COLOR + "\"><b>" + RESOURCE_GROUPS + "</b></span>"
+    treemodel.set(rgrps_iter, NAME_COL, rgrps_str,
+                              TYPE_COL, RESOURCE_GROUPS_TYPE)
 
-      for rgroup in rgroups:
-        rgroup_iter = treemodel.append(rgrps_iter)
+    for rgroup in rgroups:
+      try:
         rgroup_str = "<span>" + RESOURCE_GROUP + " " + rgroup.getName() + "</span>"
-        treemodel.set(rgroup_iter, NAME_COL, rgroup_str,
-                                 TYPE_COL, RESOURCE_GROUP_TYPE,
-                                 OBJ_COL, rgroup)
+      except KeyError, e:
+        continue
+      rgroup_iter = treemodel.append(rgrps_iter)
+      treemodel.set(rgroup_iter, NAME_COL, rgroup_str,
+                               TYPE_COL, RESOURCE_GROUP_TYPE,
+                               OBJ_COL, rgroup)
 
     self.treeview.expand_all()
+
 
   def on_props_expose_event(self, widget,event):
     self.prop_renderer.do_render()

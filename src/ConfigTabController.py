@@ -36,6 +36,7 @@ from FaildomController import FaildomController
 from FailoverDomain import FailoverDomain
 from Device import Device
 from Method import Method
+from Fence import Fence
 from ResourceHandler import ResourceHandler
 from PropertiesRenderer import PropertiesRenderer
 
@@ -109,7 +110,7 @@ class ConfigTabController:
     self.glade_xml = glade_xml
     self.reset_tree_model = reset_tree_model
 
-    self.faildom_controller = FaildomController(self.glade_xml,self.model_builder)
+    self.faildom_controller = FaildomController(self.glade_xml,self.model_builder,reset_tree_model)
 
     if not os.path.exists(PIXMAP_DIR):
       PIXMAPS = INSTALLDIR + PIXMAP_DIR
@@ -594,7 +595,7 @@ class ConfigTabController:
     nameattr = self.node_props_name.get_text()
     if nameattr == "":
       self.errorMessage(NODE_NAME_REQUIRED)
-      self.node_props_votes.set_text("")
+      self.node_props_name.set_text("")
       return
 
     if self.node_props_flag == NODE_NEW:
@@ -615,14 +616,15 @@ class ConfigTabController:
       nd = model.get_value(iter, OBJ_COL)
       ndname = nd.getName()
       if (ndname != nameattr): #indicates user changed name string
-        nds = self.model_builder.get_nodes()
+        nds = self.model_builder.getNodes()
         for n in nds:
           if n.getName() == nameattr:
             self.errorMessage(NODE_UNIQUE_NAME)
             self.node_props_name.set_text("ndname")
             return 
-        nd.setAttribute(NAME_ATTR,nameattr)
-      nd.setAttribute(VOTES_ATTR,votesattr) 
+        nd.addAttribute(NAME_ATTR,nameattr)
+      nd.addAttribute(VOTES_ATTR,votesattr) 
+    print "MADE IT TO THE END OF ADD NODE"
     apply(self.reset_tree_model)
 
       
@@ -868,6 +870,12 @@ class ConfigTabController:
   def on_f_props_expose_event(self, widget, event):
      self.fence_prop_renderer.do_render()
 
+  def set_model(self, model_builder,treeview):
+    self.model_builder = model_builder
+    self.treeview = treeview
+    self.faildom_controller.set_model(self.model_builder)
+    self.fence_handler.set_model(self.model_builder)
+    self.rc_handler.set_model(self.model_builder)
 
   def warningMessage(self, message):
     dlg = gtk.MessageDialog(None, 0, gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,

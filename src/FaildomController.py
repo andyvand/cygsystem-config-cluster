@@ -18,9 +18,10 @@ OBJ_COL = 2
 PRIORITY_INT_COL = 3
 
 class FaildomController:
-  def __init__(self, glade_xml,model_builder):
+  def __init__(self, glade_xml,model_builder,reset_tree_model):
     self.glade_xml = glade_xml
     self.model_builder = model_builder
+    self.reset_tree_model = reset_tree_model
     self.process_widgets()
     self.faildoms = self.model_builder.getFailoverDomainPtr()
     self.current_faildom = None
@@ -225,3 +226,7 @@ class FaildomController:
 
   def on_faildom_panel_close(self, button):
     self.faildom_panel.hide() 
+    apply(self.reset_tree_model)
+
+  def set_model(self, model_builder):
+    self.model_builder = model_builder

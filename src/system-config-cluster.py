@@ -15,10 +15,13 @@ import signal
 import string
 import os
 from gtk import TRUE, FALSE
+import MessageLibrary
 
 PROGNAME = "system-config-cluster"
 VERSION = "@VERSION@"
 INSTALLDIR="/usr/share/system-config-cluster"
+CLUSTER_CONF_PATH="/etc/cluster/cluster.conf"
+CLUSTER_CONF_DIR_PATH="/etc/cluster/"
 
 ### gettext ("_") must come before import gtk ###
 import gettext
@@ -55,13 +58,16 @@ gnome.program_init (PROGNAME, VERSION)
 gnome.app_version = VERSION
 FORMALNAME=_("system-config-cluster")
 ABOUT_VERSION=_("%s %s") % ('system-config-cluster',VERSION)
-                                                                                
+ 
 ###############################################
 class basecluster:
   def __init__(self, glade_xml, app):
- 
-    self.model_builder = ModelBuilder()
- 
+
+    if os.path.exists(CLUSTER_CONF_PATH):
+      self.model_builder = ModelBuilder(CLUSTER_CONF_PATH)
+    else:
+      self.model_builder = ModelBuilder()
+     
     self.glade_xml = glade_xml
 
     self.configtab = ConfigTab(glade_xml, self.model_builder)
@@ -69,7 +75,10 @@ class basecluster:
     self.glade_xml.signal_autoconnect(
       {
         "on_quit1_activate" : self.quit,
+        "on_open1_activate" : self.open,
+        "on_new1_activate" : self.new,
         "on_save1_activate" : self.model_builder.testexportModel,
+        "on_save_as1_activate" : self.save_as,
         "on_about1_activate" : self.on_about
       }
     )
@@ -89,10 +98,58 @@ class basecluster:
         dialog.set_title (FORMALNAME)
         dialog.show()
                                                                                 
-                                                                                
-                                                                                
+ 
   def quit(self, *args):
     gtk.main_quit()
+
+  def open(self, *args):
+    #offer fileselection
+    popup = gtk.FileSelection()
+    popup.set_filename(CLUSTER_CONF_DIR_PATH)
+    popup.hide_fileop_buttons()
+    popup.set_select_multiple(FALSE)
+    popup.show_all()
+    rc = popup.run()
+    filepath = popup.get_filename()
+    if os.path.isdir(filepath):
+      popup.destroy()
+      return
+    if not rc == gtk.RESPONSE_OK:
+      popup.destroy()
+      return
+    else:
+      self.model_builder = ModelBuilder(filepath)
+      self.configtab.set_model(self.model_builder)
+      popup.destroy()
+
+  def save(self, *args):
+    if self.model_builder.has_filepath():
+      self.model_builder.exportModel()
+    else:  #Must have been a 'New' instance...
+      self.save_as(None)
+
+  def save_as(self, *args):
+    popup = gtk.FileSelection()
+    popup.set_filename(CLUSTER_CONF_PATH)
+    popup.show_fileop_buttons()
+    popup.set_select_multiple(FALSE)
+    popup.show_all()
+    rc = popup.run()
+    filepath = popup.get_filename()
+    if not rc == gtk.RESPONSE_OK:
+      popup.destroy()
+      return
+    else:
+      try:
+        self.model_builder.exportModel(filepath)
+      except IOError, e:
+        MessageLibrary.errorMessage("Something ugly happened when attempting to write output file")
+    popup.destroy()
+
+  def new(self, *args):
+    self.model_builder = ModelBuilder()
+    self.configtab.set_model(self.model_builder)
+    
 
 
 

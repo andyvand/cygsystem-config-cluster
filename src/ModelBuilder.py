@@ -66,7 +66,7 @@ RESOURCEGROUP="resourcegroup"
 ###-----------------------------------
 
 class ModelBuilder:
-  def __init__(self, filename=CLUSTER_CONF):
+  def __init__(self, filename=None):
     self.filename = filename
     self.cluster_ptr = None
     self.clusternodes_ptr = None
@@ -75,13 +75,16 @@ class ModelBuilder:
     self.resourcemanager_ptr = None
     self.resources_ptr = None
 
-    try:
-      self.parent = minidom.parse(self.filename)
-    except IOError, e:
-      pass
+    if filename == None:
+      self.object_tree = self.buildModelTemplate()
+    else:
+      try:
+        self.parent = minidom.parse(self.filename)
+      except IOError, e:
+        pass
 
-    self.object_tree = self.buildModel(None)
-    self.resolve_fence_instance_types()
+      self.object_tree = self.buildModel(None)
+      self.resolve_fence_instance_types()
 
 
   def buildModel(self, parent_node):
@@ -127,6 +130,36 @@ class ModelBuilder:
         new_object.addChild(result_object)
 
     return (new_object)
+
+  def buildModelTemplate(self):
+    obj_tree = Cluster()
+    self.cluster_ptr = obj_tree
+
+    obj_tree.addAttribute("name","alpha_cluster")
+    cns = ClusterNodes()
+    obj_tree.addChild(cns)
+    self.clusternodes_ptr = cns
+
+    obj_tree.addChild(Cman())
+    obj_tree.addChild(Dlm())
+
+    fds = FenceDevices()
+    obj_tree.addChild(fds)
+    self.fencedevices_ptr = fds
+
+    rm = Rm()
+    obj_tree.addChild(rm)
+    self.resourcemanager_ptr = rm
+
+    fdoms = FailoverDomains()
+    self.failoverdomains_ptr = fdoms
+    rm.addChild(fdoms)
+
+    rcs = Resources()
+    rm.addChild(rcs)
+    self.resources_ptr = rcs
+
+    return obj_tree
     
 
   ##Because fence devices are declared in a separate XML section
@@ -153,17 +186,24 @@ class ModelBuilder:
   def testexportModel(self, *args):
     self.exportModel("/tmp/cluster.conf")
 
-  def exportModel(self, filename,objs_tree=None):
-    if objs_tree == None:
-      objs_tree = self.object_tree
+  def exportModel(self, filename=None):
+    if filename == None:
+      filename = self.filename
 
     fd = open(filename, "w+")
 
     doc = minidom.Document()
-    objs_tree.generateXML(doc)
+    self.object_tree.generateXML(doc)
     #print doc.toprettyxml()
     fd.write(doc.toprettyxml())
-         
+    self.filename = filename
+     
+  def has_filepath(self):
+    if self.filename == None:
+      return FALSE
+    else:
+      return TRUE
+    
   def getNodes(self):
     #Find the clusternodes obj and return get_children 
     return self.clusternodes_ptr.getChildren()

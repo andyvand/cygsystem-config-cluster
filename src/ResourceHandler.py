@@ -189,3 +189,6 @@ class ResourceHandler:
         menu.append(m)
 
     self.group_optionmenu.set_menu(menu)
+
+  def set_model(self, model_builder):
+    self.model_builder = model_builder

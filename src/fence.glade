@@ -521,7 +521,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkFrame" id="fence_rib">
+	    <widget class="GtkFrame" id="fence_ilo">
 	      <property name="label_xalign">0</property>
 	      <property name="label_yalign">0.5</property>
 	      <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
@@ -1923,7 +1923,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkFrame" id="fence_rib_d">
+	    <widget class="GtkFrame" id="fence_ilo_d">
 	      <property name="label_xalign">0</property>
 	      <property name="label_yalign">0.5</property>
 	      <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
