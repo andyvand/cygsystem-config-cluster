@@ -3,6 +3,7 @@ BaseResource.py	\
 ClusterNode.py	\
 ClusterNodes.py \
 Cluster.py	\
+Clusterfs.py	\
 Cman.py		\
 CommandHandler.py	\
 CommandError.py	\
@@ -26,6 +27,7 @@ MessageLibrary.py \
 Method.py \
 MgmtTab.py	\
 ModelBuilder.py \
+Netfs.py	\
 NFSClient.py \
 NFSExport.py \
 NodeData.py	\
@@ -63,6 +65,7 @@ install-exec-local:
 	chmod 755 $(DESTDIR)$(pkgdatadir)/system-config-cluster.py
 	install -m 0640 $(srcdir)/clui_constants.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/BaseResource.py $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Clusterfs.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ClusterNode.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ClusterNodes.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Cluster.py $(DESTDIR)$(pkgdatadir)/
@@ -90,6 +93,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/Method.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/MgmtTab.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ModelBuilder.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Netfs.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NFSClient.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NFSExport.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NodeData.py  $(DESTDIR)$(pkgdatadir)/

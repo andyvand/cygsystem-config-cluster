@@ -22,6 +22,8 @@ from Script import Script
 from NFSClient import NFSClient
 from NFSExport import NFSExport
 from Fs import Fs
+from Netfs import Netfs
+from Clusterfs import Clusterfs
 from Resources import Resources
 from Service import Service
 from RefObject import RefObject
@@ -51,6 +53,8 @@ TAGNAMES={ 'cluster':Cluster,
            'failoverdomainnode':FailoverDomainNode,
            'ip':Ip,
            'fs':Fs,
+           'clusterfs':Clusterfs,
+           'netfs':Netfs,
            'script':Script,
            'nfsexport':NFSExport, 
            'nfsclient':NFSClient,

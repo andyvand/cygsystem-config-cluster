@@ -113,7 +113,7 @@ class ConfigTab:
   def on_tree_selection_changed(self, *args):
     selection = self.treeview.get_selection()
     model,iter = selection.get_selected()
-    self.set_title_colors(model)
+    #self.set_title_colors(model)
     if iter == None:
       self.clear_all_buttonpanels()
       self.prop_renderer.clear_layout_area()
@@ -130,8 +130,8 @@ class ConfigTab:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.clusternode_p.show()
-      cn_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + CLUSTERNODES + "</b></span>"
-      model.set_value(self.clusternodes_iter, NAME_COL, cn_str)
+      #cn_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + CLUSTERNODES + "</b></span>"
+      #model.set_value(self.clusternodes_iter, NAME_COL, cn_str)
     elif type == CLUSTER_NODE_TYPE:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
@@ -144,8 +144,8 @@ class ConfigTab:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), FENCEDEVICES,type) 
       self.clear_all_buttonpanels()
       self.fencedevices_p.show()
-      fds_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + FENCEDEVICES + "</b></span>" 
-      model.set_value(self.fencedevices_iter, NAME_COL, fds_str)
+      #fds_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + FENCEDEVICES + "</b></span>" 
+      #model.set_value(self.fencedevices_iter, NAME_COL, fds_str)
     elif type == FENCE_DEVICE_TYPE:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
@@ -157,8 +157,8 @@ class ConfigTab:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.faildoms_p.show()
-      fdoms_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + FAILOVER_DOMAINS + "</b></span>"
-      model.set_value(self.failoverdomains_iter, NAME_COL, fdoms_str)
+      #fdoms_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + FAILOVER_DOMAINS + "</b></span>"
+      #model.set_value(self.failoverdomains_iter, NAME_COL, fdoms_str)
     elif type == FAILOVER_DOMAIN_TYPE:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
@@ -173,8 +173,8 @@ class ConfigTab:
       self.prop_renderer.render_to_layout_area(props, "",type) 
       self.clear_all_buttonpanels()
       self.services_p.show()
-      rgrps_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + SERVICES + "</b></span>"
-      model.set_value(self.services_iter, NAME_COL, rgrps_str)
+      #rgrps_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + SERVICES + "</b></span>"
+      #model.set_value(self.services_iter, NAME_COL, rgrps_str)
     elif type == RESOURCE_GROUP_TYPE:
       self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
       self.clear_all_buttonpanels()
@@ -183,8 +183,8 @@ class ConfigTab:
       self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.resources_p.show()
-      resources_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + RESOURCES + "</b></span>"
-      model.set_value(self.resources_iter, NAME_COL, resources_str)
+      #resources_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + RESOURCES + "</b></span>"
+      #model.set_value(self.resources_iter, NAME_COL, resources_str)
     elif type == RESOURCE_TYPE:
       if obj.getTagName() == "ip":
         nm = IPADDRESS
@@ -255,7 +255,6 @@ class ConfigTab:
 
     services_path = model.get_path(self.services_iter)
     services_exp = self.treeview.row_expanded(services_path)
-
     self.prepare_tree()
     self.prop_renderer.clear_layout_area()
 
@@ -274,6 +273,7 @@ class ConfigTab:
       self.treeview.expand_to_path(newmodel.get_path(self.resources_iter))
     if services_exp == TRUE:
       self.treeview.expand_to_path(newmodel.get_path(self.services_iter))
+
 
     if type == CLUSTER_TYPE:
       selection.select_iter(self.cluster_iter)
@@ -301,7 +301,6 @@ class ConfigTab:
   def prepare_tree(self):
     treemodel = self.treeview.get_model()
     treemodel.clear()
-
     #Set all major divisions
     #For each minor element, call model_builder for items
 
@@ -442,8 +441,13 @@ class ConfigTab:
     fdoms_str = "<span size=\"10000\" foreground=\"" + FAILOVERDOMAINS_COLOR + "\"><b>" + FAILOVER_DOMAINS + "</b></span>"
     resources_str = "<span size=\"10000\" foreground=\"" + RESOURCES_COLOR + "\"><b>" + RESOURCES + "</b></span>"
     rgrps_str = "<span size=\"10000\" foreground=\"" + RESOURCEGROUPS_COLOR + "\"><b>" + SERVICES + "</b></span>"
-    model.set_value(self.clusternodes_iter, NAME_COL, cn_str)
-    model.set_value(self.fencedevices_iter, NAME_COL, fds_str)
-    model.set_value(self.failoverdomains_iter, NAME_COL, fdoms_str)
-    model.set_value(self.resources_iter, NAME_COL, resources_str)
-    model.set_value(self.services_iter, NAME_COL, rgrps_str)
+    type = model.get_value(self.clusternodes_iter, TYPE_COL)
+    obj = model.get_value(self.clusternodes_iter, OBJ_COL)
+    model.set(self.clusternodes_iter, NAME_COL, cn_str,
+                                            TYPE_COL, type,
+                                            OBJ_COL, obj)
+
+    #model.set_value(self.fencedevices_iter, NAME_COL, fds_str)
+    #model.set_value(self.failoverdomains_iter, NAME_COL, fdoms_str)
+    #model.set_value(self.resources_iter, NAME_COL, resources_str)
+    #model.set_value(self.services_iter, NAME_COL, rgrps_str)

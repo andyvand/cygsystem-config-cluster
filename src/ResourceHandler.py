@@ -22,6 +22,8 @@ RC_OPTS = {"ip":_("IP Address"),
            "script":_("Script"),
            "nfsclient":_("NFS Client"),
            "nfsexport":_("NFS Export"),
+           "netfs":_("NFS Mount"),
+           "clusterfs":_("GFS"),
            "fs":_("File System") }
 
 class ResourceHandler:
@@ -51,12 +53,16 @@ class ResourceHandler:
                              "script":self.pop_script,
                              "nfsclient":self.pop_nfsclient,
                              "nfsexport":self.pop_nfsexport,
+                             "netfs":self.pop_netfs,
+                             "clusterfs":self.pop_clusterfs,
                              "fs":self.pop_fs }
 
     self.rc_validate_hash = {"ip":self.val_ip,
                              "script":self.val_script,
                              "nfsclient":self.val_nfsclient,
                              "nfsexport":self.val_nfsexport,
+                             "netfs":self.val_netfs,
+                             "clusterfs":self.val_clusterfs,
                              "fs":self.val_fs }
 
     self.process_widgets()
@@ -96,6 +102,73 @@ class ResourceHandler:
   def pop_nfsexport(self, attrs):
     self.nfse_name.set_text(attrs["name"])
 
+  def pop_netfs(self, attrs):
+    try:
+      self.netfs_name.set_text(attrs["name"])
+    except KeyError, e:
+      self.netfs_name.set_text("")
+
+    try:
+      self.netfs_mnt.set_text(attrs["mountpoint"])
+    except KeyError, e:
+      self.netfs_mnt.set_text("")
+
+    try:
+      self.netfs_host.set_text(attrs["host"])
+    except KeyError, e:
+      self.netfs_host.set_text("")
+
+    try:
+      self.netfs_export.set_text(attrs["export"])
+    except KeyError, e:
+      self.netfs_export.set_text("")
+
+    try:
+      fstype = attrs["fstype"]
+      if fstype == "nfs":
+        self.netfs_fstype.set_active(TRUE)
+      else:
+        self.netfs_fstype.set_active(FALSE)
+    except KeyError, e:
+      self.netfs_fstype.set_active(TRUE)
+
+    try:
+      force = attrs["force_unmount"]
+      if force == "1" or force == "yes":
+        self.netfs_force_unmount.set_active(TRUE)
+      else:
+        self.netfs_force_unmount.set_active(FALSE)
+    except KeyError, e:
+        self.netfs_force_unmount.set_active(FALSE)
+ 
+    try:
+      self.netfs_options.set_text(attrs["options"])
+    except KeyError, e:
+      self.netfs_options.set_text("")
+
+
+  def pop_clusterfs(self, attrs):
+    try:
+      self.gfs_name.set_text(attrs["name"])
+    except KeyError, e:
+      self.gfs_name.set_text("")
+
+    try:
+      self.gfs_mnt.set_text(attrs["mountpoint"])
+    except KeyError, e:
+      self.gfs_mnt.set_text("")
+
+    try:
+      self.gfs_device.set_text(attrs["device"])
+    except KeyError, e:
+      self.gfs_host.set_text("")
+
+
+    try:
+      self.gfs_options.set_text(attrs["options"])
+    except KeyError, e:
+      self.gfs_options.set_text("")
+
   def pop_fs(self, attrs):
     self.fs_name.set_text(attrs["name"])
     self.fs_mnt.set_text(attrs["mountpoint"])
@@ -129,6 +202,20 @@ class ResourceHandler:
     self.fs_name.set_text("")
     self.fs_mnt.set_text("")
     self.fs_device.set_text("")
+
+    self.netfs_name.set_text("")
+    self.netfs_mnt.set_text("")
+    self.netfs_host.set_text("")
+    self.netfs_export.set_text("")
+    self.netfs_options.set_text("")
+    self.netfs_force_unmount.set_active(FALSE)
+    self.netfs_fstype.set_active(TRUE)
+
+    self.gfs_name.set_text("")
+    self.gfs_mnt.set_text("")
+    self.gfs_device.set_text("")
+    self.gfs_options.set_text("")
+
 
   #### Validation Methods
   def validate_resource(self, tagname, name=None):
@@ -218,6 +305,62 @@ class ResourceHandler:
 
     return fields
 
+  def val_netfs(self, name):
+    netfs_name = self.netfs_name.get_text()
+    if netfs_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name != None:
+      if name != netfs_name:
+        res = self.check_unique_netfs_name(netfs_name)
+        if res == FALSE:  #name already used for an netfs
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+
+    fields = {}
+    fields["name"] = netfs_name
+    mntp = self.netfs_mnt.get_text()
+    fields["mountpoint"] = mntp
+    host = self.netfs_host.get_text()
+    fields["host"] = host
+    if self.netfs_fstype.get_active() == TRUE:
+      fstype = "nfs"
+    else:
+      fstype = "nfs4"
+    fields["fstype"] = fstype
+    options = self.netfs_options.get_text()
+    fields["options"] = options
+    unmount = self.netfs_force_unmount.get_active()
+    if unmount == FALSE:
+      umount = "0"
+    else:
+      umount = "1"
+    fields["force_unmount"] = umount
+
+    return fields
+
+  def val_clusterfs(self, name):
+    gfs_name = self.gfs_name.get_text()
+    if gfs_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name != None:
+      if name != gfs_name:
+        res = self.check_unique_gfs_name(gfs_name)
+        if res == FALSE:  #name already used for an gfs
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+
+    fields = {}
+    fields["name"] = gfs_name
+    mntp = self.gfs_mnt.get_text()
+    fields["mountpoint"] = mntp
+    device = self.gfs_device.get_text()
+    fields["device"] = device
+    options = self.gfs_options.get_text()
+    fields["options"] = options
+
+    return fields
+
+
   def val_fs(self, name):
 
     fs_name = self.fs_name.get_text()
@@ -261,6 +404,19 @@ class ResourceHandler:
     self.nfsc_rw = self.rc_xml.get_widget('radiobutton1')
     self.nfsc_ro = self.rc_xml.get_widget('radiobutton2')
 
+    self.netfs_name = self.rc_xml.get_widget('entry16')
+    self.netfs_mnt = self.rc_xml.get_widget('entry17')
+    self.netfs_host = self.rc_xml.get_widget('entry18')
+    self.netfs_export = self.rc_xml.get_widget('entry19')
+    self.netfs_fstype = self.rc_xml.get_widget('nfs_button')
+    self.netfs_force_unmount = self.rc_xml.get_widget('checkbutton2')
+    self.netfs_options = self.rc_xml.get_widget('entry20')
+
+    self.gfs_name = self.rc_xml.get_widget('gfs_name')
+    self.gfs_mnt = self.rc_xml.get_widget('entry14')
+    self.gfs_device = self.rc_xml.get_widget('entry15')
+    self.gfs_options = self.rc_xml.get_widget('entry21')
+
     self.fs_name = self.rc_xml.get_widget('entry11')
     self.fs_optionmenu = self.rc_xml.get_widget('optionmenu2')
     self.fs_mnt = self.rc_xml.get_widget('entry12')
@@ -268,3 +424,13 @@ class ResourceHandler:
 
   def set_model(self, model_builder):
     self.model_builder = model_builder
+
+  def check_unique_fs_name(self,fs_name):
+    return TRUE
+
+  def check_unique_netfs_name(self,netfs_name):
+    return TRUE
+
+  def check_unique_gfs_name(self,gfs_name):
+    return TRUE
+
