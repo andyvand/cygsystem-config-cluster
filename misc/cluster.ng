@@ -1,0 +1,221 @@
+<element name="cluster"  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
+ <attribute name="name"/>
+ <attribute name="config_version"/>
+ <!-- The choice section below brackets two very large group blocks. -->
+ <!-- The first group specifies schema for a cman/dlm cluster, and -->
+ <!-- the second for a gulm cluster -->
+ <choice>
+  <group>
+   <element name="cman">
+    <empty/>
+   </element>
+   <element name="clusternodes">
+    <zeroOrMore>
+     <element name="clusternode">
+      <attribute name="name">
+       <data type="ID"/>
+      </attribute>
+      <attribute name="votes">
+       <data type="positiveInteger"/>
+      </attribute>
+      <optional>
+        <element name="fence">
+         <oneOrMore>
+          <element name="method">
+           <attribute name="name"/>
+            <zeroOrMore>
+             <element name="device">
+              <attribute name="name">
+               <data type="IDREF"/>
+              </attribute>
+              <choice>
+               <!-- WTI, Brocade, Vixel, ILO, McData -->
+               <group>
+                <attribute name="port">
+                 <data type="positiveInteger"/>
+                </attribute>
+               </group>
+               <!-- APC -->
+               <group>
+                <attribute name="port">
+                 <data type="positiveInteger"/>
+                </attribute>
+                <attribute name="switch"/>
+               </group>
+               <!-- GNBD -->
+               <group>
+                <attribute name="ipaddress"/>
+               </group>
+               <!-- xCAT -->
+               <group>
+                <attribute name="nodename"/>
+               </group>
+               <!-- Egenera -->
+               <group>
+                <attribute name="LPAN"/>
+                <attribute name="PServer"/>
+               </group>
+              </choice>
+             </element>
+            </zeroOrMore>
+           </element>
+          </oneOrMore>
+         </element>
+      </optional>
+     </element>
+    </zeroOrMore>
+   </element>
+  </group> 
+  <group>
+   <element name="gulm">
+    <optional>
+     <attribute name="heartbeat_rate">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="allowed_misses">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="coreport">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>  
+    <optional>
+     <attribute name="ltpx_port">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="lt_port">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="lt_partitions">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="master_scan_delay">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="new_connection_timeout">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <oneOrMore>
+     <element name="lockserver">
+      <attribute name="name">
+       <data type="IDREF"/>
+      </attribute>
+     </element>
+    </oneOrMore> 
+   </element>
+   <element name="clusternodes">
+    <zeroOrMore>
+     <element name="clusternode">
+      <attribute name="name">
+       <data type="ID"/>
+      </attribute>
+      <optional>
+        <element name="fence">
+         <oneOrMore>
+          <element name="method">
+           <attribute name="name"/>
+            <zeroOrMore>
+             <element name="device">
+              <attribute name="name">
+               <data type="IDREF"/>
+              </attribute>
+              <choice>
+               <!-- WTI, Brocade, Vixel, ILO, McData -->
+               <group>
+                <attribute name="port">
+                 <data type="positiveInteger"/>
+                </attribute>
+               </group>
+               <!-- APC -->
+               <group>
+                <attribute name="port">
+                 <data type="positiveInteger"/>
+                </attribute>
+                <attribute name="switch"/>
+               </group>
+               <!-- GNBD -->
+               <group>
+                <attribute name="ipaddr"/>
+               </group>
+               <!-- xCAT -->
+               <group>
+                <attribute name="nodename"/>
+               </group>
+               <!-- Egenera -->
+               <group>
+                <attribute name="LPAN"/>
+                <attribute name="PServer"/>
+               </group>
+              </choice>
+             </element>
+            </zeroOrMore>
+           </element>
+          </oneOrMore>
+         </element>
+      </optional>
+     </element>
+    </zeroOrMore>
+   </element>
+  </group>
+ </choice>
+
+
+
+  <element name="fencedevices">
+    <zeroOrMore>
+      <element name="fencedevice">
+        <attribute name="name">
+         <data type="ID"/>
+        </attribute>
+        <attribute name="agent"/>
+        <optional>
+        <choice>
+         <!-- APC, Brocade, McData -->
+         <group>
+          <attribute name="ipaddress"/>
+          <attribute name="login"/>
+          <attribute name="password"/>
+         </group>
+         <!-- WTI, Vixel -->
+         <group>
+          <attribute name="ipaddress"/>
+          <attribute name="password"/>
+         </group>
+         <!-- ILO -->
+         <group>
+          <attribute name="hostname"/>
+          <attribute name="login"/>
+          <attribute name="password"/>
+         </group>
+         <!-- GNBD -->
+         <group>
+          <attribute name="server"/>
+         </group>
+         <!-- Egenera -->
+         <group>
+          <attribute name="cserver"/>
+         </group>
+         <!-- xCAT -->
+         <group>
+          <attribute name="rpowerpath"/>
+         </group>
+        </choice>
+       </optional>
+      </element>
+    </zeroOrMore>
+  </element>
+
+</element>
