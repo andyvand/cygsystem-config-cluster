@@ -88,6 +88,10 @@ NODE_UNIQUE_NAME=_("Names for Cluster Nodes must be Unique. Please choose anothe
 
 NODE_NAME_REQUIRED=_("Please provide a name for this Cluster Node.")
 
+NODE_NAME_LENGTH_EXCEEDED=_("Node names may not exceed 64 characters. Please reduce the length of this node name")
+
+NODE_NAME_WHITESPACE=_("Node names may not contain whitespace. Please remove whitespace from chosen name")
+
 FAILDOM_NAME_REQUIRED=_("Please provide a name for the new Failover Domain")
 
 UNIQUE_FAILDOM_NAME=_("Failover Domains must have unique names. The name %s is already in use. Please provide a unique name.")
@@ -714,10 +718,18 @@ class ConfigTabController:
     #New Node: get selection...get list nodes...check for unique name
     #existing node: check for diff between current name - if so, get list 
     #and check for unique
-    nameattr = self.node_props_name.get_text()
+    nameattr = self.node_props_name.get_text().strip()
     if nameattr == "":
       self.errorMessage(NODE_NAME_REQUIRED)
       self.node_props_name.set_text("")
+      return
+
+    if len(nameattr) > 64:
+      self.errorMessage(NODE_NAME_LENGTH_EXCEEDED)
+      return
+
+    if nameattr.find(" ") != (-1):
+      self.errorMessage(NODE_NAME_WHITESPACE)
       return
 
 

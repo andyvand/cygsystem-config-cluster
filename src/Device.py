@@ -1,6 +1,7 @@
 import string
 import FenceHandler
 from TagObject import TagObject
+from gtk import TRUE,FALSE
 
 TAG_NAME = "device"
 
@@ -8,6 +9,10 @@ import gettext
 _ = gettext.gettext
 
 TYPE=_("Type")
+
+#New Power Controller Fence Agent names should be added to
+#the list below
+power_controller_list=["fence_wti","fence_apc"]
 
 class Device(TagObject):
   def __init__(self):
@@ -23,6 +28,13 @@ class Device(TagObject):
 
   def setAgentType(self, agent_type):
     self.agent_type = agent_type
+
+  def isPowerController(self):
+    for item in power_controller_list:
+      if self.agent_type == item:
+        return TRUE
+
+    return FALSE
 
   def getProperties(self):
     stringbuf = ""

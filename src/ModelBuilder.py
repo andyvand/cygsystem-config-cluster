@@ -99,6 +99,7 @@ class ModelBuilder:
 
       self.object_tree = self.buildModel(None)
       self.resolve_fence_instance_types()
+      self.purgePCDuplicates()
       self.resolve_references()
 
 
@@ -320,6 +321,12 @@ class ModelBuilder:
     self.filename = filename
 
     self.isModified = FALSE
+
+    #part of the perform_final_check code adds extra
+    #fence instance entries for dual power controllers
+    #These must be removed from the tree before the UI
+    #can be used
+    self.purgePCDuplicates()
      
   def has_filepath(self):
     if self.filename == None:
@@ -470,9 +477,52 @@ class ModelBuilder:
         #examine every fence
         #If fence is of power type, add to 'found' list for that level
         #If 'found' list is longer than 1, write out extra objs
-
-    pass
-        
+    nodes = self.getNodes()
+    for node in nodes:
+      levels = node.getFenceLevels()
+      for level in levels:
+        kids = level.getChildren()
+        l = list()
+        for kid in kids:
+          if kid.isPowerController() == TRUE:
+            l.append(kid)
+        if len(l) > 1:  #Means we found multiple PCs in the same level
+          for fence in l:
+            fence.addAttribute("option","off")
+          for fence in l:
+            if fence.getAttribute("option") == "off":
+              d = Device()
+              d.setAgentType(fence.getAgentType())
+              attrs = fence.getAttributes()
+              kees = attrs.keys()
+              for k in kees:
+                d.addAttribute(k,attrs[k])
+              d.addAttribute("option","on")
+              level.addChild(d)
+          
+  def purgePCDuplicates(self):
+    found_one = TRUE
+    while found_one == TRUE:
+      found_one = FALSE
+      nodes = self.getNodes()
+      for node in nodes:
+        levels = node.getFenceLevels()
+        for level in levels:
+          kids = level.getChildren()
+          for kid in kids: #kids are actual fence instance objects
+            res = kid.getAttribute("option")
+            if res != None:
+              if res == "off":
+                kid.removeAttribute("option")
+              else:
+                level.removeChild(kid)
+                found_one = TRUE
+                break
+        if found_one == TRUE:
+          break
+          
+    
+ 
    
 if __name__ == "__main__":
   print "Starting main program"

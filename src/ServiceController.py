@@ -214,6 +214,7 @@ class ServiceController:
     model, iter = selection.get_selected()
     robj = model.get_value(iter, R_OBJ_COL)
     self.current_service.removeChild(robj)
+    self.model_builder.setModified()
     self.prep_service_tree()
 
   def on_list_selection_changed(self, *args):
@@ -352,6 +353,7 @@ class ServiceController:
         self.svc_rc_panel.hide()
         for k in returnlist.keys():
           r_obj.addAttribute(k, returnlist[k])
+          self.model_builder.setModified()
         self.prep_service_tree()
                                                                                 
     else: #New...
@@ -367,6 +369,7 @@ class ServiceController:
           self.current_service.addChild(newobj)
         else:
           r_obj.addChild(newobj)
+        self.model_builder.setModified()
         self.prep_service_tree()
                                                                                 
   def rc_panel_cancel(self, button):
@@ -392,6 +395,7 @@ class ServiceController:
       rc_obj.addChild(rf)
     else:
       self.current_service.addChild(rf)
+    self.model_builder.setModified()
                                                                                 
   def on_shared_rc_cancel(self, button):
     self.shared_rc_panel.hide()
