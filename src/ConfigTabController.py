@@ -384,21 +384,21 @@ class ConfigTabController:
     if len(fence_placeholder) == 0:
       fens = Fence()
       nd.addChild(fens)
-    chilluns = fence_placeholder[0].getChildren()
-    #chilluns holds a list of fence levels
-    for chillun in chilluns:
+    kids = fence_placeholder[0].getChildren()
+    #kids holds a list of fence levels
+    for kid in kids:
       flevel_iter = treemodel.append(node_iter)
       flevel_substr = FENCE_LEVEL % level_index
       ##The next line mutates the incoming obj tree to issue sensible 
       ##level names
-      chillun.addAttribute("name",str(level_index))
+      kid.addAttribute("name",str(level_index))
       level_index = level_index + 1
       flevel_str = "<span size=\"11000\"><b>" + flevel_substr + "</b></span>"
       treemodel.set(flevel_iter, FENCE_NAME_COL, flevel_str,
                                  FENCE_TYPE_COL, F_LEVEL_TYPE,
-                                 FENCE_OBJ_COL, chillun )
+                                 FENCE_OBJ_COL, kid )
 
-      fences = chillun.getChildren()
+      fences = kid.getChildren()
       for fence in fences:
         fence_iter = treemodel.append(flevel_iter)
         fence_str = "<span size=\"11000\"><b>" + fence.getName() + "</b></span>"
@@ -660,6 +660,7 @@ class ConfigTabController:
   def on_clusternode_add_b(self, button):
     self.node_props_flag = NODE_NEW
     self.node_props_name.set_text("")
+    self.node_props_name.grab_focus()
     self.node_props_votes.set_text("")
     if self.model_builder.getLockType() == GULM_TYPE:
       self.gulm_lockserver.show()
@@ -770,6 +771,7 @@ class ConfigTabController:
   def prep_clusternode_edit_dialog(self, status):
     if status == NODE_NEW:
       self.node_props_name.set_text("")
+      self.node_props_name.grab_focus("")
       self.node_props_votes.set_text("")
       if self.model_builder.getLockType() == GULM_TYPE:
         self.gulm_lockserver.show()
@@ -784,6 +786,8 @@ class ConfigTabController:
       try:
         self.node_props_name.set_text(attrs[NAME_ATTR]) 
         self.node_props_votes.set_text(attrs[VOTES_ATTR]) 
+        self.node_props_votes.select_region(0, (-1)) 
+        self.node_props_votes.grab_focus() 
       except KeyError, e:
         print " Error looking up key in Nodes attr hash"
 

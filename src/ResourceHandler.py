@@ -175,44 +175,92 @@ class ResourceHandler:
     return fields
 
   def val_script(self, name):
+
+    script_name = self.script_name.get_text()
+    if script_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name != None:
+      if name != script_name:
+        res = self.check_unique_script_name(script_name)
+        if res == FALSE:  #name already used for a script
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+
     filepath = self.script_filepath.get_text()
     
     fields = {}
     
-    fields["name"] = name
+    fields["name"] = script_name
     fields["file"] = filepath
 
     return fields
 
   def val_nfsclient(self, name):
+
+    nfs_name = self.nfsc_name.get_text()
+    if nfs_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name != None:
+      if name != nfs_name:
+        res = self.check_unique_nfsc_name(nfs_name)
+        if res == FALSE:  #name already used for an nfsc
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+
     fields = {}
-    target = self.nfsc_name.get_text()
+    target = self.nfsc_target.get_text()
     opt = self.nfsc_rw.get_active()
     if opt == TRUE:
       option = "rw"
     else:
       option = "ro"
 
-    fields["name"] = name
+    fields["name"] = nfs_name
     fields["target"] = target
     fields["options"] = option
 
     return fields
 
   def val_nfsexport(self, name):
+
+    nfs_name = self.nfse_name.get_text()
+    if nfs_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name != None:
+      if name != nfs_name:
+        res = self.check_unique_nfse_name(nfs_name)
+        if res == FALSE:  #name already used for an nfsc
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+
     fields = {}
-    fields["name"] = name
+    fields["name"] = nfs_name
+
+    return fields
 
   def val_fs(self, name):
+
+    fs_name = self.fs_name.get_text()
+    if fs_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name != None:
+      if name != fs_name:
+        res = self.check_unique_fs_name(fs_name)
+        if res == FALSE:  #name already used for an fs
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+
     fields = {}
-    fields["name"] = name
+    fields["name"] = fs_name
     mntp = self.fs_mnt.get_text()
     fields["mountpoint"] = mntp
-    device = self.fs_device.et_text()
+    device = self.fs_device.get_text()
     fields["device"] = device
     fstypelabel = self.fs_optionmenu.get_children()[0]
     fstype = fstypelabel.get_text()
     fields["fstype"] = fstype
+
+    return fields
 
   def val_group(self, name):
     pass

@@ -63,6 +63,8 @@ ABOUT_VERSION=_("%s %s") % ('system-config-cluster',VERSION)
 NO_CONF_PRESENT=_("The cluster configuration file, '/etc/cluster/cluster.conf' does not exist on this system. This application will help you build an initial configuration file, or you can open an existing configuration file in another location by selecting 'Open' in the file drop down menu.") 
 
 NOT_CLUSTER_MEMBER=_("Because this node is not currently part of a cluster, the management tab for this application is not available.")
+
+SAVED_FILE=_("The current configuration has been saved in \n %s")
 ###############################################
 class basecluster:
   def __init__(self, glade_xml, app):
@@ -102,7 +104,7 @@ class basecluster:
         "on_quit1_activate" : self.quit,
         "on_open1_activate" : self.open,
         "on_new1_activate" : self.new,
-        "on_save1_activate" : self.model_builder.exportModel,
+        "on_save1_activate" : self.save,
         "on_save_as1_activate" : self.save_as,
         "on_about1_activate" : self.on_about
       }
@@ -168,9 +170,12 @@ class basecluster:
 
   def save(self, *args):
     if self.model_builder.has_filepath():
+      fp = self.model_builder.getFilepath()
       self.model_builder.exportModel()
+      retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % fp)
     else:  #Must have been a 'New' instance...
       self.save_as(None)
+
 
   def save_as(self, *args):
     popup = gtk.FileSelection()

@@ -435,7 +435,7 @@ class FenceHandler:
     fields["name"] = self.apc_fd_name.get_text()
     fields["ipaddress"] = self.apc_fd_ip.get_text()
     fields["login"] = self.apc_fd_login.get_text()
-    fields["password"] = self.apc_fd_passwd.get_text()
+    fields["passwd"] = self.apc_fd_passwd.get_text()
 
     return fields
  
@@ -456,7 +456,7 @@ class FenceHandler:
     fields = {}
     fields["name"] = self.wti_fd_name.get_text()
     fields["ipaddress"] = self.wti_fd_ip.get_text()
-    fields["password"] = self.wti_fd_passwd.get_text()
+    fields["passwd"] = self.wti_fd_passwd.get_text()
 
     return fields
  
@@ -480,7 +480,7 @@ class FenceHandler:
     fields["name"] = self.brocade_fd_name.get_text()
     fields["ipaddress"] = self.brocade_fd_ip.get_text()
     fields["login"] = self.brocade_fd_login.get_text()
-    fields["password"] = self.brocade_fd_passwd.get_text()
+    fields["passwd"] = self.brocade_fd_passwd.get_text()
 
     return fields
  
@@ -504,7 +504,7 @@ class FenceHandler:
     fields["name"] = self.ilo_fd_name.get_text()
     fields["hostname"] = self.ilo_fd_hostname.get_text()
     fields["login"] = self.ilo_fd_login.get_text()
-    fields["password"] = self.ilo_fd_passwd.get_text()
+    fields["passwd"] = self.ilo_fd_passwd.get_text()
 
     return fields
  
@@ -525,7 +525,7 @@ class FenceHandler:
     fields = {}
     fields["name"] = self.vixel_fd_name.get_text()
     fields["ipaddress"] = self.vixel_fd_ip.get_text()
-    fields["password"] = self.vixel_fd_passwd.get_text()
+    fields["passwd"] = self.vixel_fd_passwd.get_text()
 
     return fields
  
@@ -549,7 +549,7 @@ class FenceHandler:
     fields["name"] = self.mcdata_fd_name.get_text()
     fields["ipaddress"] = self.mcdata_fd_ip.get_text()
     fields["login"] = self.mcdata_fd_login.get_text()
-    fields["password"] = self.mcdata_fd_passwd.get_text()
+    fields["passwd"] = self.mcdata_fd_passwd.get_text()
 
     return fields
  

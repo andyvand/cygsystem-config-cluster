@@ -323,6 +323,8 @@ class ModelBuilder:
 
   def isNodeLockserver(self,name):
     gptr = self.getGULMPtr()
+    if gptr == None:  #Obviously not GuLM
+      return FALSE
     children = gptr.getChildren()
     for child in children:
       if child.getName() == name:
