@@ -11,6 +11,7 @@ CLUSTER_POPULATION=_("Number of Members: %d")
 DLM_TYPE=_("Locking Type: Distributed")
 GULM_TYPE=_("Locking Type: GuLM")
 LOCKSERVER=_("Lock Server:")
+CONFIG_VERSION=_("Config Version")
                                                                                 
 class Cluster(TagObject):
   def __init__(self):
@@ -26,6 +27,9 @@ class Cluster(TagObject):
     gulm_ptr = None
 
     stringbuf = CLUSTER_NAME % self.getAttribute("name") + "\n"
+
+    stringbuf = stringbuf + CONFIG_VERSION + ": " + self.getConfigVersion() + "\n"
+
     kids = self.getChildren()
     for kid in kids:
       try:
@@ -71,3 +75,16 @@ class Cluster(TagObject):
         stringbuf = stringbuf + "  " + LOCKSERVER + "  " + server.getName() + "\n"
 
     return stringbuf
+
+  def getConfigVersion(self):
+    version = self.getAttribute("config_version")
+    return version
+
+  def setConfigVersion(self, version):
+    self.addAttribute(version)
+
+  def incrementConfigVersion(self):
+    version = self.getAttribute("config_version")
+    intversion = int(version)
+    intversion = intversion + 1
+    self.addAttribute("config_version", str(intversion))

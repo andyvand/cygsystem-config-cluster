@@ -6,7 +6,8 @@ Cman.py		\
 ConfigTabController.py  \
 ConfigTab.py  \
 Device.py \
-Dlm.py \
+Gulm.py \
+Lockserver.py \
 FaildomController.py \
 FailoverDomainNode.py \
 FailoverDomain.py \
@@ -60,7 +61,8 @@ install-exec-local:
 	install -m 0640 $(srcdir)/ConfigTabController.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ConfigTab.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Device.py $(DESTDIR)$(pkgdatadir)/
-	install -m 0640 $(srcdir)/Dlm.py $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Gulm.py $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Lockserver.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FaildomController.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FailoverDomainNode.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FailoverDomain.py  $(DESTDIR)$(pkgdatadir)/

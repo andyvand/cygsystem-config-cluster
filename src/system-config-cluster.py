@@ -70,14 +70,30 @@ class basecluster:
      
     self.glade_xml = glade_xml
 
+    self.notebook = self.glade_xml.get_widget('notebook1')
+    self.nodetree = self.glade_xml.get_widget('nodetree')
+    mgmtpageidx = self.notebook.page_num(self.nodetree)
+    self.mgmt_tab = self.notebook.get_nth_page(mgmtpageidx)
+
     self.configtab = ConfigTab(glade_xml, self.model_builder)
+
+    #Check to see if running app on an active cluster node.
+    #If not, hide mgmt tab
+    is_cluster_member = self.model_builder.isClusterMember()
+
+    if is_cluster_member == TRUE:
+      self.mgmttab = MgmtTab(glade_xml, self.model_builder)
+      pass
+    else:
+      #hide mgmt tab
+      self.mgmt_tab.hide()
 
     self.glade_xml.signal_autoconnect(
       {
         "on_quit1_activate" : self.quit,
         "on_open1_activate" : self.open,
         "on_new1_activate" : self.new,
-        "on_save1_activate" : self.model_builder.testexportModel,
+        "on_save1_activate" : self.model_builder.exportModel,
         "on_save_as1_activate" : self.save_as,
         "on_about1_activate" : self.on_about
       }

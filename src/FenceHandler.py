@@ -19,6 +19,7 @@ FD_PROVIDE_PASSWD = _("A password must be provided for this Fence Device")
 FI_PROVIDE_XCATNODENAME = _("An xCAT Nodename must be provided for this Fence")
 FI_PROVIDE_SWITCH = _("A switch address must be provided for this Fence")
 FI_PROVIDE_PORT = _("A port value must be provided for this Fence")
+FI_PROVIDE_PORT = _("A Blade must be specified for this Fence")
 FI_PROVIDE_IPADDRESS = _("An IP address must be provided for this Fence")
 FI_PROVIDE_ELPAN = _("A LPAN value must be provided for this Egenera Fence")
 FI_PROVIDE_EPSERVER = _("A PServer value must be provided for this Egenera Fence")
@@ -42,20 +43,22 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_brocade":_("Brocade Switch"),
               "fence_vixel":_("Vixel SAN Switch"),
               "fence_gnbd":_("Global Network Block Device"),
-              "fence_ilo":_("HP Riloe Device"),
-              "fence_xcat":_("xCAT"),
+              "fence_ilo":_("HP ILO Device"),
+              "fence_sanbox2":_("QLogic SANBox2"),
+              "fence_bladecenter":_("IBM Blade Center"),
               "fence_mcdata":_("McDATA SAN Switch"),
               "fence_egenera":_("Egenera SAN Controller"),
               "fence_manual":_("Manual Fencing") }
 
-FENCE_FD_ATTRS = {"fence_apc":["name","ipaddress","login","password"],
-              "fence_wti":["name","ipaddress","password"],
-              "fence_brocade":["name","ipaddress","login","password"],
-              "fence_vixel":["name","ipaddress","password"],
+FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
+              "fence_wti":["name","ipaddr","passwd"],
+              "fence_brocade":["name","ipaddr","login","passwd"],
+              "fence_vixel":["name","ipaddr","passwd"],
               "fence_gnbd":["name","server"],
-              "fence_ilo":["name","hostname","login","password"],
-              "fence_xcat":["name","path"],
-              "fence_mcdata":["name","ipaddress","login","password"],
+              "fence_ilo":["name","hostname","login","passwd"],
+              "fence_sanbox2":["name","ipaddr","login","passwd"],
+              "fence_bladecenter":["name","ipaddr","login","passwd"],
+              "fence_mcdata":["name","ipaddr","login","passwd"],
               "fence_egenera":["name","cserver"],
               "fence_manual":["name"] }
 
@@ -64,20 +67,22 @@ FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
               "fence_brocade":["port"],
               "fence_vixel":["port"],
               "fence_gnbd":["ipaddress"],
-              "fence_ilo":["port"],
-              "fence_xcat":["nodename"],
+              "fence_ilo":[],
+              "fence_sanbox2":["port"],
+              "fence_bladecenter":["blade"],
               "fence_mcdata":["port"],
               "fence_egenera":["lpan","pserver"],
               "fence_manual":[] }
 
 PRETTY_NAME_ATTRS = {"port":_("Port"),
+                     "blade":_("Blade"), 
                      "switch":_("Switch"),
-                     "ipaddress":_("IP Address"),
+                     "ipaddr":_("IP Address"),
                      "nodename":_("Nodename"),
                      "lpan":_("LPAN"),
                      "pserver":_("PServer"),
                      "login":_("Login"),
-                     "password":_("Password"),
+                     "passwd":_("Password"),
                      "name":_("Name"),
                      "server":_("Server"),
                      "hostname":_("Hostname"),
@@ -129,7 +134,8 @@ class FenceHandler:
               "fence_vixel":self.pop_vixel,
               "fence_gnbd":self.pop_gnbd,
               "fence_ilo":self.pop_ilo,
-              "fence_xcat":self.pop_xcat,
+              "fence_sanbox2":self.pop_sanbox2,
+              "fence_bladecenter":self.pop_bladecenter,
               "fence_mcdata":self.pop_mcdata,
               "fence_egenera":self.pop_egenera,
               "fence_manual":self.pop_manual }
@@ -140,7 +146,8 @@ class FenceHandler:
               "fence_vixel":self.pop_vixel_fd,
               "fence_gnbd":self.pop_gnbd_fd,
               "fence_ilo":self.pop_ilo_fd,
-              "fence_xcat":self.pop_xcat_fd,
+              "fence_sanbox2":self.pop_sanbox2_fd,
+              "fence_bladecenter":self.pop_bladecenter_fd,
               "fence_mcdata":self.pop_mcdata_fd,
               "fence_egenera":self.pop_egenera_fd,
               "fence_manual":self.pop_manual_fd }
@@ -151,7 +158,8 @@ class FenceHandler:
               "fence_vixel":self.val_vixel,
               "fence_gnbd":self.val_gnbd,
               "fence_ilo":self.val_ilo,
-              "fence_xcat":self.val_xcat,
+              "fence_sanbox2":self.val_sanbox2,
+              "fence_bladecenter":self.val_bladecenter,
               "fence_mcdata":self.val_mcdata,
               "fence_egenera":self.val_egenera,
               "fence_manual":self.val_manual }
@@ -162,7 +170,8 @@ class FenceHandler:
               "fence_vixel":self.val_vixel_fd,
               "fence_gnbd":self.val_gnbd_fd,
               "fence_ilo":self.val_ilo_fd,
-              "fence_xcat":self.val_xcat_fd,
+              "fence_sanbox2":self.val_sanbox2_fd,
+              "fence_bladecenter":self.val_bladecenter_fd,
               "fence_mcdata":self.val_mcdata_fd,
               "fence_egenera":self.val_egenera_fd,
               "fence_manual":self.val_manual_fd }
@@ -192,7 +201,7 @@ class FenceHandler:
     self.brocade_port.set_text(attrs["port"])
  
   def pop_ilo(self, attrs):
-    self.ilo_port.set_text(attrs["port"])
+    pass
  
   def pop_vixel(self, attrs):
     self.vixel_port_text(attrs["port"])
@@ -210,8 +219,11 @@ class FenceHandler:
     self.egenera_lpan.set_text(attrs["lpan"])
     self.egenera_pserver.set_text(attrs["pserver"])
  
-  def pop_xcat(self, attrs):
-    self.xcat_nodename.set_text(attrs["nodename"])
+  def pop_sanbox2(self, attrs):
+    self.sanbox2_port.set_text(attrs["port"])
+
+  def pop_bladecenter(self, attrs):
+    self.bladecenter_blade.set_text(attrs["blade"])
 
   def clear_fi_forms(self):
     self.apc_port.set_text("") 
@@ -220,8 +232,8 @@ class FenceHandler:
     self.brocade_port.set_text("")
     self.vixel_port.set_text("")
     self.gnbd_ip.set_text("") 
-    self.ilo_port.set_text("")
-    self.xcat_nodename.set_text("")
+    self.sanbox2_port.set_text("")
+    self.bladecenter_blade.set_text("")
     self.mcdata_port.set_text("")
     self.egenera_lpan.set_text("")
     self.egenera_pserver.set_text("")
@@ -255,8 +267,14 @@ class FenceHandler:
     self.gnbd_fd_server.set_text("")
     self.egenera_fd_name.set_text("")
     self.egenera_fd_cserver.set_text("")
-    self.xcat_fd_name.set_text("")
-    self.xcat_fd_path.set_text("")
+    self.sanbox2_fd_name.set_text("")
+    self.sanbox2_fd_ip.set_text("")
+    self.sanbox2_fd_login.set_text("")
+    self.sanbox2_fd_passwd.set_text("")
+    self.bladecenter_fd_name.set_text("")
+    self.bladecenter_fd_ip.set_text("")
+    self.bladecenter_fd_login.set_text("")
+    self.bladecenter_fd_passwd.set_text("")
 
   #Populate form methods for Fence Devices
   def pop_apc_fd(self, attrs):
@@ -311,9 +329,17 @@ class FenceHandler:
     self.egenera_fd_cserver.set_text(attrs["cserver"])
 
  
-  def pop_xcat_fd(self, attrs):
-    self.xcat_fd_name.set_text(attrs["name"])
-    self.xcat_fd_path.set_text(attrs["path"])
+  def pop_sanbox2_fd(self, attrs):
+    self.sanbox2_fd_name.set_text(attrs["name"])
+    self.sanbox2_fd_ip.set_text(attrs["ipaddr"])
+    self.sanbox2_fd_login.set_text(attrs["login"])
+    self.sanbox2_fd_passwd.set_text(attrs["passwd"])
+
+  def pop_bladecenter_fd(self, attrs):
+    self.bladecenter_fd_name.set_text(attrs["name"])
+    self.bladecenter_fd_ip.set_text(attrs["ipaddr"])
+    self.bladecenter_fd_login.set_text(attrs["login"])
+    self.bladecenter_fd_passwd.set_text(attrs["passwd"])
 
 
   def process_widgets(self):
@@ -325,7 +351,8 @@ class FenceHandler:
     self.vixel_port = self.fence_xml.get_widget('entry5') 
     self.gnbd_ip = self.fence_xml.get_widget('entry6') 
     self.ilo_port = self.fence_xml.get_widget('entry7') 
-    self.xcat_nodename = self.fence_xml.get_widget('entry8') 
+    self.sanbox2_port = self.fence_xml.get_widget('entry8') 
+    self.bladecenter_blade = self.fence_xml.get_widget('entry41') 
     self.mcdata_port = self.fence_xml.get_widget('entry9') 
     self.egenera_lpan = self.fence_xml.get_widget('entry10') 
     self.egenera_pserver = self.fence_xml.get_widget('entry11') 
@@ -357,8 +384,15 @@ class FenceHandler:
     self.ilo_fd_passwd = self.fence_xml.get_widget('entry30')
     self.ilo_fd_hostname = self.fence_xml.get_widget('entry31')
 
-    self.xcat_fd_name = self.fence_xml.get_widget('entry32')
-    self.xcat_fd_path = self.fence_xml.get_widget('entry33')
+    self.sanbox2_fd_name = self.fence_xml.get_widget('entry32')
+    self.sanbox2_fd_ip = self.fence_xml.get_widget('entry33')
+    self.sanbox2_fd_login = self.fence_xml.get_widget('entry46')
+    self.sanbox2_fd_passwd = self.fence_xml.get_widget('entry47')
+
+    self.bladecenter_fd_name = self.fence_xml.get_widget('entry42')
+    self.bladecenter_fd_ip = self.fence_xml.get_widget('entry43')
+    self.bladecenter_fd_login = self.fence_xml.get_widget('entry44')
+    self.bladecenter_fd_passwd = self.fence_xml.get_widget('entry45')
 
     self.mcdata_fd_name = self.fence_xml.get_widget('entry34')
     self.mcdata_fd_ip = self.fence_xml.get_widget('entry35')
@@ -567,29 +601,65 @@ class FenceHandler:
     return fields
 
  
-  def val_xcat_fd(self, name):
-    if self.xcat_fd_name.get_text() == "":
+  def val_sanbox2_fd(self, name):
+    if self.sanbox2_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
 
-    if name != self.xcat_fd_name.get_text():
-      res = self.check_unique_fd_name(self.xcat_fd_name.get_text())
+    if name != self.sanbox2_fd_name.get_text():
+      res = self.check_unique_fd_name(self.sanbox2_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
 
-    if self.xcat_fd_path.get_text() == "":
-      raise ValidationError('FATAL', FD_PROVIDE_PATH)
+    if self.sanbox2_fd_ip.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_IP)
+
+    if self.sanbox2_fd_login.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+
+    if self.sanbox2_fd_passwd.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
 
     fields = {}
-    fields["name"] = self.xcat_fd_name.get_text()
-    fields["path"] = self.xcat_fd_path.get_text()
+    fields["name"] = self.sanbox2_fd_name.get_text()
+    fields["ipaddr"] = self.sanbox2_fd_ip.get_text()
+    fields["login"] = self.sanbox2_fd_login.get_text()
+    fields["passwd"] = self.sanbox2_fd_passwd.get_text()
+
+    return fields
+
+  def val_bladecenter_fd(self, name):
+    if self.bladecenter_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+
+    if name != self.bladecenter_fd_name.get_text():
+      res = self.check_unique_fd_name(self.bladecenter_fd_name.get_text())
+      if res == FALSE:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+
+    if self.bladecenter_fd_ip.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_IP)
+
+    if self.bladecenter_fd_login.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+
+    if self.bladecenter_fd_passwd.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    fields = {}
+    fields["name"] = self.bladecenter_fd_name.get_text()
+    fields["ipaddr"] = self.bladecenter_fd_ip.get_text()
+    fields["login"] = self.bladecenter_fd_login.get_text()
+    fields["passwd"] = self.bladecenter_fd_passwd.get_text()
 
     return fields
 
   #Validation Methods for Fence Instances 
   def validate_fenceinstance(self, agent_type):
     try:
+      print "trying validate fence instance -- %s" % agent_type
       returnlist = apply(self.fi_validate[agent_type])
     except ValidationError, e:
+      print "Caught an error"
       MessageLibrary.errorMessage(e.getMessage())
       return None
 
@@ -644,27 +714,49 @@ class FenceHandler:
     return fields
 
   def val_ilo(self):
-    if self.ilo_port.get_text() == "":
-      raise ValidationError('FATAL', FI_PROVIDE_PORT)
 
     fields = {}
-    fields["port"] = self.ilo_port.get_text()
 
     return fields
 
-  def val_xcat(self):
-    if self.xcat_nodename.get_text() == "": 
-      raise ValidationError('FATAL', FI_PROVIDE_XCATNODENAME)
+  def val_sanbox2(self):
+    if self.sanbox2_port.get_text() == "": 
+      raise ValidationError('FATAL', FI_PROVIDE_PORT)
+
+    fields = {}
+    fields["port"] = self.sanbox2_port.get_text()
+
+    return fields
+
+  def val_bladecenter(self):
+    if self.bladecenter_blade.get_text() == "": 
+      raise ValidationError('FATAL', FI_PROVIDE_BLADE)
+
+    fields = {}
+    fields["blade"] = self.bladecenter_blade.get_text()
+
+    return fields
 
   def val_mcdata(self):
     if self.mcdata_port.get_text() == "":
       raise ValidationError('FATAL', FI_PROVIDE_PORT)
+
+    fields = {}
+    fields["port"] = self.mcdata_port.get_text()
+
+    return fields
 
   def val_egenera(self):
     if self.egenera_lpan.get_text() == "":
       raise ValidationError('FATAL', FI_PROVIDE_ELPAN)
     if self.egenera_pserver.get_text() == "":
       raise ValidationError('FATAL', FI_PROVIDE_EPSERVER)
+
+    fields = {}
+    fields["lpan"] = self.egenera_lpan.get_text()
+    fields["pserver"] = self.egenera_pserver.get_text()
+
+    return fields
 
   def val_manual(self): 
 

@@ -29,6 +29,8 @@ from FailoverDomain import FailoverDomain
 from FailoverDomains import FailoverDomains
 from FailoverDomainNode import FailoverDomainNode
 from Rm import Rm
+from CommandHandler import CommandHandler
+from CommandError import CommandError
 
 TAGNAMES={ 'cluster':Cluster,
            'clusternodes':ClusterNodes,
@@ -76,6 +78,7 @@ class ModelBuilder:
     self.fencedevices_ptr = None
     self.resourcemanager_ptr = None
     self.resources_ptr = None
+    self.command_handler = CommandHandler()
 
     if filename == None:
       self.object_tree = self.buildModelTemplate()
@@ -143,7 +146,6 @@ class ModelBuilder:
     self.clusternodes_ptr = cns
 
     obj_tree.addChild(Cman())
-    obj_tree.addChild(Dlm())
 
     fds = FenceDevices()
     obj_tree.addChild(fds)
@@ -205,6 +207,9 @@ class ModelBuilder:
       return FALSE
     else:
       return TRUE
+
+  def isClusterMember(self):
+    return self.command_handler.isClusterMember()
     
   def getNodes(self):
     #Find the clusternodes obj and return get_children 

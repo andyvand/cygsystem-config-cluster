@@ -103,6 +103,8 @@ CONFIRM_LEVEL_REMOVE_EMPTY=_("Are you certain that you wish to remove this fence
 
 CONFIRM_FI_REMOVE=_("Are you certain that you wish to remove this fence?")
 
+NEED_CONFIG_VERSION=_("Please provide a Config Version")
+
 SELECT_RC_TYPE=_("<span><b>Select a Resource Type:</b></span>")
 
 RC_PROPS=_("Properties for %s Resource: %s")
@@ -198,6 +200,7 @@ class ConfigTabController:
     self.glade_xml.get_widget('okbutton16').connect('clicked',self.on_cluster_props_edit_ok)
     self.cluster_props_dlg = self.glade_xml.get_widget('cluster_props')
     self.clustername = self.glade_xml.get_widget('clustername')
+    self.config_version = self.glade_xml.get_widget('config_version')
 
     ##Node Fields
     #Node Props
@@ -311,15 +314,25 @@ class ConfigTabController:
     cptr = self.model_builder.getClusterPtr()
     name = cptr.getName()
     self.clustername.set_text(name)
+    self.config_version.set_text(cptr.getConfigVersion())
     self.cluster_props_dlg.show()
 
   def on_cluster_props_edit_ok(self, button):
     cptr = self.model_builder.getClusterPtr()
     name = self.clustername.get_text()
+    version = self.config_version.get_text()
     if name == "":
       self.errorMessage(NEED_CLUSTER_NAME)
       return
+
+    if version == "":
+      self.errorMessage(NEED_CONFIG_VERSION)
+      self.config_version.set_text(cptr.getConfigVersion())
+      self.config_version.select_region(0, -1)
+      return
+
     cptr.addAttribute("name",name)
+    cptr.addAttribute("config_version",version)
     apply(self.reset_tree_model)
     self.cluster_props_dlg.hide()
 
