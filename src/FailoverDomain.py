@@ -5,11 +5,13 @@ TAG_NAME = "failoverdomain"
 import gettext
 _ = gettext.gettext
 
-UNRESTRICTED=_("This is an unrestricted domain\n")
-RESTRICTED=_("This domain is restricted to members\n")
-UNORDERED=_("All members share equal priority\n")
-ORDERED=_("Members are ordered by priority\n")
-NUM_KIN=_("There are currently %d members")
+TYPE=_("Type: ")
+UNRESTRICTED=_("Unrestricted")
+RESTRICTED=_("Restricted")
+UNORDERED=_("Unordered: Equal Priority")
+ORDERED=_("Ordered by Priority Level")
+NUM_KINS=_("Population: %d members")
+NUM_KIN=_("Population: %d member")
 NO_KIN=_("There are no current members")
 
 class FailoverDomain(TagObject):
@@ -52,10 +54,12 @@ class FailoverDomain(TagObject):
 
 
     num_kin = len(self.getChildren())
-    if num_kin > 0:
+    if num_kin > 1:
+      string_num_kin = NUM_KINS % num_kin
+    elif num_kin == 1:
       string_num_kin = NUM_KIN % num_kin
     else:
       string_num_kin = NO_KIN
 
-    return string_restricted + "\n" + string_ordered + "\n" + string_num_kin + "\n"
+    return TYPE + string_restricted + "\n" + string_ordered + "\n\n" + string_num_kin + "\n"
 

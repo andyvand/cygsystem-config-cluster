@@ -49,10 +49,6 @@ FENCE_NAME_COL=1
 FENCE_TYPE_COL=2
 FENCE_OBJ_COL=3
 
-F_NODE_TYPE=0
-F_LEVEL_TYPE=1
-F_FENCE_TYPE=2
-
 NODE_NEW = 0
 NODE_EXISTING = 1
 
@@ -61,9 +57,21 @@ VOTES_ATTR = "votes"
 
 FI_TYPE=_("Fence Device Type: \n %s")
 
+AFF_NODES=_("Affected Cluster Nodes")
+
+WARNING1=_("The following Cluster Node depends on Fence Device %s.")
+
+WARNINGS1=_("The following Cluster Nodes depend on Fence Device %s.")
+
+WARNING2=_("Removing this Fence Device will alter Fencing on this Cluster Node.\n Are you certain that you wish to continue?")
+
+WARNINGS2=_("Removing this Fence Device will alter Fencing on these Cluster Nodes.\n Are you certain that you wish to continue?")
+
 ADD_FENCE_DEVICE=_("Add a New Fence Device")
 
 EDIT_FENCE_DEVICE=_("Edit Properties for this Fence Device")
+
+CONFIRM_FD_DELETE=_("Are you certain that you wish to delete Fence Device %s?")
 
 ADD_FENCE=_("Add a New Fence")
 
@@ -146,6 +154,7 @@ class ConfigTabController:
     self.rc_optionmenu_hash = {}
     self.rc_dlg_label = self.glade_xml.get_widget('rc_dlg_label')
     self.rc_panel = self.glade_xml.get_widget('rc_panel')
+    self.rc_panel.connect("delete_event",self.rc_panel_delete)
 
     self.setupFencePanel()
     self.setupDialogsandButtons()
@@ -157,13 +166,16 @@ class ConfigTabController:
     self.fi_task_label = self.glade_xml.get_widget('fence_panel_task_label')
     #dialogs
     self.node_props = self.glade_xml.get_widget('node_properties')
+    self.node_props.connect("delete_event",self.node_props_delete)
     self.node_props_ok = self.glade_xml.get_widget('okbutton11')
     self.node_props_ok.connect("clicked",self.on_node_props_ok)
     self.node_props_cancel = self.glade_xml.get_widget('cancelbutton11')
     self.node_props_cancel.connect("clicked",self.on_node_props_cancel)
 
     self.fence_panel = self.glade_xml.get_widget('fence_panel')
+    self.fence_panel.connect("delete_event", self.fence_panel_delete)
     self.faildom_panel = self.glade_xml.get_widget('faildom_panel')
+    self.faildom_panel.connect("delete_event", self.faildom_panel_delete)
 
     ##buttons from button panels
     #Nodes
@@ -193,6 +205,7 @@ class ConfigTabController:
 
     self.faildom_name = self.glade_xml.get_widget('faildom_name')
     self.add_faildom_dlg = self.glade_xml.get_widget('add_faildom_dlg')
+    self.add_faildom_dlg.connect("delete_event", self.add_faildom_dlg_delete)
     self.glade_xml.get_widget('on_faildom_add_cancel').connect('clicked',self.on_faildom_add_cancel)
     self.glade_xml.get_widget('on_faildom_add_ok').connect('clicked',self.on_faildom_add_ok)
 
@@ -201,13 +214,36 @@ class ConfigTabController:
     #Fence Devices
     self.glade_xml.get_widget('fencedevices_add_b').connect('clicked',self.on_fd)
     self.glade_xml.get_widget('fencedevice_edit_b').connect('clicked',self.on_fd)
+    self.glade_xml.get_widget('fencedevice_delete_b').connect('clicked',self.on_fd_delete)
     self.fd_panel = self.glade_xml.get_widget('fd_panel')
+    self.fd_panel.connect("delete_event", self.fd_panel_delete)
     self.fd_options = self.glade_xml.get_widget('fd_options')
     self.fd_options.connect('changed',self.fd_optionmenu_change)
     self.prep_fd_options()
     self.fd_panel_label = self.glade_xml.get_widget('fd_panel_label')
     self.glade_xml.get_widget('cancelbutton12').connect('clicked',self.on_fd_panel_cancel)
     self.glade_xml.get_widget('okbutton12').connect('clicked',self.on_fd_panel_ok)
+
+    self.fd_delete = self.glade_xml.get_widget('fd_delete')
+    self.fd_delete.connect("delete_event",self.fd_delete_delete)
+    self.fd_delete_warning1 = self.glade_xml.get_widget('fd_delete_warning1')
+    self.fd_delete_warning2 = self.glade_xml.get_widget('fd_delete_warning2')
+    self.fd_delete_treeview = self.glade_xml.get_widget('fd_delete_treeview')
+    self.fd_delete_treemodel = gtk.ListStore (gobject.TYPE_STRING,
+                                              gobject.TYPE_PYOBJECT,
+                                              gobject.TYPE_STRING)
+
+    self.fd_delete_treeview.set_model(self.fd_delete_treemodel)
+    self.fd_delete_treeview.set_headers_visible(TRUE)
+    self.fd_delete_treeview.get_selection().set_mode(gtk.SELECTION_NONE)
+    self.fd_delete_treeview.get_selection().unselect_all()
+
+    renderer0 = gtk.CellRendererText()
+    column0 = gtk.TreeViewColumn(AFF_NODES,renderer0, text=0)
+    self.fd_delete_treeview.append_column(column0)
+
+    self.glade_xml.get_widget('okbutton15').connect('clicked',self.on_fd_delete_ok)
+    self.glade_xml.get_widget('cancelbutton15').connect('clicked',self.on_fd_delete_cancel)
 
     self.rc_options = self.glade_xml.get_widget('rc_options')
     self.rc_options.connect('changed',self.rc_optionmenu_change)
@@ -246,7 +282,6 @@ class ConfigTabController:
 
     self.level_properties_panel = self.glade_xml.get_widget('level_props_panel')
     self.no_selection_panel = self.glade_xml.get_widget('none_selected_panel')
-    self.fi_panel = self.glade_xml.get_widget('fence_instance_panel')
     self.level_props_label = self.glade_xml.get_widget('level_props_label')
 
     self.glade_xml.get_widget('button12').connect('clicked',self.on_create_level)
@@ -256,6 +291,7 @@ class ConfigTabController:
     self.glade_xml.get_widget('button16').connect('clicked', self.on_del_fi)
     
     self.fi_panel = self.glade_xml.get_widget('fi_panel')
+    self.fi_panel.connect("delete_event",self.fi_panel_delete)
     self.fi_type_label = self.glade_xml.get_widget('fi_type_label')
     self.fi_panel_label = self.glade_xml.get_widget('fi_panel_label')
     self.glade_xml.get_widget('okbutton13').connect('clicked',self.on_fi_ok)
@@ -336,6 +372,7 @@ class ConfigTabController:
     if iter == None:
       return
     selected_type = model.get_value(iter, FENCE_TYPE_COL)
+    obj = model.get_value(iter, FENCE_OBJ_COL)
     if selected_type == F_NODE_TYPE:
       self.clear_fence_buttonpanels()
       self.clear_fencepanel_widgets()
@@ -347,6 +384,7 @@ class ConfigTabController:
     else:
       self.clear_fence_buttonpanels()
       self.clear_fencepanel_widgets()
+      self.fence_prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(), selected_type)
       #self.refresh_fi_panel()
       self.fence_buttons.show()
 
@@ -624,7 +662,6 @@ class ConfigTabController:
             return 
         nd.addAttribute(NAME_ATTR,nameattr)
       nd.addAttribute(VOTES_ATTR,votesattr) 
-    print "MADE IT TO THE END OF ADD NODE"
     apply(self.reset_tree_model)
 
       
@@ -701,6 +738,83 @@ class ConfigTabController:
       self.fence_handler.populate_fd_form(agent_type, attrs)
       self.fencedevice_form_hash[agent_type].show()
       self.fd_panel.show()
+
+  def on_fd_delete(self, button):
+    ref_hash = {}
+    selection = self.treeview.get_selection()
+    model,iter = selection.get_selected()
+    obj = model.get_value(iter, OBJ_COL)
+    fd_name = obj.getName().strip()
+    nodes = self.model_builder.getNodes()
+    for node in nodes:
+      flevels = node.getFenceLevels()
+      for flevel in flevels:
+        kids = flevel.getChildren() # list of fences per level
+        for kid in kids:
+          if kid.getName().strip() == fd_name:
+            ref_hash[node] = 0  #Just making a keys list w/o dupes
+
+    #ref_hash.keys() now holds list of node objs that have fence
+    #instances (one or more) that refer to the fd to be deleted
+    kees = ref_hash.keys()
+    num_kees = len(kees)
+    if num_kees == 0:  #simple warning...
+      retval = self.warningMessage(CONFIRM_FD_DELETE % fd_name)
+      if (retval == gtk.RESPONSE_NO):
+        return
+      fd_ptr = self.model_builder.getFenceDevicePtr()
+      fd_ptr.removeChild(obj)
+      apply(self.reset_tree_model)
+      return
+    else:
+      treemodel = self.fd_delete_treeview.get_model()
+      treemodel.clear()
+
+      for kee in kees:
+        new_iter = treemodel.append()
+        treemodel.set(new_iter, 0, kee.getName(),
+                                1, kee,
+                                2, fd_name)
+
+      self.fd_delete_treeview.get_selection().unselect_all()
+
+      if num_kees == 1:
+        self.fd_delete_warning1.set_text(WARNING1 % fd_name)
+        self.fd_delete_warning2.set_text(WARNING2)
+      else:
+        self.fd_delete_warning1.set_text(WARNINGS1 % fd_name)
+        self.fd_delete_warning2.set_text(WARNINGS2)
+
+      self.fd_delete.show()
+
+  def on_fd_delete_ok(self, button):
+    selection = self.treeview.get_selection()
+    outer_model,outer_iter = selection.get_selected()
+    obj = outer_model.get_value(outer_iter, OBJ_COL)
+    fd_ptr = self.model_builder.getFenceDevicePtr()
+    fd_ptr.removeChild(obj)
+    model = self.fd_delete_treeview.get_model()
+    model.foreach(self.remove_fence_from_node, None)
+    self.fd_delete.hide()
+    apply(self.reset_tree_model)
+
+  def remove_fence_from_node(self, model,path,iter, *args):
+    node = model.get_value(iter, 1)
+    fd_name = model.get_value(iter, 2)
+    got_one = 1
+    while got_one > 0:
+      got_one = 0
+      flevels = node.getFenceLevels()
+      for flevel in flevels:
+        kids = flevel.getChildren()
+        for kid in kids:
+          if kid.getName().strip() == fd_name.strip():
+            flevel.removeChild(kid)
+            got_one = 1
+      
+  def on_fd_delete_cancel(self, button):
+    self.fd_delete.hide()
+      
 
   def on_fd_panel_cancel(self, button):
     self.fd_panel.hide()
@@ -910,4 +1024,35 @@ class ConfigTabController:
     dlg.destroy()
     return rc
                                                                                 
+  def node_props_delete(self, *args):
+    self.node_props.hide()
+    return gtk.TRUE
+
+  def fence_panel_delete(self, *args):
+    self.fence_panel.hide()
+    return gtk.TRUE
+
+  def fd_panel_delete(self, *args):
+    self.fd_panel.hide()
+    return gtk.TRUE
+
+  def fi_panel_delete(self, *args):
+    self.fi_panel.hide()
+    return gtk.TRUE
+
+  def faildom_panel_delete(self, *args):
+    self.faildom_panel.hide()
+    return gtk.TRUE
+
+  def add_faildom_dlg_delete(self, *args):
+    self.add_faildom_dlg.hide()
+    return gtk.TRUE
+
+  def rc_panel_delete(self, *args):
+    self.rc_panel.hide()
+    return gtk.TRUE
+
+  def fd_delete_delete(self, *args):
+    self.fd_delete.hide()
+    return gtk.TRUE
 

@@ -110,7 +110,7 @@ class ConfigTab:
       self.clear_all_buttonpanels()
       self.clusternode_p.show()
     elif type == CLUSTER_NODE_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
+      self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.node_p.show()
     elif type == FENCE_TYPE:
@@ -118,7 +118,7 @@ class ConfigTab:
       self.clear_all_buttonpanels()
       self.fence_p.show()
     elif type == FENCE_DEVICES_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getTagName(),type) 
+      self.prop_renderer.render_to_layout_area(obj.getProperties(), FENCEDEVICES,type) 
       self.clear_all_buttonpanels()
       self.fencedevices_p.show()
     elif type == FENCE_DEVICE_TYPE:
@@ -126,7 +126,7 @@ class ConfigTab:
       self.clear_all_buttonpanels()
       self.fencedevice_p.show()
     elif type == MANAGED_RESOURCES_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
+      self.prop_renderer.render_to_layout_area(None, MANAGED_RESOURCES,type) 
       self.clear_all_buttonpanels()
     elif type == FAILOVER_DOMAINS_TYPE:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 

@@ -6,7 +6,9 @@ import gettext
 _ = gettext.gettext
                                                                                 
 
-OF_CURRENT_FAILDOMS=_("Of the %d Failover Domains \n configured for this cluster, \n %d current clusternodes are included \n as Failover Domain members.")
+CURRENT_FAILDOMS=_("%d Failover Domains configured.")
+
+NO_FDOMS=_("No Domains Currently Configured.")
 
 class FailoverDomains(TagObject):
   def __init__(self):
@@ -19,15 +21,18 @@ class FailoverDomains(TagObject):
     name_hash = {}
     kids = self.getChildren()
     numkin = len(kids)
+    if numkin == 0:
+      return NO_FDOMS
 
     #This double loop adds all failoverdomainnode names to a hash table as keys.
-    for kid in kids:
-      kiddies = kid.getChildren()
-      for kiddie in kiddies:
-        name_hash[kiddie.getName().strip()] = 0
+    #Used for counting how many nodes are employed in failover domains
+    #for kid in kids:
+    #  kiddies = kid.getChildren()
+    #  for kiddie in kiddies:
+    #    name_hash[kiddie.getName().strip()] = 0
+    ##
+    #numnodes = len(name_hash.keys())
 
-    numnodes = len(name_hash.keys())
-
-    stringbuf = OF_CURRENT_FAILDOMS % (numkin,numnodes)
+    stringbuf = CURRENT_FAILDOMS % numkin
 
     return stringbuf

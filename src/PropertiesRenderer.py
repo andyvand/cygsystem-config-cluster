@@ -48,11 +48,12 @@ CLUSTER_STR=_("Cluster")
 CLUSTER_PROPS_STR=_("Cluster Properties")
 CLUSTER_NODES_STR=_("Cluster Membership")
 CLUSTER_NODE_STR=_("Cluster Node:")
-FENCE_STR=_("%s Fencing Configuration")
+FENCE_STR=_("Fence: ")
 FENCE_DEVICES_STR=_("Fence Devices")
 FENCE_DEVICE_STR=_("Fence Device:")
 FAILOVER_DOMAINS_STR=_("Failover Domains")
 FAILOVER_DOMAIN_STR=_("Failover Domain:")
+MANAGED_RESOURCES_STR=_("Managed Resources")
 RESOURCES_STR=_("Resources")
 RESOURCE_STR=_("Resource:")
 RESOURCE_GROUPS_STR=_("Resource Groups")
@@ -89,13 +90,14 @@ class PropertiesRenderer:
     self.do_render()
 
 
-  def prepare_header_layout(self, name, type):
+  def prepare_header_layout(self, inname, type):
     pc = self.pango_context
     desc = pc.get_font_description()
     desc.set_size(BIG_HEADER_SIZE)
     pc.set_font_description(desc)
     header_layout = pango.Layout(pc)
     layout_string = ""
+    name = inname.replace('_','__')
 
 
     if type == CLUSTER_TYPE:
@@ -110,11 +112,17 @@ class PropertiesRenderer:
     elif type == FENCE_TYPE:
       layout_string = "<span size=\"12000\">" + PROPERTIES_FOR_STR + FENCE_STR % name + "</span>"
 
+    elif type == F_FENCE_TYPE:
+      layout_string = "<span size=\"12000\" foreground=\"" + FENCEDEVICES_COLOR + "\">" + FENCE_STR + "</span>"+ "<span size=\"12000\">" + name + "</span>"
+
     elif type == FENCE_DEVICES_TYPE:
       layout_string = "<span size=\"12000\" foreground=\"" + FENCEDEVICES_COLOR + "\">" + FENCE_DEVICES_STR + "</span>"
 
     elif type == FENCE_DEVICE_TYPE:
       layout_string = "<span size=\"12000\" foreground=\"" + FENCEDEVICES_COLOR + "\">" + FENCE_DEVICE_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
+
+    elif type == MANAGED_RESOURCES_TYPE:
+      layout_string = "<span size=\"12000\" foreground=\"" + CLUSTER_COLOR + "\">" + MANAGED_RESOURCES_STR + "</span>"
 
     elif type == RESOURCES_TYPE:
       layout_string = "<span size=\"12000\" foreground=\"" + RESOURCES_COLOR + "\">" + RESOURCES_STR + "</span>"
@@ -263,6 +271,8 @@ class PropertiesRenderer:
     elif type == CLUSTER_NODE_TYPE:
       self.color_type = CLUSTERNODES_COLOR
     elif type == FENCE_DEVICES_TYPE:
+      self.color_type = FENCEDEVICES_COLOR
+    elif type == F_FENCE_TYPE:
       self.color_type = FENCEDEVICES_COLOR
     elif type == FENCE_DEVICE_TYPE:
       self.color_type = FENCEDEVICES_COLOR

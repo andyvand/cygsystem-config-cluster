@@ -49,6 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue Jan 11 2005 Jim Parsons <jparsons@redhat.com> 0.9.4-1
+  - Added delete fence device functionality.
 * Mon Jan 10 2005 Jim Parsons <jparsons@redhat.com> 0.9.3-1
   - Improvements to Props renderer.
 * Tue Jan 04 2005 Jim Parsons <jparsons@redhat.com> 0.9.1-1

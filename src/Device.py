@@ -14,3 +14,6 @@ class Device(TagObject):
 
   def setAgentType(self, agent_type):
     self.agent_type = agent_type
+
+  def getProperties(self):
+    return "A Fence"
