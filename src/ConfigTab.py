@@ -45,7 +45,8 @@ ONE_SERVICE=_("One Service is configured \n for this cluster")
 NUM_SERVICES=_("%d Services are configured \n for this cluster")
 
 FENCE_CONFIGURATION=_("Fence Configuration for this Cluster Node")
-
+MODIFIED_FILE=_("<modified>")
+NEW_CONFIG=_("<New Configuration>")
 
 ############################################
 class ConfigTab:
@@ -65,6 +66,7 @@ class ConfigTab:
     #placeholder iters for easy selection
     self.cluster_iter = None
     self.clusternodes_iter = None
+    self.managedrcs_iter = None
     self.failoverdomains_iter = None
     self.fencedevices_iter = None
     self.resources_iter = None
@@ -88,9 +90,13 @@ class ConfigTab:
     self.prop_renderer = PropertiesRenderer(self.area, self.area.window)
     self.prop_renderer.clear_layout_area()
 
+    self.filename_entry = self.glade_xml.get_widget('filename_entry')
+
     self.init_buttonpanels()
 
     self.prepare_tree()
+    self.treeview.expand_all()
+    self.on_tree_selection_changed(None)
 
   def clearall(self):
     treemodel = self.treeview.get_model()
@@ -101,12 +107,15 @@ class ConfigTab:
   def set_model(self, model_builder):
     self.model_builder = model_builder
     self.prepare_tree()
+    self.treeview.expand_all()
     self.controller.set_model(self.model_builder, self.treeview)
 
   def on_tree_selection_changed(self, *args):
     selection = self.treeview.get_selection()
     model,iter = selection.get_selected()
     if iter == None:
+      self.clear_all_buttonpanels()
+      self.prop_renderer.clear_layout_area()
       return
 
     type = model.get_value(iter, TYPE_COL)
@@ -137,7 +146,7 @@ class ConfigTab:
       self.clear_all_buttonpanels()
       self.fencedevice_p.show()
     elif type == MANAGED_RESOURCES_TYPE:
-      self.prop_renderer.render_to_layout_area(None, MANAGED_RESOURCES,type) 
+      self.prop_renderer.render_to_layout_area(obj.getProperties(), MANAGED_RESOURCES,type) 
       self.clear_all_buttonpanels()
     elif type == FAILOVER_DOMAINS_TYPE:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
@@ -206,29 +215,76 @@ class ConfigTab:
 
   def reset_tree_model(self, *in_args):
     selection = self.treeview.get_selection()
+    model = self.treeview.get_model()
     args = list()
     for a in in_args:
       args.append(a)
 
     type = args[0]
 
+    #Now see what main iters/paths are expanded
+    #State of tree is saved in *_exp vars
+    cluster_path = model.get_path(self.cluster_iter)
+    cluster_exp = self.treeview.row_expanded(cluster_path)
+
+    clusternodes_path = model.get_path(self.clusternodes_iter)
+    clusternodes_exp = self.treeview.row_expanded(clusternodes_path)
+
+    managedrcs_path = model.get_path(self.managedrcs_iter)
+    managedrcs_exp = self.treeview.row_expanded(managedrcs_path)
+
+    failoverdomains_path = model.get_path(self.failoverdomains_iter)
+    failoverdomains_exp = self.treeview.row_expanded(failoverdomains_path)
+
+    fencedevices_path = model.get_path(self.fencedevices_iter)
+    fencedevices_exp = self.treeview.row_expanded(fencedevices_path)
+
+    resources_path = model.get_path(self.resources_iter)
+    resources_exp = self.treeview.row_expanded(resources_path)
+
+    services_path = model.get_path(self.services_iter)
+    services_exp = self.treeview.row_expanded(services_path)
+
     self.prepare_tree()
     self.prop_renderer.clear_layout_area()
 
+    newmodel = self.treeview.get_model()
+    if cluster_exp == TRUE:
+      self.treeview.expand_to_path(newmodel.get_path(self.cluster_iter))
+    if clusternodes_exp == TRUE:
+      self.treeview.expand_to_path(newmodel.get_path(self.clusternodes_iter))
+    if managedrcs_exp == TRUE:
+      self.treeview.expand_to_path(newmodel.get_path(self.managedrcs_iter))
+    if failoverdomains_exp == TRUE:
+      self.treeview.expand_to_path(newmodel.get_path(self.failoverdomains_iter))
+    if fencedevices_exp == TRUE:
+      self.treeview.expand_to_path(newmodel.get_path(self.fencedevices_iter))
+    if resources_exp == TRUE:
+      self.treeview.expand_to_path(newmodel.get_path(self.resources_iter))
+    if services_exp == TRUE:
+      self.treeview.expand_to_path(newmodel.get_path(self.services_iter))
+
     if type == CLUSTER_TYPE:
       selection.select_iter(self.cluster_iter)
+      self.treeview.expand_to_path(newmodel.get_path(self.cluster_iter))
     elif type == CLUSTER_NODES_TYPE:
       selection.select_iter(self.clusternodes_iter)
+      self.treeview.expand_to_path(newmodel.get_path(self.clusternodes_iter))
     elif type == FENCE_DEVICES_TYPE:
       selection.select_iter(self.fencedevices_iter)
+      self.treeview.expand_to_path(newmodel.get_path(self.fencedevices_iter))
     elif type == FAILOVER_DOMAINS_TYPE:
       selection.select_iter(self.failoverdomains_iter)
+      self.treeview.expand_to_path(newmodel.get_path(self.failoverdomains_iter))
     elif type == RESOURCE_GROUPS_TYPE:
       selection.select_iter(self.services_iter)
+      self.treeview.expand_to_path(newmodel.get_path(self.services_iter))
     elif type == RESOURCES_TYPE:
       selection.select_iter(self.resources_iter)
+      self.treeview.expand_to_path(newmodel.get_path(self.resources_iter))
     else: #default, choose root
       selection.select_iter(self.cluster_iter)
+      self.treeview.expand_to_path(newmodel.get_path(self.cluster_iter))
 
 
   def prepare_tree(self):
@@ -295,9 +351,11 @@ class ConfigTab:
     resources = self.model_builder.getResources()
 
     mr_iter = treemodel.append(cluster_iter)
+    self.managedrcs_iter = mr_iter
     mr_str = "<span size=\"10000\"><b>" + MANAGED_RESOURCES + "</b></span>"
     treemodel.set(mr_iter, NAME_COL, mr_str,
-                           TYPE_COL, MANAGED_RESOURCES_TYPE)
+                           TYPE_COL, MANAGED_RESOURCES_TYPE,
+                           OBJ_COL, self.model_builder.getResourceManagerPtr())
 
     ###FAILOVER DOMAINS
     fdoms_iter = treemodel.append(mr_iter)
@@ -327,9 +385,9 @@ class ConfigTab:
     for resource in resources:
       resource_iter = treemodel.append(resources_iter)
       if resource.getTagName() == "ip":
-        resource_str = "<span>" + RESOURCE + " " + IPADDRESS + "</span>"
+        resource_str = "<span>" + resource.getResourceType() + " " + resource.getAttribute("address") + "</span>"
       else:
-        resource_str = "<span>" + RESOURCE + " " + resource.getName() + "</span>"
+        resource_str = "<span>" + resource.getResourceType() + " " + resource.getName() + "</span>"
       treemodel.set(resource_iter, NAME_COL, resource_str,
                                TYPE_COL,RESOURCE_TYPE,
                                OBJ_COL, resource)
@@ -351,7 +409,17 @@ class ConfigTab:
                                TYPE_COL, RESOURCE_GROUP_TYPE,
                                OBJ_COL, rgroup)
 
-    self.treeview.expand_all()
+    #self.treeview.expand_all()
+
+    #Fill in Filename Label
+    fname = self.model_builder.getFilepath()
+    if (fname == "") or (fname == None):
+      self.filename_entry.set_text(NEW_CONFIG)
+    else:  
+      if self.model_builder.isFileModified() == TRUE:
+        self.filename_entry.set_text(fname + " " + MODIFIED_FILE)
+      else:
+        self.filename_entry.set_text(fname)
 
 
   def on_props_expose_event(self, widget,event):

@@ -351,6 +351,7 @@ class ConfigTabController:
 
     cptr.addAttribute("name",name)
     cptr.addAttribute("config_version",version)
+    self.model_builder.setModified()
     args = list()
     args.append(CLUSTER_TYPE)
     apply(self.reset_tree_model, args)
@@ -525,6 +526,7 @@ class ConfigTabController:
         self.fi_panel.hide()
  
 
+    self.model_builder.setModified()
     #self.fi_panel.hide()
 
   def on_create_level(self, button):
@@ -542,6 +544,7 @@ class ConfigTabController:
     method = Method()
     method.addAttribute("name",str(attr_val))
     fence_ptr.addChild(method)
+    self.model_builder.setModified()
     self.prep_fence_panel(obj)
 
   def on_del_level(self, button):
@@ -561,6 +564,7 @@ class ConfigTabController:
     nd = model.get_value(root_iter, FENCE_OBJ_COL)
     fence_ptr = nd.getChildren()[0]
     fence_ptr.removeChild(obj)
+    self.model_builder.setModified()
     self.prep_fence_panel(nd)
 
   def on_del_fi(self, button):
@@ -575,6 +579,7 @@ class ConfigTabController:
     parent_iter = model.iter_parent(iter)
     parent_obj = model.get_value(parent_iter,FENCE_OBJ_COL)
     parent_obj.removeChild(obj)
+    self.model_builder.setModified()
     self.prep_fence_panel(nd)
     
 
@@ -764,6 +769,8 @@ class ConfigTabController:
           ls.addAttribute(NAME_ATTR,nameattr)
           gptr = self.model_builder.getGULMPtr()
           gptr.addChild(ls)
+
+    self.model_builder.setModified()
     args = list()
     args.append(CLUSTER_NODES_TYPE)
     apply(self.reset_tree_model, args)
@@ -923,6 +930,7 @@ class ConfigTabController:
     model = self.fd_delete_treeview.get_model()
     model.foreach(self.remove_fence_from_node, None)
     self.fd_delete.hide()
+    self.model_builder.setModified()
     args = list()
     args.append(FENCE_DEVICES_TYPE)
     apply(self.reset_tree_model, args)
@@ -986,6 +994,8 @@ class ConfigTabController:
         args.append(FENCE_DEVICES_TYPE)
         apply(self.reset_tree_model, args)
 
+    self.model_builder.setModified()
+
   def prep_fd_options(self):
    
     menu = gtk.Menu() 
@@ -1029,6 +1039,7 @@ class ConfigTabController:
     self.add_faildom_dlg.hide()
     self.faildom_name.set_text("")
     self.faildom_controller.prep_faildom_panel(failover_domain)
+    self.model_builder.setModified()
     self.faildom_panel.show()
 
   def on_faildom_add_cancel(self, button):
@@ -1051,6 +1062,7 @@ class ConfigTabController:
     ###XXX-FIX should be wrapped in exception handler
     faildoms_ptr = self.model_builder.getFailoverDomainPtr()
     faildoms_ptr.removeChild(obj)
+    self.model_builder.setModified()
     args = list()
     args.append(FAILOVER_DOMAINS_TYPE)
     apply(self.reset_tree_model, args)
@@ -1114,6 +1126,7 @@ class ConfigTabController:
       return
     rc_ptr = self.model_builder.getResourcesPtr()
     rc_ptr.removeChild(obj)
+    self.model_builder.setModified()
     args = list()
     args.append(RESOURCES_TYPE)
     apply(self.reset_tree_model, args)
@@ -1182,6 +1195,7 @@ class ConfigTabController:
     self.svc_add_dlg.hide()
     self.svc_name.set_text("")
     self.service_controller.prep_service_panel(service)
+    self.model_builder.setModified()
     self.svc_mgmt.show()
 
   def on_svc_add_cancel(self, button):
@@ -1211,6 +1225,7 @@ class ConfigTabController:
       return
     rm_ptr = self.model_builder.getResourceManagerPtr()
     rm_ptr.removeChild(obj)
+    self.model_builder.setModified()
     args = list()
     args.append(RESOURCE_GROUPS_TYPE)
     apply(self.reset_tree_model, args)

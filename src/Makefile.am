@@ -1,4 +1,5 @@
 PYTHON_FILES = clui_constants.py \
+BaseResource.py	\
 ClusterNode.py	\
 ClusterNodes.py \
 Cluster.py	\
@@ -60,6 +61,7 @@ install-exec-local:
 	sed -e 's/\@VERSION\@/@VERSION@/g' $(srcdir)/system-config-cluster.py > $(DESTDIR)$(pkgdatadir)/system-config-cluster.py
 	chmod 755 $(DESTDIR)$(pkgdatadir)/system-config-cluster.py
 	install -m 0640 $(srcdir)/clui_constants.py $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/BaseResource.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ClusterNode.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ClusterNodes.py $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Cluster.py $(DESTDIR)$(pkgdatadir)/

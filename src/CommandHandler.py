@@ -8,6 +8,7 @@ import rhpl.executil
 import gettext
 _ = gettext.gettext
 
+PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the following error:\n %s")
 class CommandHandler:
 
   def __init__(self):
@@ -152,7 +153,19 @@ class CommandHandler:
 
     return dataobjs
 
+  def propagateConfig(self, version):
+    args = list()
+    args.append("/sbin/cman_tool")
+    args.append("version")
+    args.append("-r")
+    args.append(version)
+    cmdstr = ' '.join(args)
+    try:
+      out,err,res = rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+    except RuntimeError, e:
+      raise CommandError("FATAL",PROPAGATE_ERROR % (version, err))
 
+    return res
 
 
 

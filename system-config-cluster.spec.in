@@ -49,6 +49,11 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Mar 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.17-1
+  - Fixes for bz149123, 149885, 149660, 149508, 149488, 149897,
+    150895, 150813, 149124, 149662, 149128, 149508, 149545, 149707
+* Tue Mar 22 2005 Jim Parsons <jparsons@redhat.com> 0.9.16-1
+  - Discovered nits post install fixed
 * Mon Mar 21 2005 Jim Parsons <jparsons@redhat.com> 0.9.15-1
   - Completion of service cfg ui - mgmt tab nodes
 * Tue Mar 15 2005 Jim Parsons <jparsons@redhat.com> 0.9.14-1

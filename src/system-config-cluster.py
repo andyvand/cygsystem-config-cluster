@@ -16,6 +16,8 @@ import string
 import os
 from gtk import TRUE, FALSE
 import MessageLibrary
+from CommandHandler import CommandHandler
+from CommandError import CommandError
 
 PROGNAME = "system-config-cluster"
 VERSION = "@VERSION@"
@@ -66,6 +68,9 @@ NO_CONF_PRESENT=_("The cluster configuration file, '/etc/cluster/cluster.conf' d
 NOT_CLUSTER_MEMBER=_("Because this node is not currently part of a cluster, the management tab for this application is not available.")
 
 SAVED_FILE=_("The current configuration has been saved in \n %s")
+CONFIRM_PROPAGATE=_("This action will save the current configuration in /etc/cluster/cluster.conf, and will propagate this configuration to all active cluster members. Do you wish to proceed?")
+
+UNSAVED=_("Do you want to save your changes? \n\nThe current configuration has not been saved. Click 'Yes' to discard changes and quit. Click 'No' to return to the application where the configuration can be saved by choosing 'Save' or 'Save As' from the File menu.")
 ###############################################
 class basecluster:
   def __init__(self, glade_xml, app):
@@ -87,14 +92,17 @@ class basecluster:
       #hide mgmt tab
       self.mgmt_tab.hide()
       self.no_conf_label.set_text(NO_CONF_PRESENT + "\n\n" + NOT_CLUSTER_MEMBER)
+      self.propagate_button.hide()
       #self.no_conf_dlg.show()
       self.no_conf_dlg.run()
     elif ((conf_exists == TRUE) and (is_cluster_member == FALSE)):
       self.mgmt_tab.hide()
       MessageLibrary.simpleInfoMessage(NOT_CLUSTER_MEMBER)
+      self.propagate_button.hide()
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
     else:
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
+      self.propagate_button.show()
       self.mgmttab = MgmtTab(glade_xml, self.model_builder)
 
     self.configtab = ConfigTab(glade_xml, self.model_builder)
@@ -129,6 +137,15 @@ class basecluster:
                                                                                 
  
   def quit(self, *args):
+    path = self.model_builder.getFilepath()
+    mod = self.model_builder.isFileModified()
+    if (path == "") or (path == None) or (mod == TRUE):
+      retval = MessageLibrary.warningMessage(UNSAVED)
+      if retval == gtk.RESPONSE_NO:
+        return
+      else:
+        gtk.main_quit()
+
     gtk.main_quit()
 
   def open(self, *args):
@@ -243,6 +260,22 @@ class basecluster:
     self.no_conf_label = self.glade_xml.get_widget('no_conf_label')
     self.glade_xml.get_widget('no_conf_create').connect('clicked',self.on_no_conf_create)
     self.glade_xml.get_widget('no_conf_open').connect('clicked',self.on_no_conf_open)
+    self.propagate_button = self.glade_xml.get_widget('propagate')
+    self.propagate_button.connect('clicked', self.propagate)
+
+  def propagate(self):
+    retval = self.warningMessage(CONFIRM_PROPAGATE)
+    if retval == gtk.RESPONSE_NO:
+      return
+    #1 save file to /etc/cluster/cluster.conf
+    self.model_builder.exportModel(CLUSTER_CONF_PATH)
+    #2 call cman_tool -r with config version
+    cptr = self.model_builder.getClusterPtr()
+    version = cptr.getConfigVersion()
+    try:
+      self.command_handler.propagateConfig(version)
+    except CommandError, e:
+      self.MessageLibrary.errorMessage(e.getMessage())
 
 
 #############################################################
@@ -260,7 +293,9 @@ def runFullGUI():
     app = glade_xml.get_widget('system-config-cluster')
     baseapp = basecluster(glade_xml, app)
     app.show()
-    app.connect("destroy", lambda w: gtk.main_quit())
+    #app.connect("destroy", lambda w: gtk.main_quit())
+    app.connect("delete_event", baseapp.quit)
+    #app.connect("destroy", baseapp.quit)
     gtk.main()
                                                                                 
                                                                                 

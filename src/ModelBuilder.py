@@ -82,6 +82,7 @@ class ModelBuilder:
     self.resourcemanager_ptr = None
     self.resources_ptr = None
     self.command_handler = CommandHandler()
+    self.isModified = FALSE
 
     if filename == None:
       if lock_type == DLM_TYPE:
@@ -177,6 +178,8 @@ class ModelBuilder:
     rm.addChild(rcs)
     self.resources_ptr = rcs
 
+    self.isModified = FALSE
+
     return obj_tree
     
   def buildGULMModelTemplate(self):
@@ -208,6 +211,8 @@ class ModelBuilder:
     rcs = Resources()
     rm.addChild(rcs)
     self.resources_ptr = rcs
+
+    self.isModified = FALSE
 
     return obj_tree
     
@@ -310,6 +315,8 @@ class ModelBuilder:
     #print doc.toprettyxml()
     fd.write(doc.toprettyxml())
     self.filename = filename
+
+    self.isModified = FALSE
      
   def has_filepath(self):
     if self.filename == None:
@@ -329,9 +336,36 @@ class ModelBuilder:
 
   def addNode(self, clusternode):
     self.clusternodes_ptr.addChild(clusternode)
+    self.isModified = TRUE
 
   def deleteNode(self, clusternode):
+    #1) delete node
+    #2) delete failoverdomainnodes with same name
+    #3) delete lockserver nodes if GuLM
+
+    name = clusternode.getName()
+
     self.clusternodes_ptr.removeChild(clusternode)
+
+    found_one = TRUE
+
+    while found_one == TRUE:
+      found_one = FALSE
+      fdoms = self.getFailoverDomains()
+      for fdom in fdoms:
+        children = fdom.getChildren()
+        for child in children:
+          if child.getName() == name:
+            fdom.removeChild(child)
+            found_one = TRUE
+            break
+
+      lock_type = self.getLockType()
+      if lock_type == GULM_TYPE:
+        if self.isNodeLockserver(clusternode.getName()) == TRUE:
+          self.removeLockserver(clusternode)
+
+    self.isModified = TRUE
 
   def getFenceDevices(self):
     return self.fencedevices_ptr.getChildren()
@@ -397,6 +431,30 @@ class ModelBuilder:
         return TRUE
 
     return FALSE
+
+  def removeLockserver(self, clusternode):
+    gptr = self.getGULMPtr()
+    if gptr == None:  #Obviously not GuLM
+      return
+    children = gptr.getChildren()
+    for child in children:
+      if child.getName() == clusternode.getName():
+        gptr.removeChild(child)
+        break  #Only one will be found
+
+    self.isModified = TRUE
+
+
+  def isFileModified(self):
+    return self.isModified
+
+  def setModified(self, modified=None):
+    if modified == None:
+      self.isModified = TRUE
+    else:
+      self.isModified = modified
+                                                                                
+
         
    
 if __name__ == "__main__":
