@@ -70,7 +70,7 @@ NOT_CLUSTER_MEMBER=_("Because this node is not currently part of a cluster, the 
 SAVED_FILE=_("The current configuration has been saved in \n %s")
 CONFIRM_PROPAGATE=_("This action will save the current configuration in /etc/cluster/cluster.conf, and will propagate this configuration to all active cluster members. Do you wish to proceed?")
 
-UNSAVED=_("Do you want to save your changes? \n\nThe current configuration has not been saved. Click 'Yes' to discard changes and quit. Click 'No' to return to the application where the configuration can be saved by choosing 'Save' or 'Save As' from the File menu.")
+UNSAVED=_("Do you want to save your changes? \n\nThe current configuration has not been saved. Click 'No' to discard changes and quit. Click 'Yes' to return to the application where the configuration can be saved by choosing 'Save' or 'Save As' from the File menu.")
 ###############################################
 class basecluster:
   def __init__(self, glade_xml, app):
@@ -141,7 +141,7 @@ class basecluster:
     mod = self.model_builder.isFileModified()
     if (path == "") or (path == None) or (mod == TRUE):
       retval = MessageLibrary.warningMessage(UNSAVED)
-      if retval == gtk.RESPONSE_NO:
+      if retval == gtk.RESPONSE_YES:
         return
       else:
         gtk.main_quit()

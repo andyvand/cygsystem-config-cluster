@@ -9,6 +9,9 @@ import gettext
 _ = gettext.gettext
 
 PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the following error:\n %s")
+
+NODES_INFO_ERROR=_("A problem was encountered when atempting to get information about the nodes in the cluster. The following error message was received from the cman_tool: %s")
+
 class CommandHandler:
 
   def __init__(self):
@@ -139,7 +142,7 @@ class CommandHandler:
       return FALSE
 
     if res != 0:
-      return FALSE
+      raise CommandError("FATAL", NODES_INFO_ERROR % err)
 
     lines = out.splitlines()
     y = (-1)

@@ -2,6 +2,8 @@ from gtk import TRUE, FALSE
 import string
 import gobject
 import sys
+import MessageLibrary
+from CommandError import CommandError
 from clui_constants import *
 from CommandHandler import CommandHandler
 
@@ -90,7 +92,12 @@ class MgmtTab:
     treemodel = self.nodetree.get_model()
     treemodel.clear()
 
-    nodes = self.command_handler.getNodesInfo()
+    try:
+      nodes = self.command_handler.getNodesInfo()
+    except CommandError, e:
+      retval = MessageLibrary.errorMessage(e.getMessage())
+      return
+
     for node in nodes:
       iter = treemodel.append(None)
       name, votes, status = node.getNodeProps()
