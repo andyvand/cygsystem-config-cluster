@@ -1073,7 +1073,6 @@ class ConfigTabController:
     apply(self.reset_tree_model)
 
   def rc_panel_ok(self, button):
-    print "IN RC_PANEL_OK"
     #first, find out if this is for edited props, or a new device
     selection = self.treeview.get_selection()
     model,iter = selection.get_selected()
@@ -1092,12 +1091,10 @@ class ConfigTabController:
         apply(self.reset_tree_model)
 
     else: #New...
-      print "In El;se Clause" 
       dex = self.rc_options.get_history()
       tagname = self.rc_optionmenu_hash[dex]
       newobj = self.model_builder.createObjectFromTagname(tagname)
       returnlist = self.rc_handler.validate_resource(tagname, None)
-      print "after returnlist return"
       if returnlist != None:
         self.rc_panel.hide()
         for x in returnlist.keys():

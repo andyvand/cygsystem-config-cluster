@@ -36,21 +36,25 @@ class FaildomController:
                                    gobject.TYPE_INT) #Priority integer val
     self.listmodel.set_sort_column_id(3,gtk.SORT_ASCENDING)
     self.faildom_treeview.set_model(self.listmodel)
+    self.faildom_treeview.set_headers_clickable(TRUE)
     selection = self.faildom_treeview.get_selection()
     selection.connect('changed',self.on_list_selection_changed)
 
     renderer = gtk.CellRendererText()
-    column1 = gtk.TreeViewColumn("Member Node",renderer,markup=0)
-    self.faildom_treeview.append_column(column1)
+    self.column1 = gtk.TreeViewColumn("Member Node",renderer,markup=0)
+    self.column1.set_clickable(TRUE)
+    self.column1.connect("clicked",self.on_header_clicked)
+    self.faildom_treeview.append_column(self.column1)
 
     renderer2 = gtk.CellRendererText()
-    column2 = gtk.TreeViewColumn("Priority",renderer2,markup=1)
-    self.faildom_treeview.append_column(column2)
+    self.column2 = gtk.TreeViewColumn("Priority",renderer2,markup=1)
+    self.column2.set_clickable(TRUE)
+    self.column2.connect("clicked",self.on_header_clicked)
+    self.faildom_treeview.append_column(self.column2)
 
     self.node_options = self.glade_xml.get_widget('node_options')
+    self.node_options.connect("changed",self.on_add_domain_member)
     self.faildom_name_label = self.glade_xml.get_widget('domain_name_label')
-    self.add_member_b = self.glade_xml.get_widget('add_domain_member')
-    self.add_member_b.connect('clicked',self.on_add_domain_member)
 
     self.priority_up = self.glade_xml.get_widget('priority_up')
     self.priority_up.connect('clicked',self.on_priority_up)
@@ -164,7 +168,7 @@ class FaildomController:
     in_name = args[0]
     if in_name == name.strip():
       self.foreach_found_sentinel = TRUE
-      selection.select_range(path,path)
+      selection.select_iter(iter)
       
 
   def on_priority_cbox_change(self, cb):
@@ -174,11 +178,13 @@ class FaildomController:
       self.priority_up.set_sensitive(TRUE)
       self.priority_label.set_sensitive(TRUE)
       self.current_faildom.addAttribute("ordered","1")
+      self.column2.set_visible(TRUE)
     else:
       self.priority_down.set_sensitive(FALSE)
       self.priority_up.set_sensitive(FALSE)
       self.priority_label.set_sensitive(FALSE)
       self.current_faildom.addAttribute("ordered","0")
+      self.column2.set_visible(FALSE)
     
   def on_restricted_cbox_change(self, cb):
     selected = self.restricted_cbox.get_active()
@@ -274,8 +280,19 @@ class FaildomController:
       
 
   def on_faildom_panel_close(self, button):
+    if self.priority_cbox.get_active() == FALSE:
+      children = self.current_faildom.getChildren()
+      for child in children:
+        child.setPriorityLevel(1)
     self.faildom_panel.hide() 
     apply(self.reset_tree_model)
 
   def set_model(self, model_builder):
     self.model_builder = model_builder
+
+  def on_header_clicked(self, tvc, *args):
+    model = self.faildom_treeview.get_model()
+    if tvc == self.column1:
+      model.set_sort_column_id(0,gtk.SORT_ASCENDING)
+    else:
+      model.set_sort_column_id(3,gtk.SORT_ASCENDING)

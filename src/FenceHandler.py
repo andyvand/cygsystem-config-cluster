@@ -656,10 +656,8 @@ class FenceHandler:
   #Validation Methods for Fence Instances 
   def validate_fenceinstance(self, agent_type):
     try:
-      print "trying validate fence instance -- %s" % agent_type
       returnlist = apply(self.fi_validate[agent_type])
     except ValidationError, e:
-      print "Caught an error"
       MessageLibrary.errorMessage(e.getMessage())
       return None
 

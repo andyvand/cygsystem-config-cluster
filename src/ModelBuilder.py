@@ -254,6 +254,9 @@ class ModelBuilder:
     else:
       return TRUE
 
+  def getFilepath(self):
+    return self.filename
+
   def isClusterMember(self):
     return self.command_handler.isClusterMember()
     

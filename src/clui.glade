@@ -3602,22 +3602,6 @@
 		  <property name="fill">False</property>
 		</packing>
 	      </child>
-
-	      <child>
-		<widget class="GtkButton" id="add_domain_member">
-		  <property name="visible">True</property>
-		  <property name="can_focus">True</property>
-		  <property name="label" translatable="yes">Add Member to Domain</property>
-		  <property name="use_underline">True</property>
-		  <property name="relief">GTK_RELIEF_NORMAL</property>
-		  <property name="focus_on_click">True</property>
-		</widget>
-		<packing>
-		  <property name="padding">5</property>
-		  <property name="expand">True</property>
-		  <property name="fill">False</property>
-		</packing>
-	      </child>
 	    </widget>
 	    <packing>
 	      <property name="padding">0</property>
@@ -3660,6 +3644,7 @@
 
 		      <child>
 			<widget class="GtkTreeView" id="faildom_treeview">
+			  <property name="width_request">180</property>
 			  <property name="visible">True</property>
 			  <property name="can_focus">True</property>
 			  <property name="headers_visible">True</property>
