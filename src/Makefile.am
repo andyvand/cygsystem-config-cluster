@@ -16,6 +16,7 @@ FaildomController.py \
 FailoverDomainNode.py \
 FailoverDomain.py \
 FailoverDomains.py \
+FenceDaemon.py \
 FenceDevice.py \
 FenceDevices.py \
 FenceHandler.py \
@@ -27,6 +28,7 @@ MessageLibrary.py \
 Method.py \
 MgmtTab.py	\
 ModelBuilder.py \
+Multicast.py \
 Netfs.py	\
 NFSClient.py \
 NFSExport.py \
@@ -81,6 +83,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/FailoverDomainNode.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FailoverDomain.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FailoverDomains.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/FenceDaemon.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FenceDevice.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FenceDevices.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FenceHandler.py  $(DESTDIR)$(pkgdatadir)/
@@ -93,6 +96,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/Method.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/MgmtTab.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ModelBuilder.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Multicast.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Netfs.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NFSClient.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NFSExport.py  $(DESTDIR)$(pkgdatadir)/

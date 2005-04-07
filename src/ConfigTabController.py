@@ -118,6 +118,10 @@ NEED_CONFIG_VERSION=_("Please provide a Config Version")
 ###as a GUI string. Please do not use whitespace in this string. 
 FENCE_LEVEL=_("Fence-Level-%d")
 
+NEED_VALID_POSTJOIN=_("Post-Join Delay should be an integer value representing seconds. Leave this field blank to use the default value of three seconds.")
+
+NEED_VALID_POSTFAIL=_("Post-Fail Delay should be an integer value representing seconds. Leave this field blank to use the default value of zero seconds.")
+
 from ClusterNode import ClusterNode
 
 class ConfigTabController:
@@ -211,6 +215,9 @@ class ConfigTabController:
     self.cluster_props_dlg = self.glade_xml.get_widget('cluster_props')
     self.clustername = self.glade_xml.get_widget('clustername')
     self.config_version = self.glade_xml.get_widget('config_version')
+    self.post_join = self.glade_xml.get_widget('post_join')
+    self.post_fail = self.glade_xml.get_widget('post_fail')
+    self.clean_start = self.glade_xml.get_widget('clean_start')
 
     ##Node Fields
     #Node Props
@@ -334,15 +341,31 @@ class ConfigTabController:
    
   def on_cluster_props_edit(self, button):
     cptr = self.model_builder.getClusterPtr()
+    fptr = self.model_builder.getFenceDaemonPtr()
+
+    #set fields for edit
     name = cptr.getName()
     self.clustername.set_text(name)
     self.config_version.set_text(cptr.getConfigVersion())
+
+    #set fence daemon fields
+    self.post_join.set_text(fptr.getPostJoinDelay())
+    self.post_fail.set_text(fptr.getPostFailDelay())
+    if fptr.getCleanStart() == "0":
+      self.clean_start.set_active(FALSE)
+    else:
+      self.clean_start.set_active(TRUE)
     self.cluster_props_dlg.show()
 
   def on_cluster_props_edit_ok(self, button):
     cptr = self.model_builder.getClusterPtr()
+    fdptr = self.model_builder.getFenceDaemonPtr()
     name = self.clustername.get_text()
     version = self.config_version.get_text()
+    postjoin = self.post_join.get_text()
+    postfail = self.post_fail.get_text()
+    cleanstart = self.clean_start.get_active()
+
     if name == "":
       self.errorMessage(NEED_CLUSTER_NAME)
       return
@@ -353,8 +376,49 @@ class ConfigTabController:
       self.config_version.select_region(0, -1)
       return
 
+      
+    if postjoin.startswith("-") == TRUE:
+      postjoinstr = postjoin[1:]
+    else:
+      postjoinstr = postjoin
+    if postjoinstr.isdigit() == FALSE:
+      if postjoin.strip() != "":
+        self.errorMessage(NEED_VALID_POSTJOIN)
+        self.post_join.select_region(0, -1)
+        return
+
+    if postfail.startswith("-") == TRUE:
+      postfailstr = postfail[1:]
+    else:
+      postfailstr = postfail
+    if postfailstr.isdigit() == FALSE:
+      if postfail.strip() != "":
+        self.errorMessage(NEED_VALID_POSTFAIL)
+        self.post_fail.select_region(0, -1)
+        return
+
     cptr.addAttribute("name",name)
     cptr.addAttribute("config_version",version)
+
+    if postjoin.strip() != "":
+      if int(postjoin) < 0:
+        postjoin = "-1"  #If negative, make unlimitted delay
+      fdptr.addAttribute("post_join_delay",postjoin)
+    else:
+      fdptr.addAttribute("post_join_delay",POST_JOIN_DEFAULT)
+
+    if postfail.strip() != "":
+      if int(postfail) < 0:
+        postfail = "-1"  #If negative, make unlimitted delay
+      fdptr.addAttribute("post_fail_delay",postfail)
+    else:
+      fdptr.addAttribute("post_fail_delay",POST_FAIL_DEFAULT)
+
+    if cleanstart == FALSE:
+      fdptr.addAttribute("clean_start","0")
+    else:
+      fdptr.addAttribute("clean_start","1")
+
     self.model_builder.setModified()
     args = list()
     args.append(CLUSTER_TYPE)

@@ -22,6 +22,8 @@ from Script import Script
 from NFSClient import NFSClient
 from NFSExport import NFSExport
 from Fs import Fs
+from Multicast import Multicast
+from FenceDaemon import FenceDaemon
 from Netfs import Netfs
 from Clusterfs import Clusterfs
 from Resources import Resources
@@ -53,6 +55,8 @@ TAGNAMES={ 'cluster':Cluster,
            'failoverdomainnode':FailoverDomainNode,
            'ip':Ip,
            'fs':Fs,
+           'fence_daemon':FenceDaemon,
+           'multicast':Multicast,
            'clusterfs':Clusterfs,
            'netfs':Netfs,
            'script':Script,
@@ -70,6 +74,7 @@ FAILDOMS_PTR_STR="failoverdomains"
 FENCEDEVICES_PTR_STR="fencedevices"
 RESOURCEMANAGER_PTR_STR="rm"
 RESOURCES_PTR_STR="resources"
+FENCEDAEMON_PTR_STR="fence_daemon"
 SERVICE="service"
 GULM_TAG_STR="gulm"
 ###-----------------------------------
@@ -85,6 +90,7 @@ class ModelBuilder:
     self.fencedevices_ptr = None
     self.resourcemanager_ptr = None
     self.resources_ptr = None
+    self.fence_daemon_ptr = None
     self.command_handler = CommandHandler()
     self.isModified = FALSE
 
@@ -102,6 +108,7 @@ class ModelBuilder:
         pass
 
       self.object_tree = self.buildModel(None)
+      self.check_fence_daemon()
       self.resolve_fence_instance_types()
       self.purgePCDuplicates()
       self.resolve_references()
@@ -140,6 +147,8 @@ class ModelBuilder:
         self.resourcemanager_ptr = new_object
       elif parent_node.nodeName == RESOURCES_PTR_STR:
         self.resources_ptr = new_object
+      elif parent_node.nodeName == FENCEDAEMON_PTR_STR:
+        self.fence_daemon_ptr = new_object
       elif parent_node.nodeName == GULM_TAG_STR:
         self.GULM_ptr = new_object
         self.lock_type = GULM_TYPE
@@ -161,6 +170,8 @@ class ModelBuilder:
 
     obj_tree.addAttribute("name","alpha_cluster")
     obj_tree.addAttribute("config_version","1")
+    fdp = FenceDaemon()
+    obj_tree.addChild(fdp)
     cns = ClusterNodes()
     obj_tree.addChild(cns)
     self.clusternodes_ptr = cns
@@ -193,6 +204,8 @@ class ModelBuilder:
 
     obj_tree.addAttribute("name","alpha_cluster")
     obj_tree.addAttribute("config_version","1")
+    fdp = FenceDaemon()
+    obj_tree.addChild(fdp)
     cns = ClusterNodes()
     obj_tree.addChild(cns)
     self.clusternodes_ptr = cns
@@ -458,6 +471,13 @@ class ModelBuilder:
 
     self.isModified = TRUE
 
+  def check_fence_daemon(self):
+    if self.fence_daemon_ptr == None:
+      self.fence_daemon_ptr = FenceDaemon()
+      self.cluster_ptr.addChild(self.fence_daemon_ptr)
+
+  def getFenceDaemonPtr(self):
+    return self.fence_daemon_ptr
 
   def isFileModified(self):
     return self.isModified

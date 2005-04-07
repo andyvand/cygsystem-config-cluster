@@ -38,6 +38,11 @@ RESOURCE_COLOR="#00CC00"
 RESOURCEGROUPS_COLOR="#FF6600"
 RESOURCEGROUP_COLOR="#FF8800"
 
+#Fence Daemon Default Values
+POST_JOIN_DEFAULT = "3"
+POST_FAIL_DEFAULT = "0"
+CLEAN_START_DEFAULT = "0"
+
 SELECT_RC_TYPE=_("<span><b>Select a Resource Type:</b></span>")
 
 RC_PROPS=_("Properties for %s Resource: %s")
