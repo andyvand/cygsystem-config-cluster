@@ -1,4 +1,6 @@
-<element name="cluster"  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
+<grammar  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
+<start>
+<element name="cluster">
  <attribute name="name"/>
  <attribute name="config_version"/>
  <!-- The choice section below brackets two very large group blocks. -->
@@ -222,60 +224,281 @@
    <element name="rm">
     <optional>
      <element name="failoverdomains">
+      <zeroOrMore>
+       <element name="failoverdomain">
+        <attribute name="name"/>
+        <optional>
+         <attribute name="ordered"/>
+        </optional>
+        <optional>
+         <attribute name="restricted"/>
+        </optional>
+        <zeroOrMore>
+         <element name="failoverdomainnode">
+          <optional>
+           <attribute name="priority"/>
+          </optional>
+          <attribute name="name"/>
+         </element>
+        </zeroOrMore>
+       </element>
+      </zeroOrMore>
      </element>
-    </optional>
-    <optional>
+    </optional>  <!-- End of failoverdomains block -->
+    <optional> 
      <element name="resources">
       <zeroOrMore>
-       <element name="script">
-       </element>
-      </zeroOrMore>
-      <zeroOrMore>
-       <element name="ip">
-        
-       </element>
-      </zeroOrMore>
-      <zeroOrMore>
-       <element name="fs">
-       </element>
-      </zeroOrMore>
-      <zeroOrMore>
-       <element name="netfs">
-       </element>
-      </zeroOrMore>
-      <zeroOrMore>
-       <element name="clusterfs">
-       </element>
-      </zeroOrMore>
-      <zeroOrMore>
-       <element name="nfsclient">
-       </element>
-      </zeroOrMore>
-      <zeroOrMore>
-       <element name="nfsexport">
-       </element>
+       <ref name="ALLCHILDREN"/>
       </zeroOrMore>
      </element>
     </optional>
     <zeroOrMore>
      <element name="service">
+      <attribute name="name"/>
+      <optional>
+       <attribute name="domain"/>
+      </optional>
+      <optional>
+       <attribute name="autostart"/>
+      </optional>
+      <optional>
+       <attribute name="hardrecovery"/>
+      </optional>
+      <optional>
+       <attribute name="exclusive"/>
+      </optional>
+      <optional>
+       <attribute name="recovery"/>
+      </optional>
+      <zeroOrMore>
+       <ref name="CHILDREN"/>
+      </zeroOrMore>
      </element>
     </zeroOrMore>
    </element>
   </optional>
 
-  <define name="IP">
-   <choice>
-    <group>
-      <attribute name="ref"/>
-    </group>
-    <group>
-     <attribute name="address"/>
-     <attribute name="monitor_link"/>
-    </group>
-    <group>
-    </group>
-  </choice>
-   </choice> 
-
 </element>
+</start>
+
+
+  <define name="IP">
+   <element name="ip">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+     <group>
+      <attribute name="address"/>
+      <attribute name="monitor_link"/>
+      <optional>
+       <attribute name="family"/>
+      </optional>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+    </choice>
+   </element>
+  </define>
+
+  <define name="FS">
+   <element name="fs">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+      <optional>
+       <ref name="NFSEXPORT"/>
+      </optional>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <attribute name="mountpoint"/>
+      <attribute name="device"/>
+      <optional>
+       <attribute name="fstype"/>
+      </optional>
+      <optional>
+       <attribute name="force_unmount"/>
+      </optional>
+      <optional>
+       <attribute name="self_fence"/>
+      </optional>
+      <optional>
+       <attribute name="force_fsck"/>
+      </optional>
+      <optional>
+       <attribute name="options"/>
+      </optional>
+      <zeroOrMore>
+       <choice>
+        <ref name="NFSEXPORT"/>
+        <ref name="CHILDREN"/>
+       </choice>
+      </zeroOrMore>
+     </group>
+    </choice>
+   </element>
+  </define> 
+
+  <define name="CLUSTERFS">
+   <element name="clusterfs">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+      <optional>
+       <ref name="NFSEXPORT"/>
+      </optional>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <attribute name="mountpoint"/>
+      <attribute name="device"/>
+      <optional>
+       <attribute name="fstype"/>
+      </optional>
+      <optional>
+       <attribute name="force_unmount"/>
+      </optional>
+      <optional>
+       <attribute name="options"/>
+      </optional>
+      <optional>
+       <ref name="NFSEXPORT"/>
+      </optional>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+    </choice>
+   </element>
+  </define> 
+
+  <define name="NETFS">
+   <element name="netfs">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <attribute name="mountpoint"/>
+      <attribute name="host"/>
+      <attribute name="export"/>
+      <optional>
+       <attribute name="fstype"/>
+      </optional>
+      <optional>
+       <attribute name="force_unmount"/>
+      </optional>
+      <optional>
+       <attribute name="options"/>
+      </optional>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+    </choice>
+   </element>
+  </define> 
+
+  <define name="NFSEXPORT">
+   <element name="nfsexport">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+      <optional>
+       <ref name="NFSCLIENT"/>
+      </optional>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <optional>
+       <ref name="NFSCLIENT"/>
+      </optional>
+     </group>
+    </choice>
+   </element>
+  </define>
+
+  <define name="NFSCLIENT">
+   <element name="nfsclient"> 
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <attribute name="target"/>
+      <optional>
+       <attribute name="options"/>
+      </optional>
+     </group>
+    </choice>
+   </element>
+  </define>
+
+  <define name="SCRIPT">
+   <element name="script">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <attribute name="file"/>
+      <optional>
+       <ref name="CHILDREN"/>
+      </optional>
+     </group>
+    </choice>
+   </element>
+  </define>
+
+  <define name="CHILD">
+    <zeroOrMore>
+     <choice>
+      <ref name="SCRIPT"/>
+      <ref name="IP"/>
+      <ref name="NETFS"/>
+      <ref name="CLUSTERFS"/>
+      <ref name="FS"/>
+      <ref name="CHILD"/>
+     </choice>
+    </zeroOrMore>
+  </define>
+
+  <define name="CHILDREN">
+   <zeroOrMore>
+    <ref name="CHILD"/>
+   </zeroOrMore>
+  </define>
+
+  <define name="ALLCHILDREN">
+   <zeroOrMore>
+    <choice>
+     <ref name="CHILD"/>
+     <ref name="NFSEXPORT"/>
+     <ref name="NFSCLIENT"/>
+    </choice>
+   </zeroOrMore>
+  </define>
+</grammar>      
+
+
+
