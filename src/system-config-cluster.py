@@ -54,6 +54,7 @@ from ConfigTab import ConfigTab
 from ModelBuilder import ModelBuilder
 from clui_constants import *
 from MgmtTab import MgmtTab
+from IPAddrEntry import IP
 
 import gnome
 import gnome.ui
@@ -71,11 +72,14 @@ SAVED_FILE=_("The current configuration has been saved in \n %s")
 CONFIRM_PROPAGATE=_("This action will save the current configuration in /etc/cluster/cluster.conf, and will propagate this configuration to all active cluster members. Do you wish to proceed?")
 
 UNSAVED=_("Do you want to save your changes? \n\nThe current configuration has not been saved. Click 'No' to discard changes and quit. Click 'Yes' to return to the application where the configuration can be saved by choosing 'Save' or 'Save As' from the File menu.")
+
+NO_MCAST_IP=_("Please Provide a Valid Multicast IP Address")
 ###############################################
 class basecluster:
   def __init__(self, glade_xml, app):
 
     self.model_builder = None
+    self.mcast_address = None
     self.glade_xml = glade_xml
     self.command_handler = CommandHandler()
     self.init_widgets()
@@ -130,6 +134,8 @@ class basecluster:
         "on_new1_activate" : self.new,
         "on_save1_activate" : self.save,
         "on_save_as1_activate" : self.save_as,
+        "on_change_lockserver1_activate" : self.change_lockserver,
+        "on_use_multicast_mode1_activate" : self.swap_multicast_state,
         "on_about1_activate" : self.on_about
       }
     )
@@ -233,18 +239,39 @@ class basecluster:
 
   def new(self, *args):
     #Ask what type of lockserver to employ
+    self.mcast_cbox.set_sensitive(TRUE)
+    self.mcast_cbox.set_active(FALSE)
+    self.ip.set_sensitive(FALSE)
+    self.mcast_address = None
+    self.mcast_addr_label.set_sensitive(FALSE)
+    self.radio_dlm.set_active(TRUE)
     self.lock_method_dlg.show()
-    self.model_builder = ModelBuilder(self.lock_type)
-    self.glade_xml.get_widget("filename_entry").set_text(NEW_CONFIG)
-    self.configtab.set_model(self.model_builder)
+    #print "So now the mcast_addr == %s" % self.mcast_address
+    #self.model_builder = ModelBuilder(self.lock_type, None, self.mcast_address)
+    ##set file name field at top of tab to 'New Configuration'
+    #self.glade_xml.get_widget("filename_entry").set_text(NEW_CONFIG)
+    #self.configtab.set_model(self.model_builder)
 
   def lock_ok(self, button):
+
     if self.radio_dlm.get_active() == TRUE:
+      if self.mcast_cbox.get_active() == TRUE: #User wishes to use multicast
+        if self.ip.isValid() == FALSE:
+          retval = MessageLibrary.errorMessage(NO_MCAST_IP)
+          self.mcast_address = None
+          return
+        else:
+          self.mcast_address = self.ip.getAddrAsString() 
       self.lock_type = DLM_TYPE
     else:
       self.lock_type = GULM_TYPE
+      self.mcast_address = None
 
     self.lock_method_dlg.hide()
+    self.model_builder = ModelBuilder(self.lock_type, None, self.mcast_address)
+    #set file name field at top of tab to 'New Configuration'
+    self.glade_xml.get_widget("filename_entry").set_text(NEW_CONFIG)
+    self.configtab.set_model(self.model_builder)
 
   def lock_method_delete(self, *args):
     self.lock_type = DLM_TYPE
@@ -253,6 +280,11 @@ class basecluster:
 
   def on_no_conf_create(self, button):
     self.no_conf_dlg.hide()
+    self.radio_dlm.set_active(TRUE)
+    self.mcast_cbox.set_sensitive(TRUE)
+    self.mcast_cbox.set_active(FALSE)
+    self.ip.set_sensitive(FALSE)
+    self.mcast_addr_label.set_sensitive(FALSE)
     self.lock_method_dlg.show_all()
     retval = self.lock_method_dlg.run()
     self.lock_method_dlg.destroy()
@@ -261,6 +293,24 @@ class basecluster:
   def on_no_conf_open(self, button):
     self.no_conf_dlg.hide()
     self.open_limited(None)
+
+  def on_mcast_cbox_changed(self, *args):
+    if self.mcast_cbox.get_active() == FALSE:
+      self.ip.set_sensitive(FALSE)
+      self.mcast_addr_label.set_sensitive(FALSE)
+    else:
+      self.ip.set_sensitive(TRUE)
+      self.mcast_addr_label.set_sensitive(TRUE)
+
+  def on_radio_change(self, *args):
+    if self.radio_dlm.get_active() == FALSE:
+      self.mcast_cbox.set_sensitive(FALSE)
+      self.ip.set_sensitive(FALSE)
+      self.mcast_addr_label.set_sensitive(FALSE)
+    else:
+      self.mcast_cbox.set_sensitive(TRUE)
+      self.ip.set_sensitive(TRUE)
+      self.mcast_addr_label.set_sensitive(TRUE)
     
 
   def init_widgets(self):
@@ -270,6 +320,7 @@ class basecluster:
     self.mgmt_tab = self.notebook.get_nth_page(mgmtpageidx)
     self.lock_type = DLM_TYPE  #Default Value
     self.radio_dlm = self.glade_xml.get_widget('radio_dlm')
+    self.radio_dlm.connect('toggled',self.on_radio_change)
     self.lock_method_dlg = self.glade_xml.get_widget('lock_method')
     self.glade_xml.get_widget('okbutton17').connect('clicked', self.lock_ok)
     self.no_conf_dlg = self.glade_xml.get_widget('no_conf')
@@ -281,6 +332,12 @@ class basecluster:
     self.bad_xml_dlg = self.glade_xml.get_widget('bad_xml_dlg')
     self.bad_xml_label = self.glade_xml.get_widget('bad_xml_label')
     self.bad_xml_text = self.glade_xml.get_widget('bad_xml_text')
+    self.mcast_cbox = self.glade_xml.get_widget('mcast_cbox')
+    self.mcast_cbox.connect('toggled',self.on_mcast_cbox_changed)
+    self.mcast_addr_label = self.glade_xml.get_widget('label121')
+    self.ip = IP()
+    self.ip.show_all()
+    self.glade_xml.get_widget('mcast_ip_proxy').add(self.ip)
 
   def propagate(self):
     retval = self.warningMessage(CONFIRM_PROPAGATE)
@@ -303,6 +360,19 @@ class basecluster:
       except CommandError, e:
         self.MessageLibrary.errorMessage(e.getMessage())
 
+  def change_lockserver(self, *args):
+    #warning message
+    retval = MessageLibrary.warningMessage(DANGER_REBOOT_CLUSTER)
+    if retval != gtk.RESPONSE_YES:
+      print "NOT OK -- Sorry"
+      return
+    #call model builder call
+    self.model_builder.switch_lockservers()
+    #call configtab.prepare_tree()
+    self.configtab.prepare_tree()
+
+  def swap_multicast_state(self, *args):
+    pass
 
 #############################################################
 def initGlade():

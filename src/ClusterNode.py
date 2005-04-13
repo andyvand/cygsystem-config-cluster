@@ -30,6 +30,29 @@ class ClusterNode(TagObject):
       retval = list()
       return retval
 
+  def getMulticastNode(self):
+    children = self.getChildren()
+    for child in children:
+      if child.getTagName() == "multicast":
+        return child
+
+    return None
+
+  def getInterface(self):
+    nd = self.getMulticastNode()
+    if nd == None:
+      return None
+    else:
+      return nd.getAttribute("interface")
+
+  def setInterface(self, ifc):
+    nd = self.getMulticastNode()
+    if nd == None:
+      return 
+    else:
+      nd.addAttribute("interface",ifc)
+
+
   def getProperties(self):
     stringbuf = ""
     try:

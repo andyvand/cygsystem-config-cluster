@@ -77,14 +77,18 @@ RESOURCES_PTR_STR="resources"
 FENCEDAEMON_PTR_STR="fence_daemon"
 SERVICE="service"
 GULM_TAG_STR="gulm"
+MCAST_STR="multicast"
+CMAN_PTR_STR="cman"
 ###-----------------------------------
 
 class ModelBuilder:
-  def __init__(self, lock_type, filename=None):
+  def __init__(self, lock_type, filename=None, mcast_addr=None):
     self.filename = filename
     self.lock_type = DLM_TYPE
+    self.mcast_address = mcast_addr
     self.cluster_ptr = None
     self.GULM_ptr = None
+    self.CMAN_ptr = None
     self.clusternodes_ptr = None
     self.failoverdomains_ptr = None
     self.fencedevices_ptr = None
@@ -93,6 +97,10 @@ class ModelBuilder:
     self.fence_daemon_ptr = None
     self.command_handler = CommandHandler()
     self.isModified = FALSE
+    if mcast_addr == None:
+      self.usesMulticast = FALSE
+    else:
+      self.usesMulticast = TRUE
 
     if filename == None:
       if lock_type == DLM_TYPE:
@@ -112,6 +120,7 @@ class ModelBuilder:
       self.resolve_fence_instance_types()
       self.purgePCDuplicates()
       self.resolve_references()
+      self.check_for_multicast()
 
 
   def buildModel(self, parent_node):
@@ -152,6 +161,10 @@ class ModelBuilder:
       elif parent_node.nodeName == GULM_TAG_STR:
         self.GULM_ptr = new_object
         self.lock_type = GULM_TYPE
+      elif parent_node.nodeName == CMAN_PTR_STR:
+        self.CMAN_ptr = new_object
+      elif parent_node.nodeName == MCAST_STR:
+        self.usesMulticast = TRUE
 
     else:
       return None
@@ -176,7 +189,13 @@ class ModelBuilder:
     obj_tree.addChild(cns)
     self.clusternodes_ptr = cns
 
-    obj_tree.addChild(Cman())
+    cman = Cman()
+    obj_tree.addChild(cman)
+
+    if self.usesMulticast == TRUE:
+      mcast = Multicast()
+      mcast.addAttribute("addr",self.mcast_address)
+      cman.addChild(mcast)
 
     fds = FenceDevices()
     obj_tree.addChild(fds)
@@ -363,6 +382,11 @@ class ModelBuilder:
 
   def addNode(self, clusternode):
     self.clusternodes_ptr.addChild(clusternode)
+    if self.usesMulticast == TRUE:
+      mcast = Multicast()
+      mcast.addAttribute("addr",self.mcast_address)
+      mcast.addAttribute("interface","eth0")  #eth0 is the default
+      clusternode.addChild(mcast)
     self.isModified = TRUE
 
   def deleteNode(self, clusternode):
@@ -395,16 +419,46 @@ class ModelBuilder:
     self.isModified = TRUE
 
   def getFenceDevices(self):
-    return self.fencedevices_ptr.getChildren()
+    if self.fencedevices_ptr == None:
+      return list()
+    else:
+      return self.fencedevices_ptr.getChildren()
 
   def getFenceDevicePtr(self):
     return self.fencedevices_ptr
 
   def getFailoverDomains(self):
-    return self.failoverdomains_ptr.getChildren()
+    if self.failoverdomains_ptr == None:
+      return list()
+    else:
+      return self.failoverdomains_ptr.getChildren()
         
   def getFailoverDomainPtr(self):
     return self.failoverdomains_ptr
+
+  def isMulticast(self):
+    if self.usesMulticast == FALSE:
+      print "in isMulticast...usesMulticast is false"
+    else:
+      print "in isMulticast...usesMulticast is true"
+    return self.usesMulticast
+
+  def check_for_multicast(self):
+    if self.usesMulticast == TRUE:
+      #set mcast address
+      children = self.CMAN_ptr.getChildren()
+      for child in children:
+        if child.getTagName() == MCAST_STR:
+          addr = child.getAttribute("addr")
+          if addr != None:
+            self.mcast_address = addr
+            return
+          else:  #What a mess! a multicast tag, but no addr attribute
+            self.mcast_address = ""
+            return
+
+  def getMcastAddr(self):
+    return self.mcast_address
         
   def getServices(self):
     rg_list = list()
@@ -471,6 +525,75 @@ class ModelBuilder:
 
     self.isModified = TRUE
 
+  def switch_lockservers(self):
+    #first get what type of locking is currently in place
+    if self.lock_type == DLM_TYPE:
+      #remove <cman>
+      self.cluster_ptr.removeChild(self.CMAN_ptr)
+      self.CMAN_ptr = None
+
+      #add gulm tag
+      gulm = Gulm()
+      self.GULM_ptr = gulm
+      self.cluster_ptr.addChild(gulm)
+
+      #check for multicast
+      #if multicast, remove <multicast> from each node
+      #remove votes attr from each node
+      nodes = self.getNodes()
+      for node in nodes:
+        if self.usesMulticast == TRUE:
+          mnode = node.getMulticastNode()
+          if mnode != None:
+            node.removeChild(mnode)
+        node.removeAttribute(VOTES_ATTR)
+
+      self.usesMulticast = None
+      self.mcast_address = None
+
+      #reset self.lock_type
+      self.lock_type = GULM_TYPE
+
+      #make the first node a lockserver
+      nodes = self.getNodes()
+      for node in nodes:
+        ls = Lockserver()
+        ls.addAttribute(NAME_ATTR, node.getName())
+        self.GULM_ptr.addChild(ls)
+        break
+ 
+
+      #set modified
+      self.isModified = TRUE
+
+    else:
+      #remove <gulm> tag
+      children = self.cluster_ptr.getChildren()
+      for child in children:
+        if child.getTagName() == "gulm":
+          self.cluster_ptr.removeChild(child)
+          break
+
+      #set gulm pointer to None
+      self.GULM_ptr = None
+
+      #add <cman> tag
+      cman = Cman()
+      self.CMAN_ptr = cman
+      self.cluster_ptr.addChild(cman)
+
+      #reset self.lock_type
+      self.lock_type = DLM_TYPE
+
+      #give each node a vote of 1
+      nds = self.getNodes()
+      for nd in nds:
+        nd.addAttribute(VOTES_ATTR, ONE_VOTE)
+
+      #set modified
+      self.isModified = TRUE
+    
+
   def check_fence_daemon(self):
     if self.fence_daemon_ptr == None:
       self.fence_daemon_ptr = FenceDaemon()
@@ -487,7 +610,7 @@ class ModelBuilder:
       self.isModified = TRUE
     else:
       self.isModified = modified
-                                                                                
+
   def perform_final_check(self):
     self.dual_power_fence_check()
 

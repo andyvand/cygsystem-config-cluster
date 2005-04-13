@@ -49,6 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Thu Apr 07 2005 Jim Parsons <jparsons@redhat.com> 0.9.30-1
+  - Multicast config and a new tool for switching lock managers. 
+* Thu Apr 07 2005 Jim Parsons <jparsons@redhat.com> 0.9.29-1
+  - Fence Daemon config support plus final cluster.ng. 
 * Thu Mar 31 2005 Jim Parsons <jparsons@redhat.com> 0.9.28-1
   - Fixed nits. 
 * Thu Mar 31 2005 Jim Parsons <jparsons@redhat.com> 0.9.27-1

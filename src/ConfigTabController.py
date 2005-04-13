@@ -42,6 +42,7 @@ from Fence import Fence
 from Lockserver import Lockserver
 from ResourceHandler import ResourceHandler
 from PropertiesRenderer import PropertiesRenderer
+from Multicast import Multicast
 
 PIXMAP_DIR = "/usr/share/system-config-cluster/pixmaps/"
 INSTALLDIR = "/usr/share/system-config-cluster/"
@@ -54,9 +55,6 @@ FENCE_OBJ_COL=3
 
 NODE_NEW = 0
 NODE_EXISTING = 1
-
-NAME_ATTR = "name"
-VOTES_ATTR = "votes"
 
 FI_TYPE=_("Fence Device Type: \n %s")
 
@@ -218,6 +216,8 @@ class ConfigTabController:
     self.post_join = self.glade_xml.get_widget('post_join')
     self.post_fail = self.glade_xml.get_widget('post_fail')
     self.clean_start = self.glade_xml.get_widget('clean_start')
+    self.mcast_interface = self.glade_xml.get_widget('mcast_interface')
+    self.mcast_interface_entry = self.glade_xml.get_widget('mcast_interface_entry')
 
     ##Node Fields
     #Node Props
@@ -755,8 +755,15 @@ class ConfigTabController:
     if self.model_builder.getLockType() == GULM_TYPE:
       self.gulm_lockserver.show()
       self.gulm_lockserver.set_active(FALSE)
+      self.mcast_interface.hide()
     else:
+      print "Ok, here we go..."
       self.gulm_lockserver.hide()
+      if self.model_builder.isMulticast() == TRUE:
+        self.mcast_interface.show()
+      else:
+        print "Wow - isMulticast is NOT true!"
+        self.mcast_interface.hide()
 
     self.node_props.set_default_response(gtk.RESPONSE_OK)
     self.node_props.show()
@@ -815,6 +822,16 @@ class ConfigTabController:
           ls = Lockserver()
           ls.addAttribute(NAME_ATTR,nameattr)
           self.model_builder.getGULMPtr().addChild(ls)
+      else:  #DLM Type locking...
+        if self.model_builder.isMulticast() == TRUE:
+          mcast = cn.getMulticastNode()
+          if mcast != None:
+            mcast.addAttribute("addr",self.model_builder.getMcastAddr())
+            ifc = self.mcast_interface_entry.get_text().strip()
+            if ifc == "":
+              mcast.addAttribute("interface","eth0")
+            else: 
+              mcast.addAttribute("interface",ifc)
 
     else:
       selection = self.treeview.get_selection()
@@ -845,6 +862,14 @@ class ConfigTabController:
           ls.addAttribute(NAME_ATTR,nameattr)
           gptr = self.model_builder.getGULMPtr()
           gptr.addChild(ls)
+
+      else:
+        if self.model_builder.isMulticast() == TRUE:
+          ifc = self.mcast_interface_entry.get_text().strip()
+          if ifc == "":
+            nd.setInterface("eth0") #set the default
+          else: 
+            nd.setInterface(ifc) 
 
     self.model_builder.setModified()
     args = list()
@@ -889,8 +914,13 @@ class ConfigTabController:
       if self.model_builder.getLockType() == GULM_TYPE:
         self.gulm_lockserver.show()
         self.gulm_lockserver.set_active(FALSE)
-      else:
+        self.mcast_interface.hide()  #Insurance...
+      else:  #Uses DLM Type locking then...
         self.gulm_lockserver.hide()
+        if self.model_builder.isMulticast() == TRUE:
+          self.mcast_interface.show()
+        else: 
+          self.mcast_interface.hide()
     else:
       selection = self.treeview.get_selection()
       model,iter = selection.get_selected()
@@ -898,20 +928,34 @@ class ConfigTabController:
       attrs = nd.getAttributes()
       try:
         self.node_props_name.set_text(attrs[NAME_ATTR]) 
-        self.node_props_votes.set_text(attrs[VOTES_ATTR]) 
         self.node_props_votes.select_region(0, (-1)) 
         self.node_props_votes.grab_focus() 
       except KeyError, e:
         print " Error looking up key in Nodes attr hash"
 
+      try:
+        self.node_props_votes.set_text(attrs[VOTES_ATTR]) 
+      except KeyError, e:
+        self.node_props_votes.set_text(ONE_VOTE)
+
       if self.model_builder.getLockType() == GULM_TYPE:
         self.gulm_lockserver.show()
+        self.mcast_interface.hide()
         if self.model_builder.isNodeLockserver(attrs[NAME_ATTR]):
           self.gulm_lockserver.set_active(TRUE)
         else:
           self.gulm_lockserver.set_active(FALSE)
-      else:
+      else:  #DLM type then...
         self.gulm_lockserver.hide()
+        if self.model_builder.isMulticast() == TRUE:
+          self.mcast_interface.show()
+          ifc = nd.getInterface()
+          if ifc != None:
+            self.mcast_interface_entry.set_text(ifc)
+          else:
+            self.mcast_interface_entry.set_text("eth0")
+        else: 
+          self.mcast_interface.hide()
 
     self.node_props.show()
 

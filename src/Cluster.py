@@ -12,6 +12,7 @@ DLM_TYPE=_("Locking Type: Distributed")
 GULM_TYPE=_("Locking Type: GuLM")
 LOCKSERVER=_("Lock Server:")
 CONFIG_VERSION=_("Config Version")
+MCAST_MODE=_("Cluster Manager using Multicast Mode. \n   Multicast Address: %s")
                                                                                 
 class Cluster(TagObject):
   def __init__(self):
@@ -26,6 +27,8 @@ class Cluster(TagObject):
     numkids = 0
     dlm_locking = TRUE
     gulm_ptr = None
+    isMulticast = FALSE
+    mcast_address = ""
 
     stringbuf = CLUSTER_NAME % self.getAttribute("name") + "\n"
 
@@ -55,7 +58,13 @@ class Cluster(TagObject):
         kidname = kid.getTagName()
         if kidname.strip() == "cman":
           dlm_locking = TRUE
-          gulm_ptr = None          
+          gulm_ptr = None 
+          cman_kids = kid.getChildren()
+          for cman_kid in cman_kids:
+            if cman_kid.getTagName() == "multicast":
+              isMulticast = TRUE
+              mcast_address = cman_kid.getAttribute("addr")
+              break
           break
         if kidname.strip() == "gulm":
           dlm_locking = FALSE
@@ -68,7 +77,9 @@ class Cluster(TagObject):
     stringbuf = stringbuf + CLUSTER_POPULATION % numkids + "\n\n"
 
     if dlm_locking == TRUE:
-      stringbuf = stringbuf + DLM_TYPE
+      stringbuf = stringbuf + DLM_TYPE + "\n"
+      if isMulticast == TRUE:
+        stringbuf = stringbuf + (MCAST_MODE % mcast_address)
     else:
       stringbuf = stringbuf + GULM_TYPE + "\n"
       lockservers = gulm_ptr.getChildren()

@@ -35,7 +35,7 @@ except RuntimeError, e:
 import gnome
 import gnome.ui
 
-LABEL_X = 225
+LABEL_X = 275
 LABEL_Y = 450
 X_OFF = 2
 Y_OFF = 2

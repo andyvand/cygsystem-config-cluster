@@ -38,6 +38,12 @@ RESOURCE_COLOR="#00CC00"
 RESOURCEGROUPS_COLOR="#FF6600"
 RESOURCEGROUP_COLOR="#FF8800"
 
+#Attribute Strings
+VOTES_ATTR="votes"
+NAME_ATTR="name"
+
+ONE_VOTE=_("1")
+
 #Fence Daemon Default Values
 POST_JOIN_DEFAULT = "3"
 POST_FAIL_DEFAULT = "0"
@@ -51,3 +57,10 @@ MODIFIED_FILE=_("<modified>")
 NEW_CONFIG=_("<New Configuration>")
 
 XML_CONFIG_ERROR=_("<span>A problem was encountered while reading configuration file <b>%s</b> . Details or the error appear below. Click the \'Cancel\' button to quit the application. Click the \'New\' button to create a new configuration file. To continue anyway (Not Recommended!), click the \'Ok\' button.</span>") 
+
+SWITCH_TO_GULM=_("Change to GuLM Lockserver")
+SWITCH_TO_DLM=_("Change to Distributed Lock Manager")
+SWITCH_TO_BROADCAST=_("Change to Broadcast Mode for Cluster Manager")
+SWITCH_TO_MULTICAST=_("Change to Multicast Mode for Cluster Manager")
+
+DANGER_REBOOT_CLUSTER=_("This operation, if performed, will require the cluster to be completely stopped and restarted. Are you certain that you wish to proceed with this change? If so, press 'Yes'.")

@@ -90,6 +90,9 @@ class ConfigTab:
 
     self.filename_entry = self.glade_xml.get_widget('filename_entry')
 
+    self.change_lockserver = self.glade_xml.get_widget('change_lockserver1')
+    self.use_multicast_mode = self.glade_xml.get_widget('use_multicast_mode1')
+
     self.init_buttonpanels()
 
     self.prepare_tree()
@@ -432,6 +435,21 @@ class ConfigTab:
         self.filename_entry.set_text(fname + " " + MODIFIED_FILE)
       else:
         self.filename_entry.set_text(fname)
+
+    #Set appropriate labels for Tools menu dropdown
+    if self.model_builder.getLockType() == DLM_TYPE:
+      self.change_lockserver.get_children()[0].set_text(SWITCH_TO_GULM)
+      self.use_multicast_mode.set_sensitive(TRUE)
+      if self.model_builder.isMulticast() == TRUE:
+        self.use_multicast_mode.get_children()[0].set_text(SWITCH_TO_BROADCAST)
+      else:
+        self.use_multicast_mode.get_children()[0].set_text(SWITCH_TO_MULTICAST)
+    else:
+      self.change_lockserver.get_children()[0].set_text(SWITCH_TO_DLM)
+      self.use_multicast_mode.get_children()[0].set_text(SWITCH_TO_MULTICAST)
+      self.use_multicast_mode.set_sensitive(FALSE)
+
+    
 
 
   def on_props_expose_event(self, widget,event):

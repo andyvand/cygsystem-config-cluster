@@ -1,10 +1,8 @@
 import string
 from TagObject import TagObject
+from clui_constants import *
 
 TAG_NAME = "fence_daemon"
-POST_JOIN_DEFAULT = "3"
-POST_FAIL_DEFAULT = "0"
-CLEAN_START_DEFAULT = "0"
 
 import gettext
 _ = gettext.gettext

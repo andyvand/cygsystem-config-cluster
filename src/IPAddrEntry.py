@@ -1,5 +1,7 @@
 import gtk
 
+from gtk import TRUE, FALSE
+
 class IP (gtk.HBox):
   def __init__ (self):
     gtk.HBox.__init__ (self)
@@ -65,3 +67,15 @@ class IP (gtk.HBox):
   def setAddrFromList(self, addr):
     pass
 
+  #This method just checks that all fields are filled in
+  def isValid(self):
+    if self.e1.get_text().strip() == "":
+      return FALSE
+    elif self.e2.get_text().strip() == "":
+      return FALSE
+    elif self.e3.get_text().strip() == "":
+      return FALSE
+    elif self.e4.get_text().strip() == "":
+      return FALSE
+
+    return TRUE
