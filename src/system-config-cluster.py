@@ -74,12 +74,15 @@ CONFIRM_PROPAGATE=_("This action will save the current configuration in /etc/clu
 UNSAVED=_("Do you want to save your changes? \n\nThe current configuration has not been saved. Click 'No' to discard changes and quit. Click 'Yes' to return to the application where the configuration can be saved by choosing 'Save' or 'Save As' from the File menu.")
 
 NO_MCAST_IP=_("Please Provide a Valid Multicast IP Address")
+
+FILE_DOES_NOT_EXIST=_("The file %s does not exist on the filesystem.")
 ###############################################
 class basecluster:
   def __init__(self, glade_xml, app):
 
     self.model_builder = None
     self.mcast_address = None
+    self.configtab = None
     self.glade_xml = glade_xml
     self.command_handler = CommandHandler()
     self.init_widgets()
@@ -177,6 +180,14 @@ class basecluster:
     popup.show_all()
     rc = popup.run()
     filepath = popup.get_filename()
+
+    #Check to see if file actually exists
+    path_exists = os.path.exists(filepath)
+    if path_exists == FALSE:
+      MessageLibrary.errorMessage(FILE_DOES_NOT_EXIST % filepath)
+      popup.destroy()
+      return
+  
     if os.path.isdir(filepath):
       popup.destroy()
       return
@@ -197,6 +208,15 @@ class basecluster:
     popup.show_all()
     rc = popup.run()
     filepath = popup.get_filename()
+
+    #Check to see if file actually exists
+    path_exists = os.path.exists(filepath)
+    if path_exists == FALSE:
+      MessageLibrary.errorMessage(FILE_DOES_NOT_EXIST % filepath)
+      popup.destroy()
+      self.model_builder = ModelBuilder(DLM_TYPE, None)
+      return
+  
     if os.path.isdir(filepath):
       popup.destroy()
       self.model_builder = ModelBuilder(DLM_TYPE, None)
@@ -271,7 +291,8 @@ class basecluster:
     self.model_builder = ModelBuilder(self.lock_type, None, self.mcast_address)
     #set file name field at top of tab to 'New Configuration'
     self.glade_xml.get_widget("filename_entry").set_text(NEW_CONFIG)
-    self.configtab.set_model(self.model_builder)
+    if self.configtab != None:
+      self.configtab.set_model(self.model_builder)
 
   def lock_method_delete(self, *args):
     self.lock_type = DLM_TYPE

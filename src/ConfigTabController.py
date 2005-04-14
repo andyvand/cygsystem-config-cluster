@@ -757,12 +757,10 @@ class ConfigTabController:
       self.gulm_lockserver.set_active(FALSE)
       self.mcast_interface.hide()
     else:
-      print "Ok, here we go..."
       self.gulm_lockserver.hide()
       if self.model_builder.isMulticast() == TRUE:
         self.mcast_interface.show()
       else:
-        print "Wow - isMulticast is NOT true!"
         self.mcast_interface.hide()
 
     self.node_props.set_default_response(gtk.RESPONSE_OK)

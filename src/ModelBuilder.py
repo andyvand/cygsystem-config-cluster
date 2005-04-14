@@ -190,6 +190,7 @@ class ModelBuilder:
     self.clusternodes_ptr = cns
 
     cman = Cman()
+    self.CMAN_ptr = cman
     obj_tree.addChild(cman)
 
     if self.usesMulticast == TRUE:
@@ -437,10 +438,6 @@ class ModelBuilder:
     return self.failoverdomains_ptr
 
   def isMulticast(self):
-    if self.usesMulticast == FALSE:
-      print "in isMulticast...usesMulticast is false"
-    else:
-      print "in isMulticast...usesMulticast is true"
     return self.usesMulticast
 
   def check_for_multicast(self):
@@ -462,15 +459,19 @@ class ModelBuilder:
         
   def getServices(self):
     rg_list = list()
-    kids = self.resourcemanager_ptr.getChildren()
-    for kid in kids:
-      if kid.getTagName() == SERVICE:
-        rg_list.append(kid)
+    if resourcemanager_ptr != None:
+      kids = self.resourcemanager_ptr.getChildren()
+        for kid in kids:
+        if kid.getTagName() == SERVICE:
+          rg_list.append(kid)
 
     return rg_list
         
   def getResources(self):
-    return self.resources_ptr.getChildren()
+    if self.resources_ptr != None:
+      return self.resources_ptr.getChildren()
+    else:
+      return list()
 
   def getResourcesPtr(self):
     return self.resources_ptr
