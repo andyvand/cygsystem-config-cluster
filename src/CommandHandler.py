@@ -170,7 +170,7 @@ class CommandHandler:
     try:
       out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/clustat",args)
     except RuntimeError, e:
-      return FALSE
+      return dataobjs  #empty list with no services
 
     if res != 0:
       raise CommandError("FATAL", NODES_INFO_ERROR % err)

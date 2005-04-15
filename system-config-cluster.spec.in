@@ -49,6 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Fri Apr 15 2005 Jim Parsons <jparsons@redhat.com> 0.9.33-1
+  - Fixed getServicesInfo bug
+* Fri Apr 15 2005 Jim Parsons <jparsons@redhat.com> 0.9.32-1
+  - Fixed prop rendering for tree components
 * Thu Apr 14 2005 Jim Parsons <jparsons@redhat.com> 0.9.31-1
   - Fixes for bz154835, 154831,154843,150899,154830,154847,
     154860,151068 
