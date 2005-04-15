@@ -459,9 +459,9 @@ class ModelBuilder:
         
   def getServices(self):
     rg_list = list()
-    if resourcemanager_ptr != None:
+    if self.resourcemanager_ptr != None:
       kids = self.resourcemanager_ptr.getChildren()
-        for kid in kids:
+      for kid in kids:
         if kid.getTagName() == SERVICE:
           rg_list.append(kid)
 

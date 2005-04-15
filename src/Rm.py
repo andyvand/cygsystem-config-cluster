@@ -19,7 +19,7 @@ class Rm(TagObject):
     stringbuf = ""
 
     num_fdoms = 0
-    num_resouurces = 0
+    num_resources = 0
     num_services = 0
 
     children = self.getChildren()

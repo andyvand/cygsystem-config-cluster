@@ -390,7 +390,7 @@ class basecluster:
     #call model builder call
     self.model_builder.switch_lockservers()
     #call configtab.prepare_tree()
-    self.configtab.prepare_tree()
+    self.configtab.prepare_tree(TRUE)
 
   def swap_multicast_state(self, *args):
     pass

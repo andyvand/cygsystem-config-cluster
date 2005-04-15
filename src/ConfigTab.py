@@ -45,6 +45,8 @@ ONE_SERVICE=_("One Service is configured \n for this cluster")
 NUM_SERVICES=_("%d Services are configured \n for this cluster")
 
 FENCE_CONFIGURATION=_("Fence Configuration for this Cluster Node")
+NO_FDOMS=_("No Failover Domains Currently Configured")
+NO_RCS=_("No Resources Currently Configured")
 
 ############################################
 class ConfigTab:
@@ -155,7 +157,10 @@ class ConfigTab:
       self.prop_renderer.render_to_layout_area(obj.getProperties(), MANAGED_RESOURCES,type) 
       self.clear_all_buttonpanels()
     elif type == FAILOVER_DOMAINS_TYPE:
-      self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
+      if obj == None:
+        self.prop_renderer.render_to_layout_area(NO_FDOMS, FAILOVER_DOMAINS,type) 
+      else: 
+        self.prop_renderer.render_to_layout_area(obj.getProperties(), obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.faildoms_p.show()
       fdoms_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + FAILOVER_DOMAINS + "</b></span>"
@@ -181,7 +186,10 @@ class ConfigTab:
       self.clear_all_buttonpanels()
       self.service_p.show()
     elif type == RESOURCES_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
+      if obj == None:
+        self.prop_renderer.render_to_layout_area(NO_RCS, RESOURCES,type) 
+      else:
+        self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.resources_p.show()
       resources_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + RESOURCES + "</b></span>"
@@ -299,7 +307,7 @@ class ConfigTab:
       self.treeview.expand_to_path(newmodel.get_path(self.cluster_iter))
 
 
-  def prepare_tree(self):
+  def prepare_tree(self, expand_all=None):
     treemodel = self.treeview.get_model()
 
     self.treeview.get_selection ().handler_block (self.selection_changed_id)
@@ -424,7 +432,8 @@ class ConfigTab:
                                TYPE_COL, RESOURCE_GROUP_TYPE,
                                OBJ_COL, rgroup)
 
-    #self.treeview.expand_all()
+    if expand_all != None:
+      self.treeview.expand_all()
 
     #Fill in Filename Label
     fname = self.model_builder.getFilepath()
