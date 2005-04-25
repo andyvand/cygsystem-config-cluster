@@ -385,7 +385,6 @@ class basecluster:
     #warning message
     retval = MessageLibrary.warningMessage(DANGER_REBOOT_CLUSTER)
     if retval != gtk.RESPONSE_YES:
-      print "NOT OK -- Sorry"
       return
     #call model builder call
     self.model_builder.switch_lockservers()

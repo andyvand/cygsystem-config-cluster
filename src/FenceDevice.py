@@ -27,12 +27,7 @@ class FenceDevice(TagObject):
     attrlist = self.fd_attrs[agent_type]
                                                                                 
     stringbuf = stringbuf + "<span><b>" + TYPE + ": " + "</b>" + pretty_fence_type + "\n</span>"
-    i = 0 
-    print "len attrl.ist is %d" % len(attrlist)
     for attr in attrlist:
-      print "I = %d" % i
-      i = i + 1
-      print "Ding Dang It! it is -->%s<--" % self.pretty_name_attrs[attr] 
       try:
         NAME = self.pretty_name_attrs[attr]
         VALUE = self.getAttribute(attr)
