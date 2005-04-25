@@ -121,6 +121,7 @@ class ModelBuilder:
       self.purgePCDuplicates()
       self.resolve_references()
       self.check_for_multicast()
+      self.check_empty_ptrs()
 
 
   def buildModel(self, parent_node):
@@ -185,6 +186,7 @@ class ModelBuilder:
     obj_tree.addAttribute("config_version","1")
     fdp = FenceDaemon()
     obj_tree.addChild(fdp)
+    self.fence_daemon_ptr = fdp
     cns = ClusterNodes()
     obj_tree.addChild(cns)
     self.clusternodes_ptr = cns
@@ -226,6 +228,7 @@ class ModelBuilder:
     obj_tree.addAttribute("config_version","1")
     fdp = FenceDaemon()
     obj_tree.addChild(fdp)
+    self.fence_daemon_ptr = fdp
     cns = ClusterNodes()
     obj_tree.addChild(cns)
     self.clusternodes_ptr = cns
@@ -456,6 +459,32 @@ class ModelBuilder:
 
   def getMcastAddr(self):
     return self.mcast_address
+
+  def check_empty_ptrs(self):
+    if self.resourcemanager_ptr == None:
+      rm = ResourceManager()
+      self.cluster_ptr.addChild(rm)
+      self.resourcemanager_ptr = rm
+
+    if self.failoverdomains_ptr == None:
+      fdoms = FailoverDomains()
+      self.resourcemanager_ptr.addChild(fdoms)
+      self.failoverdomains_ptr = fdoms
+
+    if self.fencedevices_ptr == None:
+      fds = FenceDevices()
+      self.cluster_ptr.addChild(fds)
+      self.fencedevices_ptr = fds
+        
+    if self.resources_ptr == None:
+      rcs = Resources()
+      self.resourcemanager_ptr.addChild(rcs)
+      self.resources_ptr = rcs
+        
+    if self.fence_daemon_ptr == None:
+      fdp = FenceDaemon()
+      self.cluster_ptr.addChild(fdp)
+      self.fence_daemon_ptr = fdp
         
   def getServices(self):
     rg_list = list()

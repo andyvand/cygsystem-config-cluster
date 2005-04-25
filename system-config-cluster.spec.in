@@ -49,6 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Apr 25 2005 Jim Parsons <jparsons@redhat.com> 0.9.34-1
+  - Fixed bz155024,155028,155052,155046,155269,154845,154888,154546
 * Fri Apr 15 2005 Jim Parsons <jparsons@redhat.com> 0.9.33-1
   - Fixed getServicesInfo bug
 * Fri Apr 15 2005 Jim Parsons <jparsons@redhat.com> 0.9.32-1

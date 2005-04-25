@@ -15,6 +15,8 @@ INSTALLDIR="/usr/share/system-config-cluster"
 
 NONE_PLACEHOLDER=_("None")
 
+RESOURCE_PROVIDE_NAME=_("Please provide a name for this resource.")
+
 #ADDING A NEW RESOURCE: RC form should be named the same as its tagname in
 #the glade file. Then add tagname to this list.
 

@@ -27,11 +27,21 @@ class FenceDevice(TagObject):
     attrlist = self.fd_attrs[agent_type]
                                                                                 
     stringbuf = stringbuf + "<span><b>" + TYPE + ": " + "</b>" + pretty_fence_type + "\n</span>"
-                                                                                
+    i = 0 
+    print "len attrl.ist is %d" % len(attrlist)
     for attr in attrlist:
-      NAME = self.pretty_name_attrs[attr]
-      VALUE = self.getAttribute(attr)
-      stringbuf = stringbuf + "<span><b>" + NAME + ": " + "</b>" + VALUE + "\n</span>"
+      print "I = %d" % i
+      i = i + 1
+      print "Ding Dang It! it is -->%s<--" % self.pretty_name_attrs[attr] 
+      try:
+        NAME = self.pretty_name_attrs[attr]
+        VALUE = self.getAttribute(attr)
+      except KeyError, e:
+        NAME = None
+        VALUE = None
+
+      if (NAME != None) and (VALUE != None):
+        stringbuf = stringbuf + "<span><b>" + NAME + ": " + "</b>" + VALUE + "\n</span>"
                                                                                 
     return stringbuf
 
