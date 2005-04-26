@@ -8,8 +8,7 @@
  <!-- the second for a gulm cluster -->
  <interleave>
  <choice>
-  <group>
-   <interleave>
+  <interleave>
    <element name="cman">
     <optional>
      <element name="multicast">
@@ -41,9 +40,7 @@
     </zeroOrMore>
    </element>
   </interleave>
-  </group> 
-  <group>
-   <interleave>
+  <interleave>
    <element name="gulm">
     <optional>
      <attribute name="heartbeat_rate">
@@ -106,7 +103,6 @@
     </zeroOrMore>
    </element>
   </interleave>
-  </group>
  </choice>
  
  
