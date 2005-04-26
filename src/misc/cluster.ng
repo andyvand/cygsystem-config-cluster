@@ -155,6 +155,7 @@
 
  <optional>
   <element name="rm">
+   <interleave>
    <optional>
     <element name="failoverdomains">
      <zeroOrMore>
@@ -208,6 +209,7 @@
      </zeroOrMore>
     </element>
    </zeroOrMore>
+  </interleave>
   </element>
  </optional>
 
@@ -423,48 +425,48 @@
 
 
  <define name="FENCE">
-       <element name="fence">
-        <oneOrMore>
-         <element name="method">
-          <attribute name="name"/>
-           <zeroOrMore>
-            <element name="device">
-             <attribute name="name">
-              <data type="IDREF"/>
-             </attribute>
-             <choice>
-              <!-- WTI, Brocade, Vixel, ILO, McData -->
-              <group>
-               <attribute name="port">
-                <data type="positiveInteger"/>
-               </attribute>
-              </group>
-              <!-- APC -->
-              <group>
-               <attribute name="port">
-                <data type="positiveInteger"/>
-               </attribute>
-               <attribute name="switch"/>
-              </group>
-              <!-- GNBD -->
-              <group>
-               <attribute name="ipaddress"/>
-              </group>
-              <!-- xCAT -->
-              <group>
-               <attribute name="nodename"/>
-              </group>
-              <!-- Egenera -->
-              <group>
-               <attribute name="LPAN"/>
-               <attribute name="PServer"/>
-              </group>
-             </choice>
-            </element>
-           </zeroOrMore>
-         </element>
-        </oneOrMore>
-       </element>
+  <element name="fence">
+   <oneOrMore>
+    <element name="method">
+     <attribute name="name"/>
+     <zeroOrMore>
+      <element name="device">
+       <attribute name="name">
+        <data type="IDREF"/>
+       </attribute>
+       <choice>
+        <!-- WTI, Brocade, Vixel, ILO, McData -->
+        <group>
+         <attribute name="port">
+          <data type="positiveInteger"/>
+         </attribute>
+        </group>
+        <!-- APC -->
+        <group>
+         <attribute name="port">
+          <data type="positiveInteger"/>
+         </attribute>
+         <attribute name="switch"/>
+        </group>
+        <!-- GNBD -->
+        <group>
+         <attribute name="ipaddress"/>
+        </group>
+        <!-- xCAT -->
+        <group>
+         <attribute name="nodename"/>
+        </group>
+        <!-- Egenera -->
+        <group>
+         <attribute name="LPAN"/>
+         <attribute name="PServer"/>
+        </group>
+       </choice>
+      </element>
+     </zeroOrMore>
+    </element>
+   </oneOrMore>
+  </element>
  </define>
 
 </grammar>      
