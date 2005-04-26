@@ -234,6 +234,7 @@ class basecluster:
       fp = self.model_builder.getFilepath()
       self.model_builder.exportModel()
       retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % fp)
+      self.configtab.prepare_tree(TRUE)
     else:  #Must have been a 'New' instance...
       self.save_as(None)
 
@@ -358,7 +359,11 @@ class basecluster:
     self.mcast_addr_label = self.glade_xml.get_widget('label121')
     self.ip = IP()
     self.ip.show_all()
+    self.mcast_addr_entry = IP()
+    self.mcast_addr_entry.show_all()
     self.glade_xml.get_widget('mcast_ip_proxy').add(self.ip)
+    self.glade_xml.get_widget('mcast_addr_entry_proxy').add(self.mcast_addr_entry)
+    self.mcast_ip_dlg = self.glade_xml.get_widget('mcast_ip_dlg')
 
   def propagate(self):
     retval = self.warningMessage(CONFIRM_PROPAGATE)
@@ -392,7 +397,19 @@ class basecluster:
     self.configtab.prepare_tree(TRUE)
 
   def swap_multicast_state(self, *args):
-    pass
+    address = None
+    if self.model_builder.isMulticast() == FALSE:
+      self.mcast_addr_entry.clear()
+      retval = self.mcast_ip_dlg.run()
+      if retval == gtk.RESPONSE_OK:
+        address = self.mcast_addr_entry.getAddrAsString()
+        self.mcast_ip_dlg.destroy()
+      else:
+        self.mcast_ip_dlg.destroy()
+        return
+         
+    self.model_builder.swap_multicast_state(address)
+    self.configtab.prepare_tree(TRUE)
 
 #############################################################
 def initGlade():

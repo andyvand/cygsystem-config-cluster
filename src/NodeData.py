@@ -7,10 +7,15 @@ MEMBER=_("Member")
 JOINING=_("Joining")
 Dead=_("Dead")
 UNKNOWN=_("Unknown")
+NOT_APPLICABLE=_("N/A")
 
 
 class NodeData:
   def __init__(self, votes, status, name):
+    if votes == None:
+      self.votes = NOT_APPLICABLE
+    else:
+      self.votes = votes
     self.votes = votes
     self.name = name
     stat = status.strip()

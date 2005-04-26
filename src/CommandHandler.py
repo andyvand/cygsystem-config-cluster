@@ -4,6 +4,7 @@ from gtk import TRUE, FALSE
 from CommandError import CommandError
 from NodeData import NodeData
 from ServiceData import ServiceData
+from clui_constants import *
 import rhpl.executil
 
 import gettext
@@ -16,6 +17,10 @@ PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the
 PROPAGATE_ERROR=_("Propagation of configuration file failed with the following error:\n %s")
 
 NODES_INFO_ERROR=_("A problem was encountered when attempting to get information about the nodes in the cluster. The following error message was received from the cman_tool: %s")
+
+MODE_OFFSET = 4
+
+NAME_STR = "Name"
 
 class CommandHandler:
 
@@ -135,31 +140,64 @@ class CommandHandler:
 
     return FALSE
 
-  def getNodesInfo(self):
+  def getNodesInfo(self, locking_type ):
     dataobjs = list()
-    args = list()
-    args.append("/sbin/cman_tool")
-    args.append("nodes")
-    cmdstr = ' '.join(args)
-    try:
-      out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
-    except RuntimeError, e:
-      return FALSE
+    if locking_type == DLM_TYPE:
+      args = list()
+      args.append("/sbin/cman_tool")
+      args.append("nodes")
+      cmdstr = ' '.join(args)
+      try:
+        out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      except RuntimeError, e:
+        return FALSE
 
-    if res != 0:
-      raise CommandError("FATAL", NODES_INFO_ERROR % err)
+      if res != 0:
+        raise CommandError("FATAL", NODES_INFO_ERROR % err)
 
-    lines = out.splitlines()
-    y = (-1)
-    for line in lines:
-      y = y + 1
-      if y == 0:
-        continue
-      words = line.split()
-      nd = NodeData(words[1],words[3],words[4])
-      dataobjs.append(nd)
+      lines = out.splitlines()
+      y = (-1)
+      for line in lines:
+        y = y + 1
+        if y == 0:
+          continue
+        words = line.split()
+        nd = NodeData(words[1],words[3],words[4])
+        dataobjs.append(nd)
 
-    return dataobjs
+      return dataobjs
+
+    else:
+      args = list()
+      args.append("/sbin/gulm_tool")
+      args.append("nodelist")
+      args.append("localhost:core")
+      cmdstr = ' '.join(args)
+      try:
+        out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/gulm_tool",args)
+      except RuntimeError, e:
+        return FALSE
+
+      if res != 0:
+        raise CommandError("FATAL", NODES_INFO_ERROR % err)
+
+      lines = out.splitlines()
+      line_counter = (-1)
+      for line in lines:
+        line_counter = line_counter + 1
+        dex = line.find(NAME_STR)
+        if dex == (-1):
+          continue
+        #We now have a name line
+        words = line.split() #second word is name...
+        name = words[1]
+        modeline = lines[line_counter + MODE_OFFSET] #The mode is 4 lines down..
+        mwords = modeline.split()
+        mode = mwords[2]
+        nd = NodeData(None,mode,name)
+        dataobjs.append(nd)
+
+      return dataobjs
 
   def getServicesInfo(self):
     dataobjs = list()

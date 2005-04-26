@@ -43,6 +43,7 @@ from Lockserver import Lockserver
 from ResourceHandler import ResourceHandler
 from PropertiesRenderer import PropertiesRenderer
 from Multicast import Multicast
+import MessageLibrary
 
 PIXMAP_DIR = "/usr/share/system-config-cluster/pixmaps/"
 INSTALLDIR = "/usr/share/system-config-cluster/"
@@ -77,6 +78,8 @@ CONFIRM_FD_DELETE=_("Are you certain that you wish to delete Fence Device %s?")
 ADD_FENCE=_("Add a New Fence")
 
 EDIT_FENCE=_("Edit Properties for Fence: %s")
+
+SELECT_LEVEL_FOR_FENCE=_("Please select a fence level for the new fence first.")
 
 FENCE_PANEL_LABEL=_("<span size=\"11000\">Fence Configuration for Cluster Node: <b> %s</b></span>")
 
@@ -211,6 +214,7 @@ class ConfigTabController:
     self.glade_xml.get_widget('cancelbutton16').connect('clicked',self.on_cluster_props_edit_cancel)
     self.glade_xml.get_widget('okbutton16').connect('clicked',self.on_cluster_props_edit_ok)
     self.cluster_props_dlg = self.glade_xml.get_widget('cluster_props')
+    self.cluster_props_dlg.connect("delete_event", self.cluster_props_dlg_delete)
     self.clustername = self.glade_xml.get_widget('clustername')
     self.config_version = self.glade_xml.get_widget('config_version')
     self.post_join = self.glade_xml.get_widget('post_join')
@@ -530,6 +534,11 @@ class ConfigTabController:
     self.fi_panel.hide()
 
   def on_create_fi(self, button):
+    selection = self.fence_treeview.get_selection()
+    model,iter = selection.get_selected()
+    if iter == None:
+      retval = MessageLibrary.errorMessage(SELECT_LEVEL_FOR_FENCE)
+      return 
     self.prep_fi_options()
     self.fi_options.set_history(0)
     ########Call change listener here
@@ -600,7 +609,8 @@ class ConfigTabController:
   def on_create_level(self, button):
     selection = self.fence_treeview.get_selection()
     model,iter = selection.get_selected()
-    obj = model.get_value(iter, FENCE_OBJ_COL) #node
+    root_iter = model.get_iter_root()
+    obj = model.get_value(root_iter, FENCE_OBJ_COL) #node
     fence_ptr = obj.getChildren()[0]
     #find out how many levels
     kin = fence_ptr.getChildren()
@@ -1404,6 +1414,10 @@ class ConfigTabController:
                                                                                 
   def node_props_delete(self, *args):
     self.node_props.hide()
+    return gtk.TRUE
+
+  def cluster_props_dlg_delete(self, *args):
+    self.cluster_props_dlg.hide()
     return gtk.TRUE
 
   def fence_panel_delete(self, *args):

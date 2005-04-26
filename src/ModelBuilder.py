@@ -622,6 +622,61 @@ class ModelBuilder:
 
       #set modified
       self.isModified = TRUE
+
+  def swap_multicast_state(self, address=None):
+    if self.usesMulticast == TRUE:
+      #First, eliminate <multicast> tag
+      if self.CMAN_ptr != None:
+        children = self.CMAN_ptr.getChildren()
+        if len(children) > 0:
+          for child in children:
+            if child.getTagName() == MCAST_STR:
+              self.CMAN_ptr.removeChild(child)
+              break
+      found_one = TRUE
+      while found_one == TRUE:
+        found_one = FALSE
+        nodes = self.clusternodes_ptr.getChildren()
+        for node in nodes:
+          node_children = node.getChildren()
+          for node_child in node_children:
+            if node_child.getTagName() == MCAST_STR:
+              node.removeChild(node_child)
+              found_one = TRUE
+              break
+          if found_one == TRUE:
+            break
+
+      self.usesMulticast = FALSE 
+      self.mcast_address = None
+      self.isModified = TRUE
+          
+
+    else:
+      if self.CMAN_ptr != None:
+        mcast = Multicast()
+        mcast.addAttribute("addr",address)
+        self.CMAN_ptr.addChild(mcast)
+
+      has_one = FALSE
+      nodes = self.getNodes()
+      for node in nodes:
+        has_one = FALSE
+        node_children = node.getChildren()
+        for node_child in node_children:
+          if node_child.getTagName() == MCAST_STR:
+            has_one = TRUE
+            break;
+        if has_one == FALSE:
+          mcast = Multicast()
+          mcast.addAttribute("addr",address)
+          mcast.addAttribute("interface","eth0")
+          node.addChild(mcast)
+
+      self.mcast_address = address
+      self.usesMulticast = TRUE
+      self.isModified = TRUE
+        
     
 
   def check_fence_daemon(self):

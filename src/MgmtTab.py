@@ -58,6 +58,14 @@ S_RESTARTS_COL = 4
 class MgmtTab:
   def __init__(self, glade_xml, model_builder):
 
+    # make sure threading is disabled
+    try:
+      from gtk import _disable_gdk_threading
+      _disable_gdk_threading()
+    except ImportError:
+      pass
+
+
     self.model_builder = model_builder
     self.glade_xml = glade_xml
     self.command_handler = CommandHandler()
@@ -128,18 +136,14 @@ class MgmtTab:
     self.glade_xml.get_widget('label90').set_text(STATUS % self.command_handler.getClusterStatus())
     self.glade_xml.get_widget('label93').set_text(ON_MEMBER % self.command_handler.getNodeName())
                                                                                 
-#    self.controller = MgmtTabController(self.model_builder,
-#                                          self.nodetree,
-#                                          self.glade_xml,
-#                                          self.reset_tree_model)
-                                                                                
+    self.onTimer() 
 
   def prep_tree(self):
     treemodel = self.nodetree.get_model()
     treemodel.clear()
 
     try:
-      nodes = self.command_handler.getNodesInfo()
+      nodes = self.command_handler.getNodesInfo(self.model_builder.getLockType())
     except CommandError, e:
       retval = MessageLibrary.errorMessage(e.getMessage())
       return
@@ -180,3 +184,8 @@ class MgmtTab:
                             S_OWNER_COL, owner,
                             S_LASTOWNER_COL, lastowner,
                             S_RESTARTS_COL, restarts) 
+
+  def onTimer(self):
+    self.prep_tree()
+    self.prep_service_tree()
+    gtk.timeout_add(10000,self.onTimer)
