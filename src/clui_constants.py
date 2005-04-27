@@ -56,7 +56,7 @@ RC_PROPS=_("Properties for %s Resource: %s")
 MODIFIED_FILE=_("<modified>")
 NEW_CONFIG=_("<New Configuration>")
 
-XML_CONFIG_ERROR=_("<span>A problem was encountered while reading configuration file <b>%s</b> . Details or the error appear below. Click the \'Cancel\' button to quit the application. Click the \'New\' button to create a new configuration file. To continue anyway (Not Recommended!), click the \'Ok\' button.</span>") 
+XML_CONFIG_ERROR=_("A problem was encountered while reading configuration file %s . Details or the error appear below. Click the \'Cancel\' button to quit the application. Click the \'New\' button to create a new configuration file. To continue anyway (Not Recommended!), click the \'Ok\' button.") 
 
 SWITCH_TO_GULM=_("Change to GuLM Lockserver")
 SWITCH_TO_DLM=_("Change to Distributed Lock Manager")

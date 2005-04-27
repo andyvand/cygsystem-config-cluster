@@ -2183,21 +2183,6 @@ Cluster</property>
 				  <property name="homogeneous">True</property>
 				</packing>
 			      </child>
-
-			      <child>
-				<widget class="GtkToolButton" id="button20">
-				  <property name="visible">True</property>
-				  <property name="stock_id">gtk-properties</property>
-				  <property name="visible_horizontal">True</property>
-				  <property name="visible_vertical">True</property>
-				  <property name="is_important">False</property>
-				  <signal name="clicked" handler="on_properties_activate" last_modification_time="Wed, 19 Feb 2003 21:45:49 GMT"/>
-				</widget>
-				<packing>
-				  <property name="expand">False</property>
-				  <property name="homogeneous">True</property>
-				</packing>
-			      </child>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>

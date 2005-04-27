@@ -157,7 +157,6 @@ class MgmtTab:
     self.glade_xml.get_widget('button17').connect("clicked",self.on_svc_enable)
     self.glade_xml.get_widget('button18').connect("clicked",self.on_svc_disable)
     self.glade_xml.get_widget('button19').connect("clicked",self.on_svc_restart)
-    self.glade_xml.get_widget('button20').connect("clicked",self.on_svc_props)
                                                                                 
     self.onTimer() 
 
@@ -247,9 +246,6 @@ class MgmtTab:
     errorstring = ""
     self.grayOutMainWindow()
     fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring,self.ungrayOutAndResetMainWindow)
-
-  def on_svc_props(self, button):
-    pass
 
   def grayOutMainWindow(self):
     #Temporarily mothball main window

@@ -105,6 +105,7 @@ class basecluster:
       #self.no_conf_dlg.show()
       self.no_conf_dlg.run()
     elif ((conf_exists == TRUE) and (is_cluster_member == FALSE)):
+      self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
       self.mgmt_tab.hide()
       MessageLibrary.simpleInfoMessage(NOT_CLUSTER_MEMBER)
       self.propagate_button.hide()
@@ -118,13 +119,29 @@ class basecluster:
           gtk.main_quit()
         elif retval == gtk.RESPONSE_APPLY:
           #make new cfg file
+          self.bad_xml_dlg.hide()
           self.no_conf_dlg.run()
         else:  #Proceed anyway...
+          self.bad_xml_dlg.hide()
           self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
-      self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
     else:
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
       self.propagate_button.show()
+      try:
+        self.command_handler.check_xml(CLUSTER_CONF_PATH)
+      except CommandError, e:
+        self.bad_xml_label.set_text(XML_CONFIG_ERROR % CLUSTER_CONF_PATH)
+        self.bad_xml_text.get_buffer().set_text(e.getMessage())
+        retval = self.bad_xml_dlg.run()
+        if retval == gtk.RESPONSE_CANCEL:
+          gtk.main_quit()
+        elif retval == gtk.RESPONSE_APPLY:
+          #make new cfg file
+          self.bad_xml_dlg.hide()
+          self.no_conf_dlg.run()
+        else:  #Proceed anyway...
+          self.bad_xml_dlg.hide()
+          self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
       self.mgmttab = MgmtTab(glade_xml, self.model_builder,self.winMain)
 
     self.configtab = ConfigTab(glade_xml, self.model_builder)
@@ -196,9 +213,24 @@ class basecluster:
       popup.destroy()
       return
     else:
-      self.model_builder = ModelBuilder(DLM_TYPE, filepath)
-      self.configtab.set_model(self.model_builder)
-      popup.destroy()
+      try:
+        self.command_handler.check_xml(filepath)
+      except CommandError, e:
+        self.bad_xml_label.set_text(XML_CONFIG_ERROR % filepath)
+        self.bad_xml_text.get_buffer().set_text(e.getMessage())
+        retval = self.bad_xml_dlg.run()
+        if retval == gtk.RESPONSE_CANCEL:
+          gtk.main_quit()
+        elif retval == gtk.RESPONSE_APPLY:
+          #make new cfg file
+          popup.destroy()
+          self.bad_xml_dlg.hide()
+          self.no_conf_dlg.run()
+        else:  #Proceed anyway...
+          self.bad_xml_dlg.hide()
+          self.model_builder = ModelBuilder(DLM_TYPE, filepath)
+          self.configtab.set_model(self.model_builder)
+          popup.destroy()
 
   def open_limited(self, *args):
     #offer fileselection
