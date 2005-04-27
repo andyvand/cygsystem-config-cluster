@@ -23,6 +23,10 @@ MODE_OFFSET = 4
 
 NAME_STR = "Name"
 
+DEAD_STR=_("Dead")
+
+MEMBER_STR=_("Member")
+
 class CommandHandler:
 
   def __init__(self):
@@ -197,10 +201,18 @@ class CommandHandler:
         #We now have a name line
         words = line.split() #second word is name...
         name = words[1]
+        stateline = lines[line_counter + STATE_OFFSET] #The state is 2 lines down..
         modeline = lines[line_counter + MODE_OFFSET] #The mode is 4 lines down..
+        swords = stateline.split()
+        ste = swords[2:].strip()
+        if ste == "Logged in":
+          statestr = MEMBER_STR
+        else:
+          statestr = DEAD_STR
         mwords = modeline.split()
         mode = mwords[2]
-        nd = NodeData(None,mode,name)
+        modestate = mode + " - " + statestr
+        nd = NodeData(None,modestate,name)
         dataobjs.append(nd)
 
       return dataobjs

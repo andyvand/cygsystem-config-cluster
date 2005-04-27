@@ -49,6 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Apr 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.39-1
+  - Fix for bz155033, and some other minor stuff
+* Wed Apr 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.38-1
+  - minor amendment to ng file
 * Wed Apr 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.37-1
   - DnD support for service enabling, fixed various nits
 * Tue Apr 26 2005 Jim Parsons <jparsons@redhat.com> 0.9.36-1

@@ -26,7 +26,7 @@ class NodeData:
     elif stat == "X":
       self.status = DEAD
     else: 
-      self.status = UNKNOWN
+      self.status = status
 
   def getNodeProps(self):
     return (self.name, self.votes, self.status)

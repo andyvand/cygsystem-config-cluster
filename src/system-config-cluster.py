@@ -367,7 +367,7 @@ class basecluster:
     self.mcast_ip_dlg = self.glade_xml.get_widget('mcast_ip_dlg')
 
   def propagate(self, button):
-    retval = self.warningMessage(CONFIRM_PROPAGATE)
+    retval = MessageLibrary.warningMessage(CONFIRM_PROPAGATE)
     if retval == gtk.RESPONSE_NO:
       return
     #1 save file to /etc/cluster/cluster.conf
@@ -376,7 +376,7 @@ class basecluster:
     try:
       self.command_handler.propagateConfig(CLUSTER_CONF_PATH)
     except CommandError, e:
-      self.MessageLibrary.errorMessage(e.getMessage())
+      MessageLibrary.errorMessage(e.getMessage())
     #3 call cman_tool -r with config version
     ltype = self.model_builder.getLockType()
     if ltype == DLM_TYPE:
@@ -385,7 +385,7 @@ class basecluster:
       try:
         self.command_handler.propagateCManConfig(version)
       except CommandError, e:
-        self.MessageLibrary.errorMessage(e.getMessage())
+        MessageLibrary.errorMessage(e.getMessage())
 
   def change_lockserver(self, *args):
     #warning message
