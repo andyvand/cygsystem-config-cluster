@@ -97,6 +97,11 @@
        <data type="ID"/>
       </attribute>
       <optional>
+       <attribute name="votes">
+        <data type="positiveInteger"/>
+       </attribute>
+      </optional>
+      <optional>
         <ref name="FENCE"/>
       </optional>
      </element>
