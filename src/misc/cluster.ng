@@ -116,7 +116,7 @@
      <attribute name="agent"/>
      <optional>
       <choice>
-       <!-- APC, Brocade, McData -->
+       <!-- APC, Brocade, McData, SANBox2, Bladecenter -->
        <group>
         <attribute name="ipaddr"/>
         <attribute name="login"/>
@@ -144,6 +144,12 @@
        <!-- xCAT -->
        <group>
         <attribute name="rpowerpath"/>
+       </group>
+       <!-- manual -->
+       <group>
+        <optional>
+         <empty/>
+        </optional>
        </group>
       </choice>
      </optional>
@@ -435,7 +441,7 @@
         <data type="IDREF"/>
        </attribute>
        <choice>
-        <!-- WTI, Brocade, Vixel, ILO, McData -->
+        <!-- WTI, Brocade, Vixel, McData, SANBox2 -->
         <group>
          <attribute name="port">
           <data type="positiveInteger"/>
@@ -447,6 +453,10 @@
           <data type="positiveInteger"/>
          </attribute>
          <attribute name="switch"/>
+        </group>
+        <!-- BladeCenter -->
+        <group>
+         <attribute name="blade"/>
         </group>
         <!-- GNBD -->
         <group>
@@ -460,6 +470,12 @@
         <group>
          <attribute name="LPAN"/>
          <attribute name="PServer"/>
+        </group>
+        <!-- ILO, manual -->
+        <group>
+         <optional>
+          <empty/>
+         </optional>
         </group>
        </choice>
       </element>
