@@ -473,8 +473,8 @@
         </group>
         <!-- Egenera -->
         <group>
-         <attribute name="LPAN"/>
-         <attribute name="PServer"/>
+         <attribute name="lpan"/>
+         <attribute name="pserver"/>
         </group>
         <!-- ILO, manual -->
         <group>
