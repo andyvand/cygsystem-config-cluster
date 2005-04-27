@@ -10,7 +10,8 @@ import rhpl.executil
 import gettext
 _ = gettext.gettext
 
-PATH_TO_RELAXNG_FILE = "../misc/cluster.ng"
+PATH_TO_RELAXNG_FILE = "./misc/cluster.ng"
+ALT_PATH_TO_RELAXNG_FILE = "/usr/share/system-config-cluster/misc/cluster.ng"
 
 PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the following error:\n %s")
 
@@ -25,6 +26,11 @@ NAME_STR = "Name"
 class CommandHandler:
 
   def __init__(self):
+    path_exists = os.path.exists(PATH_TO_RELAXNG_FILE)
+    if path_exists == TRUE:
+      self.relaxng_file = PATH_TO_RELAXNG_FILE
+    else:
+      self.relaxng_file = ALT_PATH_TO_RELAXNG_FILE
     pass
 
   def isClusterMember(self):
@@ -57,10 +63,10 @@ class CommandHandler:
     try:
       out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
-      return FALSE
+      return ""
 
     if res != 0:
-      return FALSE
+      return ""
 
     #look for Cluster Name string
     lines = out.splitlines()
@@ -305,7 +311,7 @@ class CommandHandler:
     args = list()
     args.append("/usr/bin/xmllint")
     args.append("--relaxng")
-    args.append(PATH_TO_RELAXNG_FILE)
+    args.append(self.relaxng_file)
     args.append(file)
     try:
       out,err,res = rhpl.executil.execWithCaptureErrorStatus("/usr/bin/xmllint",args)

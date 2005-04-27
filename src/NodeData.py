@@ -5,7 +5,7 @@ _ = gettext.gettext
 
 MEMBER=_("Member")
 JOINING=_("Joining")
-Dead=_("Dead")
+DEAD=_("Dead")
 UNKNOWN=_("Unknown")
 NOT_APPLICABLE=_("N/A")
 

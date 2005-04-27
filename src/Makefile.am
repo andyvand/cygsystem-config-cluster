@@ -21,6 +21,7 @@ FenceDevice.py \
 FenceDevices.py \
 FenceHandler.py \
 Fence.py \
+ForkedCommand.py	\
 Fs.py \
 Ip.py \
 IPAddrEntry.py	\
@@ -46,6 +47,7 @@ TagObject.py \
 ValidationError.py \
 pixmaps/node.png	\
 pixmaps/fence.png	\
+misc/cluster.ng	\
 system-config-cluster.py
 
 GLADE_FILES = clui.glade fence.glade resources.glade
@@ -63,6 +65,7 @@ glade_DATA = $(GLADE_FILES)
 
 install-exec-local:
 	mkdir -p $(DESTDIR)$(sbindir) $(DESTDIR)$(bindir) $(DESTDIR)$(pkgdatadir) $(DESTDIR)$(pkgdatadir)/pixmaps/
+	mkdir -p $(DESTDIR)$(sbindir) $(DESTDIR)$(bindir) $(DESTDIR)$(pkgdatadir) $(DESTDIR)$(pkgdatadir)/misc/
 	sed -e 's/\@VERSION\@/@VERSION@/g' $(srcdir)/system-config-cluster.py > $(DESTDIR)$(pkgdatadir)/system-config-cluster.py
 	chmod 755 $(DESTDIR)$(pkgdatadir)/system-config-cluster.py
 	install -m 0640 $(srcdir)/clui_constants.py $(DESTDIR)$(pkgdatadir)/
@@ -88,6 +91,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/FenceDevices.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FenceHandler.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fence.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/ForkedCommand.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fs.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Ip.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/IPAddrEntry.py  $(DESTDIR)$(pkgdatadir)/
@@ -113,6 +117,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/ValidationError.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/pixmaps/fence.png  $(DESTDIR)$(pkgdatadir)/pixmaps/
 	install -m 0640 $(srcdir)/pixmaps/node.png  $(DESTDIR)$(pkgdatadir)/pixmaps/
+	install -m 0640 $(srcdir)/misc/cluster.ng  $(DESTDIR)$(pkgdatadir)/misc/
 	softdir=$(pkgdatadir); \
 	p=$(DESTDIR) ; \
 	softdir=$${softdir/#$$p} ; \

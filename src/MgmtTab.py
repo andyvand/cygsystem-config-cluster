@@ -6,6 +6,8 @@ import MessageLibrary
 from CommandError import CommandError
 from clui_constants import *
 from CommandHandler import CommandHandler
+from ForkedCommand import ForkedCommand
+
 
 import gettext
 _ = gettext.gettext
@@ -34,6 +36,8 @@ STATUS=_("Status: %s")
 
 NO_SERVICES=_("No Services Currently Defined")
 
+PATIENCE_MESSAGE=_("Please be patient.\n Starting and Stopping Services\n can sometimes take a minute or two.")
+
 T_NAME=_("Name")
 T_VOTES=_("Votes")
 T_STATUS=_("Status")
@@ -44,20 +48,26 @@ S_OWNER=_("Owner")
 S_LASTOWNER=_("Previous Owner")
 S_RESTARTS=_("Restarts")
 
-NAME_COL = 0
+TITLE_COL = 0
 VOTES_COL = 1
 STATUS_COL = 2
+NAME_COL = 3
 
-S_NAME_COL = 0
+S_TITLE_COL = 0
 S_STATE_COL = 1
 S_OWNER_COL = 2
 S_LASTOWNER_COL = 3
 S_RESTARTS_COL = 4
+S_NAME_COL = 5
+
+python_code_targets = [('execable_python', 0, 0),
+                       ('pickled_python', 0, 1)];
 
 ############################################
 class MgmtTab:
-  def __init__(self, glade_xml, model_builder):
+  def __init__(self, glade_xml, model_builder,winmain):
 
+    self.winMain = winmain
     # make sure threading is disabled
     try:
       from gtk import _disable_gdk_threading
@@ -74,8 +84,12 @@ class MgmtTab:
     self.nodetree = self.glade_xml.get_widget('nodetree')
     self.treemodel = gtk.TreeStore (gobject.TYPE_STRING,
                                     gobject.TYPE_STRING,
+                                    gobject.TYPE_STRING,
                                     gobject.TYPE_STRING)
     self.nodetree.set_model(self.treemodel)
+
+    self.nodetree.drag_dest_set(gtk.DEST_DEFAULT_ALL, python_code_targets, gtk.gdk.ACTION_COPY)
+    self.nodetree.connect('drag_data_received',self.dest_drag_data_received)
 
     renderer = gtk.CellRendererText()
     column1 = gtk.TreeViewColumn(T_NAME,renderer,markup=0)
@@ -98,8 +112,12 @@ class MgmtTab:
                                     gobject.TYPE_STRING,
                                     gobject.TYPE_STRING,
                                     gobject.TYPE_STRING,
+                                    gobject.TYPE_STRING,
                                     gobject.TYPE_STRING)
     self.servicetree.set_model(self.streemodel)
+
+    self.servicetree.drag_source_set(gtk.gdk.BUTTON1_MASK, python_code_targets, gtk.gdk.ACTION_COPY)
+    self.servicetree.connect('drag_data_get',self.source_drag_data_get)
 
     srenderer = gtk.CellRendererText()
     scolumn1 = gtk.TreeViewColumn(S_NAME,srenderer,markup=0)
@@ -135,6 +153,11 @@ class MgmtTab:
     #Now set info labels
     self.glade_xml.get_widget('label90').set_text(STATUS % self.command_handler.getClusterStatus())
     self.glade_xml.get_widget('label93').set_text(ON_MEMBER % self.command_handler.getNodeName())
+
+    self.glade_xml.get_widget('button17').connect("clicked",self.on_svc_enable)
+    self.glade_xml.get_widget('button18').connect("clicked",self.on_svc_disable)
+    self.glade_xml.get_widget('button19').connect("clicked",self.on_svc_restart)
+    self.glade_xml.get_widget('button20').connect("clicked",self.on_svc_props)
                                                                                 
     self.onTimer() 
 
@@ -152,9 +175,10 @@ class MgmtTab:
       iter = treemodel.append(None)
       name, votes, status = node.getNodeProps()
       name_str = "<span size=\"10000\"><b>" + name + "</b></span>"
-      treemodel.set(iter, NAME_COL, name_str,
+      treemodel.set(iter, TITLE_COL, name_str,
                           VOTES_COL, votes,
-                          STATUS_COL, status) 
+                          STATUS_COL, status,
+                          NAME_COL, name) 
 
   def prep_service_tree(self):
     treemodel = self.servicetree.get_model()
@@ -179,13 +203,101 @@ class MgmtTab:
         else:
           color = "red"
         state_str = "<span foreground=\"" + color + "\">" + state + "</span>"
-        treemodel.set(iter, S_NAME_COL, name_str,
+        treemodel.set(iter, S_TITLE_COL, name_str,
                             S_STATE_COL, state_str,
                             S_OWNER_COL, owner,
                             S_LASTOWNER_COL, lastowner,
-                            S_RESTARTS_COL, restarts) 
+                            S_RESTARTS_COL, restarts,
+                            S_NAME_COL, name) 
 
   def onTimer(self):
     self.prep_tree()
     self.prep_service_tree()
     gtk.timeout_add(10000,self.onTimer)
+
+  def on_svc_enable(self, button):
+    selection = self.servicetree.get_selection()
+    model,iter = selection.get_selected()
+    if iter == None:
+      return
+    svc_name = model.get_value(iter, S_NAME_COL)
+    self.grayOutMainWindow()
+    commandstring = "clusvcadm -e \"" + svc_name + "\""
+    errorstring = (_("Error: Service Enable failed - please check the logs for error messages.\n\nOnce the problem has been corrected, the 'Failed' service must first be Disabled before it can be Enabled."))
+    fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring, self.ungrayOutAndResetMainWindow)
+
+  def on_svc_disable(self, button):
+    selection = self.servicetree.get_selection()
+    model,iter = selection.get_selected()
+    if iter == None:
+      return
+    svc_name = model.get_value(iter, S_NAME_COL)
+    commandstring = "clusvcadm -d \"" + svc_name + "\""
+    errorstring = _(" An error has occurred while disabling this service. Please check logs for details.")
+    self.grayOutMainWindow()
+    fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring, self.ungrayOutAndResetMainWindow)
+
+  def on_svc_restart(self, button):
+    selection = self.servicetree.get_selection()
+    model,iter = selection.get_selected()
+    if iter == None:
+      return
+    svc_name = model.get_value(iter, S_NAME_COL)
+    commandstring = "clusvcadm -R \"" + svc_name + "\""
+    errorstring = ""
+    self.grayOutMainWindow()
+    fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring,self.ungrayOutAndResetMainWindow)
+
+  def on_svc_props(self, button):
+    pass
+
+  def grayOutMainWindow(self):
+    #Temporarily mothball main window
+    watch = gtk.gdk.Cursor (gtk.gdk.WATCH)
+    self.winMain.window.set_cursor(watch)
+    self.winMain.set_sensitive(FALSE)
+                                                                              
+  def ungrayOutMainWindow(self):
+    self.winMain.window.set_cursor(None)
+    self.winMain.set_sensitive(TRUE)
+                                                                              
+  def ungrayOutAndResetMainWindow(self):
+    self.winMain.window.set_cursor(None)
+    self.winMain.set_sensitive(TRUE)
+    self.prep_service_tree()
+
+  def dest_drag_data_received(self,w, context, x, y, selection_data, info, time):
+    errorstring1 = ""
+    errorstring2 = ""
+    row = w.get_path_at_pos(x,y-25)[0][0]
+    model=w.get_model()
+    iter=model.get_iter_first()
+    for i in range(row):
+        iter=model.iter_next(iter)
+    m_name = model.get_value (iter, NAME_COL)
+    #if s.getStateString() == 'Disabled':
+    ###XXX Fix - find out how to get state info on service here
+    if TRUE:
+      ### Service is 'Disabled' - just 'enable' on new member
+      commandstring = "clusvcadm -e " + selection_data.data + " -m " + m_name
+      self.grayOutMainWindow()
+      fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring1, self.ungrayOutAndResetMainWindow)
+    else:
+      ### Service is not 'Disabled' - restart it on new member
+      commandstring = "clusvcadm -r \"" + selection_data.data + "\" -m " + m_name
+      self.grayOutMainWindow()
+      fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring2, self.ungrayOutAndResetMainWindow)
+                                                                            
+    return 
+
+  def source_drag_data_get(self,w, context, selection_data, info, time):
+    selection=w.get_selection()
+    result = selection.get_selected ()
+    if result != None:
+      (model, iter) = result
+      try:
+        s_name = model.get_value (iter, S_NAME_COL)
+      except:
+        pass
+    selection_data.set(selection_data.target, 0, s_name)
+    return

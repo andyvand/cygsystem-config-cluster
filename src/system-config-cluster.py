@@ -80,6 +80,7 @@ FILE_DOES_NOT_EXIST=_("The file %s does not exist on the filesystem.")
 class basecluster:
   def __init__(self, glade_xml, app):
 
+    self.winMain = app
     self.model_builder = None
     self.mcast_address = None
     self.configtab = None
@@ -107,24 +108,24 @@ class basecluster:
       self.mgmt_tab.hide()
       MessageLibrary.simpleInfoMessage(NOT_CLUSTER_MEMBER)
       self.propagate_button.hide()
-      #try:
-      #  self.command_handler.check_xml(CLUSTER_CONF_PATH)
-      #except CommandError, e:
-      #  self.bad_xml_label.set_text(XML_CONFIG_ERROR % CLUSTER_CONF_PATH)
-      #  self.bad_xml_text.get_buffer().set_text(e.getMessage())
-      #  retval = self.bad_xml_dlg.run()
-      #  if retval == gtk.RESPONSE_CANCEL:
-      #    gtk.main_quit()
-      #  elif retval == gtk.RESPONSE_APPLY:
-      #    #make new cfg file
-      #    self.no_conf_dlg.run()
-      #  else:  #Proceed anyway...
-      #    self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
+      try:
+        self.command_handler.check_xml(CLUSTER_CONF_PATH)
+      except CommandError, e:
+        self.bad_xml_label.set_text(XML_CONFIG_ERROR % CLUSTER_CONF_PATH)
+        self.bad_xml_text.get_buffer().set_text(e.getMessage())
+        retval = self.bad_xml_dlg.run()
+        if retval == gtk.RESPONSE_CANCEL:
+          gtk.main_quit()
+        elif retval == gtk.RESPONSE_APPLY:
+          #make new cfg file
+          self.no_conf_dlg.run()
+        else:  #Proceed anyway...
+          self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
     else:
       self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
       self.propagate_button.show()
-      self.mgmttab = MgmtTab(glade_xml, self.model_builder)
+      self.mgmttab = MgmtTab(glade_xml, self.model_builder,self.winMain)
 
     self.configtab = ConfigTab(glade_xml, self.model_builder)
 
@@ -365,7 +366,7 @@ class basecluster:
     self.glade_xml.get_widget('mcast_addr_entry_proxy').add(self.mcast_addr_entry)
     self.mcast_ip_dlg = self.glade_xml.get_widget('mcast_ip_dlg')
 
-  def propagate(self):
+  def propagate(self, button):
     retval = self.warningMessage(CONFIRM_PROPAGATE)
     if retval == gtk.RESPONSE_NO:
       return
@@ -409,6 +410,7 @@ class basecluster:
         return
          
     self.model_builder.swap_multicast_state(address)
+    
     self.configtab.prepare_tree(TRUE)
 
 #############################################################

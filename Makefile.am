@@ -9,6 +9,7 @@ EXTRA_DIST = \
 	system-config-cluster.pam		\
 	src/pixmaps/fence.png			\
 	src/pixmaps/node.png			\
+	src/misc/cluster.ng			\
 	intltool-extract.in			\
 	intltool-merge.in			\
 	intltool-update.in			\

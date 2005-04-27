@@ -49,6 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Apr 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.37-1
+  - DnD support for service enabling, fixed various nits
 * Tue Apr 26 2005 Jim Parsons <jparsons@redhat.com> 0.9.36-1
   - Fixed bz155064,155023,155035,149897,154530,154860,154938,155049,154866,155042
 * Mon Apr 25 2005 Jim Parsons <jparsons@redhat.com> 0.9.35-1
