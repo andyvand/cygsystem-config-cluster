@@ -116,7 +116,8 @@ class basecluster:
         self.bad_xml_text.get_buffer().set_text(e.getMessage())
         retval = self.bad_xml_dlg.run()
         if retval == gtk.RESPONSE_CANCEL:
-          gtk.main_quit()
+          #gtk.main_quit() 
+          sys.exit(0)
         elif retval == gtk.RESPONSE_APPLY:
           #make new cfg file
           self.bad_xml_dlg.hide()
@@ -134,7 +135,8 @@ class basecluster:
         self.bad_xml_text.get_buffer().set_text(e.getMessage())
         retval = self.bad_xml_dlg.run()
         if retval == gtk.RESPONSE_CANCEL:
-          gtk.main_quit()
+          #gtk.main_quit()
+          sys.exit(0)
         elif retval == gtk.RESPONSE_APPLY:
           #make new cfg file
           self.bad_xml_dlg.hide()
@@ -220,17 +222,23 @@ class basecluster:
         self.bad_xml_text.get_buffer().set_text(e.getMessage())
         retval = self.bad_xml_dlg.run()
         if retval == gtk.RESPONSE_CANCEL:
-          gtk.main_quit()
+          sys.exit(0)
+          #gtk.main_quit() 
         elif retval == gtk.RESPONSE_APPLY:
           #make new cfg file
           popup.destroy()
           self.bad_xml_dlg.hide()
           self.no_conf_dlg.run()
+          return
         else:  #Proceed anyway...
           self.bad_xml_dlg.hide()
           self.model_builder = ModelBuilder(DLM_TYPE, filepath)
           self.configtab.set_model(self.model_builder)
           popup.destroy()
+          return
+      self.model_builder = ModelBuilder(DLM_TYPE, filepath)
+      self.configtab.set_model(self.model_builder)
+      popup.destroy()
 
   def open_limited(self, *args):
     #offer fileselection
@@ -475,5 +483,8 @@ if __name__ == "__main__":
         print _("Please restart %s with root permissions!") % (sys.argv[0])
         sys.exit(10)
 
-    runFullGUI()
+    try:
+      runFullGUI()
+    except KeyboardInterrupt, e:
+      pass
 

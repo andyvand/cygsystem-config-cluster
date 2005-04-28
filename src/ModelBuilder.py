@@ -143,7 +143,6 @@ class ModelBuilder:
           attrValue = attrNode.nodeValue
           new_object.addAttribute(attrName,attrValue)
       except KeyError, k:
-        print "Can't locate %s in tag names dict" % parent_node.nodeName
         return None
       if parent_node.nodeName == CLUSTER_PTR_STR:
         self.cluster_ptr = new_object
@@ -695,6 +694,14 @@ class ModelBuilder:
       self.isModified = TRUE
     else:
       self.isModified = modified
+
+  def rectifyNewNodenameWithFaildoms(self, oldname, newname):
+    fdoms = self.getFailoverDomains()
+    for fdom in fdoms:
+      children = fdom.getChildren() #These are failoverdomainnodes...
+      for child in children:
+        if child.getName().strip() == oldname:
+          child.addAttribute("name",newname)
 
   def perform_final_check(self):
     self.dual_power_fence_check()

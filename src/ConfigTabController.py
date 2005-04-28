@@ -115,6 +115,10 @@ CONFIRM_FI_REMOVE=_("Are you certain that you wish to remove this fence?")
 
 NEED_CONFIG_VERSION=_("Please provide a Config Version")
 
+CONFIG_VERSION_DIGITS=_("Config Version field must contain numeric digits only.")
+
+CONFIG_VERSION_DIGITS_MAX=_("Config Version field is limited to values from 1 to 10,000")
+
 ###TRANSLATOR: The string below is used as an attr value in an XML file, as well
 ###as a GUI string. Please do not use whitespace in this string. 
 FENCE_LEVEL=_("Fence-Level-%d")
@@ -380,7 +384,20 @@ class ConfigTabController:
       self.config_version.select_region(0, -1)
       return
 
-      
+    if version.isdigit() == FALSE: 
+      self.errorMessage(CONFIG_VERSION_DIGITS)
+      self.config_version.set_text(cptr.getConfigVersion())
+      self.config_version.select_region(0, -1)
+      return
+
+    x = int(version)
+    if (x >= 10000) or (x < 0):
+      self.errorMessage(CONFIG_VERSION_DIGITS_MAX)
+      self.config_version.set_text(cptr.getConfigVersion())
+      self.config_version.select_region(0, -1)
+      return
+
+
     if postjoin.startswith("-") == TRUE:
       postjoinstr = postjoin[1:]
     else:
@@ -841,7 +858,7 @@ class ConfigTabController:
             else: 
               mcast.addAttribute("interface",ifc)
 
-    else:
+    else:  #this case is for editing existing nodes
       selection = self.treeview.get_selection()
       model,iter = selection.get_selected()
       nd = model.get_value(iter, OBJ_COL)
@@ -859,6 +876,9 @@ class ConfigTabController:
             lsn = self.model_builder.getLockServer(ndname)
             lsn.addAttribute(NAME_ATTR,nameattr)
         nd.addAttribute(NAME_ATTR,nameattr)
+        #Before we are finished here, we need to iterate through all of the
+        #current faildoms and replace ndname with nameattr...
+        self.model_builder.rectifyNewNodenameWithFaildoms(ndname,nameattr)
       nd.addAttribute(VOTES_ATTR,votesattr) 
 
       if self.model_builder.getLockType() == GULM_TYPE:

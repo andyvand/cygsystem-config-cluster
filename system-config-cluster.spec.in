@@ -49,6 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Thu Apr 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.42-1
+  - Fixed bz149508,149662,154839,156002,149124
 * Wed Apr 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.41-1
   - another Schema checking fix
 * Wed Apr 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.40-1
