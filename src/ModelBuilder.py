@@ -4,6 +4,8 @@
 from xml.dom import minidom, Node
 import string
 import os
+### gettext ("_") must come before gtk ###
+import gettext
 from gtk import TRUE, FALSE
 from TagObject import TagObject
 from Cluster import Cluster
@@ -36,6 +38,7 @@ from Rm import Rm
 from CommandHandler import CommandHandler
 from CommandError import CommandError
 from clui_constants import *
+import MessageLibrary
 
 TAGNAMES={ 'cluster':Cluster,
            'clusternodes':ClusterNodes,
@@ -80,6 +83,10 @@ GULM_TAG_STR="gulm"
 MCAST_STR="multicast"
 CMAN_PTR_STR="cman"
 ###-----------------------------------
+
+
+INVALID_GULM_COUNT=_("GuLM locking mechanism may consist of 1, 3, 4 or 5 locking servers. You have configured %d. Fix the error and try saving again.")
+
 
 class ModelBuilder:
   def __init__(self, lock_type, filename=None, mcast_addr=None):
@@ -345,12 +352,14 @@ class ModelBuilder:
     self.exportModel("/tmp/cluster.conf")
 
   def exportModel(self, filename=None):
-
-    self.perform_final_check()
-
+    if self.perform_final_error_check() == FALSE: # failed
+      return
+    
+    #check for dual power fences
+    self.dual_power_fence_check()
+    
     if filename == None:
-      filename = self.filename
-
+      filename = self.filename  
     fd = open(filename, "w+")
 
     doc = minidom.Document()
@@ -361,7 +370,7 @@ class ModelBuilder:
 
     self.isModified = FALSE
 
-    #part of the perform_final_check code adds extra
+    #dual_power_fence_check() adds extra
     #fence instance entries for dual power controllers
     #These must be removed from the tree before the UI
     #can be used
@@ -703,8 +712,20 @@ class ModelBuilder:
         if child.getName().strip() == oldname:
           child.addAttribute("name",newname)
 
-  def perform_final_check(self):
-    self.dual_power_fence_check()
+  def perform_final_error_check(self):
+    if self.perform_gulm_count_check() == FALSE:
+      return FALSE
+    #add more checks
+    
+    return TRUE
+
+  def perform_gulm_count_check(self):
+    if self.getLockType() == GULM_TYPE:
+      gulm_count = len(self.getGULMPtr().getChildren())
+      if not (gulm_count in (1, 3, 4, 5)):
+        MessageLibrary.errorMessage(INVALID_GULM_COUNT % gulm_count)
+        return FALSE
+    return TRUE
 
   def dual_power_fence_check(self):
     #if 2 or more power controllers reside in the same fence level,
