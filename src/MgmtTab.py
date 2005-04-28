@@ -220,6 +220,9 @@ class MgmtTab:
     if iter == None:
       return
     svc_name = model.get_value(iter, S_NAME_COL)
+    svc_title = model.get_value(iter,S_TITLE_COL)
+    if svc_title == "" or svc_title == None:
+      return
     self.grayOutMainWindow()
     commandstring = "clusvcadm -e \"" + svc_name + "\""
     errorstring = (_("Error: Service Enable failed - please check the logs for error messages.\n\nOnce the problem has been corrected, the 'Failed' service must first be Disabled before it can be Enabled."))
@@ -231,6 +234,9 @@ class MgmtTab:
     if iter == None:
       return
     svc_name = model.get_value(iter, S_NAME_COL)
+    svc_title = model.get_value(iter,S_TITLE_COL)
+    if svc_title == "" or svc_title == None:
+      return
     commandstring = "clusvcadm -d \"" + svc_name + "\""
     errorstring = _(" An error has occurred while disabling this service. Please check logs for details.")
     self.grayOutMainWindow()
@@ -242,6 +248,9 @@ class MgmtTab:
     if iter == None:
       return
     svc_name = model.get_value(iter, S_NAME_COL)
+    svc_title = model.get_value(iter,S_TITLE_COL)
+    if svc_title == "" or svc_title == None:
+      return
     commandstring = "clusvcadm -R \"" + svc_name + "\""
     errorstring = ""
     self.grayOutMainWindow()

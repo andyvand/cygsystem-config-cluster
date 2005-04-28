@@ -350,7 +350,7 @@ class basecluster:
     self.mcast_addr_label.set_sensitive(FALSE)
     self.lock_method_dlg.show_all()
     retval = self.lock_method_dlg.run()
-    self.lock_method_dlg.destroy()
+    self.lock_method_dlg.hide()
     self.model_builder = ModelBuilder(self.lock_type)
     
   def on_no_conf_open(self, button):
@@ -385,6 +385,7 @@ class basecluster:
     self.radio_dlm = self.glade_xml.get_widget('radio_dlm')
     self.radio_dlm.connect('toggled',self.on_radio_change)
     self.lock_method_dlg = self.glade_xml.get_widget('lock_method')
+    self.lock_method_dlg.connect("delete_event", self.lock_method_dlg_delete)
     self.glade_xml.get_widget('okbutton17').connect('clicked', self.lock_ok)
     self.no_conf_dlg = self.glade_xml.get_widget('no_conf')
     self.no_conf_label = self.glade_xml.get_widget('no_conf_label')
@@ -405,6 +406,8 @@ class basecluster:
     self.glade_xml.get_widget('mcast_ip_proxy').add(self.ip)
     self.glade_xml.get_widget('mcast_addr_entry_proxy').add(self.mcast_addr_entry)
     self.mcast_ip_dlg = self.glade_xml.get_widget('mcast_ip_dlg')
+    self.mcast_ip_dlg.connect("delete_event", self.mcast_ip_dlg_delete)
+    self.lock_method_dlg.connect("delete_event", self.lock_method_dlg_delete)
 
   def propagate(self, button):
     retval = MessageLibrary.warningMessage(CONFIRM_PROPAGATE)
@@ -423,7 +426,7 @@ class basecluster:
       cptr = self.model_builder.getClusterPtr()
       version = cptr.getConfigVersion()
       try:
-        self.command_handler.propagateCManConfig(version)
+        self.command_handler.propagateCmanConfig(version)
       except CommandError, e:
         MessageLibrary.errorMessage(e.getMessage())
 
@@ -444,14 +447,22 @@ class basecluster:
       retval = self.mcast_ip_dlg.run()
       if retval == gtk.RESPONSE_OK:
         address = self.mcast_addr_entry.getAddrAsString()
-        self.mcast_ip_dlg.destroy()
+        self.mcast_ip_dlg.hide()
       else:
-        self.mcast_ip_dlg.destroy()
+        self.mcast_ip_dlg.hide()
         return
          
     self.model_builder.swap_multicast_state(address)
     
     self.configtab.prepare_tree(TRUE)
+
+  def lock_method_dlg_delete(self, *args):
+    self.lock_method_dlg.hide()
+    return gtk.TRUE
+
+  def mcast_ip_dlg_delete(self, *args):
+    self.mcast_ip_dlg.hide()
+    return gtk.TRUE
 
 #############################################################
 def initGlade():

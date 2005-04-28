@@ -117,7 +117,7 @@ NEED_CONFIG_VERSION=_("Please provide a Config Version")
 
 CONFIG_VERSION_DIGITS=_("Config Version field must contain numeric digits only.")
 
-CONFIG_VERSION_DIGITS_MAX=_("Config Version field is limited to values from 1 to 10,000")
+CONFIG_VERSION_DIGITS_MAX=_("Config Version field is limited to values from 1 to 9999")
 
 ###TRANSLATOR: The string below is used as an attr value in an XML file, as well
 ###as a GUI string. Please do not use whitespace in this string. 
@@ -1002,7 +1002,8 @@ class ConfigTabController:
       fences = self.fencedevice_form_hash.keys()
       #for fence in fences: #hide all forms
       #  self.fencedevice_form_hash[fence].hide()
-      self.fd_panel.show()
+      #self.fd_panel.show()
+      self.fd_panel.run()
     else:
       fd_obj = model.get_value(iter,OBJ_COL)
       attrs = fd_obj.getAttributes()
@@ -1017,7 +1018,8 @@ class ConfigTabController:
       self.fencedevice_form_hash[agent_type].show()
       self.fence_handler.populate_fd_form(agent_type, attrs)
       self.fencedevice_form_hash[agent_type].show()
-      self.fd_panel.show()
+      #self.fd_panel.show()
+      self.fd_panel.run()
 
   def on_fd_delete(self, button):
     ref_hash = {}

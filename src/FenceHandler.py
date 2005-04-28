@@ -417,12 +417,14 @@ class FenceHandler:
     return returnlist
 
   def val_apc_fd(self, name):
+    rectify_fence_name = FALSE
     if self.apc_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.apc_fd_name.get_text():
       res = self.check_unique_fd_name(self.apc_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.apc_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
@@ -430,6 +432,9 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
     if self.apc_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.apc_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.apc_fd_name.get_text()
@@ -441,17 +446,22 @@ class FenceHandler:
  
  
   def val_wti_fd(self, name):
+    rectify_fence_name = FALSE
     if self.wti_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.wti_fd_name.get_text():
       res = self.check_unique_fd_name(self.wti_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.wti_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
     if self.wti_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.wti_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.wti_fd_name.get_text()
@@ -462,12 +472,14 @@ class FenceHandler:
  
  
   def val_brocade_fd(self, name):
+    rectify_fence_name = FALSE
     if self.brocade_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.brocade_fd_name.get_text():
       res = self.check_unique_fd_name(self.brocade_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.brocade_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
@@ -475,6 +487,9 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
     if self.brocade_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.brocade_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.brocade_fd_name.get_text()
@@ -486,12 +501,14 @@ class FenceHandler:
  
  
   def val_ilo_fd(self, name):
+    rectify_fence_name = FALSE
     if self.ilo_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.ilo_fd_name.get_text():
       res = self.check_unique_fd_name(self.ilo_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.ilo_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
@@ -499,6 +516,9 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
     if self.ilo_fd_hostname.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_HOSTNAME)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.ilo_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.ilo_fd_name.get_text()
@@ -510,17 +530,22 @@ class FenceHandler:
  
  
   def val_vixel_fd(self, name):
+    rectify_fence_name = FALSE
     if self.vixel_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.vixel_fd_name.get_text():
       res = self.check_unique_fd_name(self.vixel_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.vixel_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
     if self.vixel_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.vixel_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.vixel_fd_name.get_text()
@@ -531,12 +556,14 @@ class FenceHandler:
  
  
   def val_mcdata_fd(self, name):
+    rectify_fence_name = FALSE
     if self.mcdata_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.mcdata_fd_name.get_text():
       res = self.check_unique_fd_name(self.mcdata_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.mcdata_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
@@ -544,6 +571,9 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
     if self.mcdata_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.mcdata_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.mcdata_fd_name.get_text()
@@ -554,12 +584,17 @@ class FenceHandler:
     return fields
  
   def val_manual_fd(self, name):
+    rectify_fence_name = FALSE
     if self.manual_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.manual_fd_name.get_text():
       res = self.check_unique_fd_name(self.manual_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.manual_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.manual_fd_name.get_text()
@@ -567,15 +602,20 @@ class FenceHandler:
     return fields
  
   def val_gnbd_fd(self, name):
+    rectify_fence_name = FALSE
     if self.gnbd_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.gnbd_fd_name.get_text():
       res = self.check_unique_fd_name(self.gnbd_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.gnbd_fd_server.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_SERVER)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.gnbd_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.gnbd_fd_name.get_text()
@@ -584,15 +624,20 @@ class FenceHandler:
     return fields
  
   def val_egenera_fd(self, name):
+    rectify_fence_name = FALSE
     if self.egenera_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     if name != self.egenera_fd_name.get_text():
       res = self.check_unique_fd_name(self.egenera_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.egenera_fd_cserver.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_CSERVER)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.egenera_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.egenera_fd_name.get_text()
@@ -602,6 +647,7 @@ class FenceHandler:
 
  
   def val_sanbox2_fd(self, name):
+    rectify_fence_name = FALSE
     if self.sanbox2_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
 
@@ -609,6 +655,7 @@ class FenceHandler:
       res = self.check_unique_fd_name(self.sanbox2_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.sanbox2_fd_ip.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_IP)
@@ -619,6 +666,9 @@ class FenceHandler:
     if self.sanbox2_fd_passwd.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
 
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.sanbox2_fd_name.get_text())
+
     fields = {}
     fields["name"] = self.sanbox2_fd_name.get_text()
     fields["ipaddr"] = self.sanbox2_fd_ip.get_text()
@@ -628,6 +678,7 @@ class FenceHandler:
     return fields
 
   def val_bladecenter_fd(self, name):
+    rectify_fence_name = FALSE
     if self.bladecenter_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
 
@@ -635,6 +686,7 @@ class FenceHandler:
       res = self.check_unique_fd_name(self.bladecenter_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
 
     if self.bladecenter_fd_ip.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_IP)
@@ -644,6 +696,9 @@ class FenceHandler:
 
     if self.bladecenter_fd_passwd.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.bladecenter_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.bladecenter_fd_name.get_text()

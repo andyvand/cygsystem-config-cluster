@@ -21,6 +21,8 @@ NODES_INFO_ERROR=_("A problem was encountered when attempting to get information
 
 MODE_OFFSET = 4
 
+STATE_OFFSET = 2
+
 NAME_STR = "Name"
 
 DEAD_STR=_("Dead")
@@ -203,9 +205,10 @@ class CommandHandler:
         name = words[1]
         stateline = lines[line_counter + STATE_OFFSET] #The state is 2 lines down..
         modeline = lines[line_counter + MODE_OFFSET] #The mode is 4 lines down..
-        swords = stateline.split()
-        ste = swords[2:].strip()
-        if ste == "Logged in":
+        sdex = stateline.find("state =")
+        sdex = sdex + 8  #move past locator string
+        ste = stateline[sdex:]
+        if ste.strip() == "Logged in":
           statestr = MEMBER_STR
         else:
           statestr = DEAD_STR
