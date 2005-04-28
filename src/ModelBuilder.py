@@ -85,7 +85,7 @@ CMAN_PTR_STR="cman"
 ###-----------------------------------
 
 
-INVALID_GULM_COUNT=_("GuLM locking mechanism may consist of 1, 3, 4 or 5 locking servers. You have configured %d. Fix the error and try saving again.")
+INVALID_GULM_COUNT=_("GuLM locking mechanism may consist of 1, 3, 4 or 5 locking servers. You have configured %d. Fix the error and try again.")
 
 
 class ModelBuilder:
