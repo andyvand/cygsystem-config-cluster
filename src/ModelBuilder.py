@@ -85,7 +85,7 @@ CMAN_PTR_STR="cman"
 ###-----------------------------------
 
 
-INVALID_GULM_COUNT=_("GuLM locking mechanism may consist of 1, 3, 4 or 5 locking servers. You have configured %d. Fix the error and try again.")
+INVALID_GULM_COUNT=_("GuLM locking mechanism may consist of 1, 3, 4 or 5 locking servers. You have configured %d. Fix the error and try saving again.")
 
 
 class ModelBuilder:
@@ -711,6 +711,18 @@ class ModelBuilder:
       for child in children:
         if child.getName().strip() == oldname:
           child.addAttribute("name",newname)
+
+  ###This method runs through ALL fences (Device objs) and changes name attr
+  ###to new name
+  def rectifyNewFencedevicenameWithFences(self, oldname, newname):
+    nodes = self.getNodes()
+    for node in nodes:
+      levels = node.getFenceLevels()
+      for level in levels:
+        fences = level.getChildren()
+        for fence in fences:
+          if fence.getName() == oldname:
+            fence.addAttribute("name",newname)
 
   def perform_final_error_check(self):
     if self.perform_gulm_count_check() == FALSE:
