@@ -451,6 +451,9 @@
          <attribute name="port">
           <data type="positiveInteger"/>
          </attribute>
+        <optional>
+         <attribute name="option"/>
+        </optional>
         </group>
         <!-- APC -->
         <group>
