@@ -273,9 +273,9 @@ class basecluster:
   def save(self, *args):
     if self.model_builder.has_filepath():
       fp = self.model_builder.getFilepath()
-      self.model_builder.exportModel()
-      retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % fp)
-      self.configtab.prepare_tree(TRUE)
+      if self.model_builder.exportModel() == TRUE:
+          retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % fp)
+          self.configtab.prepare_tree(TRUE)
     else:  #Must have been a 'New' instance...
       self.save_as(None)
 
@@ -293,8 +293,9 @@ class basecluster:
       return
     else:
       try:
-        self.model_builder.exportModel(filepath)
-        self.glade_xml.get_widget("filename_entry").set_text(filepath)
+        if self.model_builder.exportModel(filepath) == TRUE:
+            retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % filepath)
+            self.glade_xml.get_widget("filename_entry").set_text(filepath)
       except IOError, e:
         MessageLibrary.errorMessage("Something ugly happened when attempting to write output file")
     popup.destroy()

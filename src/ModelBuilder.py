@@ -353,7 +353,7 @@ class ModelBuilder:
 
   def exportModel(self, filename=None):
     if self.perform_final_error_check() == FALSE: # failed
-      return
+      return FALSE
     
     #check for dual power fences
     self.dual_power_fence_check()
@@ -375,7 +375,9 @@ class ModelBuilder:
     #These must be removed from the tree before the UI
     #can be used
     self.purgePCDuplicates()
-     
+
+    return TRUE
+  
   def has_filepath(self):
     if self.filename == None:
       return FALSE
