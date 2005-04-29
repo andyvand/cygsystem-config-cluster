@@ -281,8 +281,14 @@ class basecluster:
 
 
   def save_as(self, *args):
+    fname = ""
+    flname = self.model_builder.getFilepath()
+    if (flname == None) or (flname == ""):
+      fname = CLUSTER_CONF_PATH
+    else:
+      fname = flname
     popup = gtk.FileSelection()
-    popup.set_filename(CLUSTER_CONF_PATH)
+    popup.set_filename(fname)
     popup.show_fileop_buttons()
     popup.set_select_multiple(FALSE)
     popup.show_all()
@@ -439,7 +445,8 @@ class basecluster:
     #call model builder call
     self.model_builder.switch_lockservers()
     #call configtab.prepare_tree()
-    self.configtab.prepare_tree(TRUE)
+    #self.configtab.prepare_tree(TRUE)
+    self.configtab.reset_tree_model(None)
 
   def swap_multicast_state(self, *args):
     address = None

@@ -467,10 +467,12 @@ class ConfigTabController:
     
     self.prep_fence_panel(nd)
     self.fence_panel.show()
+    #self.fence_panel.run()
     self.fence_props_area.connect('expose-event',self.on_f_props_expose_event)
     self.fence_prop_renderer = PropertiesRenderer(self.fence_props_area,self.fence_props_area.window)
     self.fence_prop_renderer.clear_layout_area()
     #self.fence_panel.show()
+    #self.fence_panel.run()
 
   def prep_fence_panel(self, nd):
     level_index = 1
@@ -791,7 +793,7 @@ class ConfigTabController:
         self.mcast_interface.hide()
 
     self.node_props.set_default_response(gtk.RESPONSE_OK)
-    self.node_props.show()
+    self.node_props.run()
    
   def on_node_props_ok(self, button):
     #Get attrs
@@ -917,7 +919,7 @@ class ConfigTabController:
     self.node_props_votes.set_activates_default(gtk.TRUE)
     self.prep_clusternode_edit_dialog(NODE_EXISTING)
     self.node_props.set_default_response(gtk.RESPONSE_OK)
-    self.node_props.show()
+    self.node_props.run()
 
   def on_clusternode_delete_b(self, button):
     selection = self.treeview.get_selection()
@@ -938,7 +940,7 @@ class ConfigTabController:
     if status == NODE_NEW:
       self.node_props_name.set_text("")
       self.node_props_name.grab_focus("")
-      self.node_props_votes.set_text("")
+      self.node_props_votes.set_text("1")
       if self.model_builder.getLockType() == GULM_TYPE:
         self.gulm_lockserver.show()
         self.gulm_lockserver.set_active(FALSE)
@@ -985,7 +987,8 @@ class ConfigTabController:
         else: 
           self.mcast_interface.hide()
 
-    self.node_props.show()
+    #self.node_props.show()
+    #self.node_props.run()
 
   def on_fd(self, button):
     selection = self.treeview.get_selection()
