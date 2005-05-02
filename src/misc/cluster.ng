@@ -10,6 +10,21 @@
  <choice>
   <interleave>
    <element name="cman">
+    <choice>
+     <group>
+      <attribute name="two_node"/>
+      <attribute name="expected_votes">
+       <data type="positiveInteger"/>
+      </attribute>
+     </group>
+     <group>
+      <optional>
+       <attribute name="expected_votes">
+        <data type="positiveInteger"/>
+       </attribute>
+      </optional>
+     </group>
+    </choice>
     <optional>
      <element name="multicast">
       <attribute name="addr"/>

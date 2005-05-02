@@ -352,7 +352,7 @@ class ModelBuilder:
     self.exportModel("/tmp/cluster.conf")
 
   def exportModel(self, filename=None):
-    if self.perform_final_error_check() == FALSE: # failed
+    if self.perform_final_check() == FALSE: # failed
       return FALSE
     
     #check for dual power fences
@@ -726,20 +726,31 @@ class ModelBuilder:
           if fence.getName() == oldname:
             fence.addAttribute("name",newname)
 
-  def perform_final_error_check(self):
-    if self.perform_gulm_count_check() == FALSE:
+  def perform_final_check(self):
+    if self.check_gulm_count() == FALSE:
       return FALSE
+    self.check_two_node()
     #add more checks
-    
     return TRUE
 
-  def perform_gulm_count_check(self):
+  def check_gulm_count(self):
     if self.getLockType() == GULM_TYPE:
       gulm_count = len(self.getGULMPtr().getChildren())
       if not (gulm_count in (1, 3, 4, 5)):
         MessageLibrary.errorMessage(INVALID_GULM_COUNT % gulm_count)
         return FALSE
     return TRUE
+
+  def check_two_node(self):
+    if self.getLockType() == DLM_TYPE:
+      clusternodes_count = len(self.clusternodes_ptr.getChildren())
+      if clusternodes_count == 2:
+        self.CMAN_ptr.addAttribute('two_node', '1')
+        self.CMAN_ptr.addAttribute('expected_votes', '1')
+      else:
+        if self.CMAN_ptr.getAttribute('expected_votes') in ('0', '1'):
+          self.CMAN_ptr.removeAttribute('expected_votes')
+        self.CMAN_ptr.removeAttribute('two_node')          
 
   def dual_power_fence_check(self):
     #if 2 or more power controllers reside in the same fence level,
