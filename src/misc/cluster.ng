@@ -216,7 +216,7 @@
       <attribute name="recovery"/>
      </optional>
      <zeroOrMore>
-      <ref name="CHILDREN"/>
+      <ref name="ALLCHILDREN"/>
      </zeroOrMore>
     </element>
    </zeroOrMore>
