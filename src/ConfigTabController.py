@@ -107,6 +107,8 @@ CONFIRM_RC_REMOVE=_("Are you certain that you wish to remove resource %s ?")
 
 CONFIRM_SVC_REMOVE=_("Are you certain that you wish to remove service %s ?")
 
+SERVICE_NAME_REQUIRED=_("Please provide a name for this service.")
+
 CONFIRM_LEVEL_REMOVE=_("Are you certain that you wish to remove this fence level and all fences contained within it??")
 
 CONFIRM_LEVEL_REMOVE_EMPTY=_("Are you certain that you wish to remove this fence level?")
@@ -1257,7 +1259,8 @@ class ConfigTabController:
       self.rc_options.set_history(0)
       self.rc_options.show()
       self.rc_dlg_label.set_markup(SELECT_RC_TYPE)
-      self.rc_panel.show()
+      #self.rc_panel.show()
+      self.rc_panel.run()
     else:
       self.rc_options.hide()
       rc_obj = model.get_value(iter, OBJ_COL)
@@ -1270,7 +1273,8 @@ class ConfigTabController:
         self.rc_form_hash[rc].hide()
       self.rc_handler.populate_rc_form(tagname, attrs)
       self.rc_form_hash[tagname].show()
-      self.rc_panel.show()
+      #self.rc_panel.show()
+      self.rc_panel.run()
 
   def on_rc_delete(self, button):
     selection = self.treeview.get_selection()

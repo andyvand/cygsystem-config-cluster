@@ -11,7 +11,12 @@ import gettext
 _ = gettext.gettext
 
 PATH_TO_RELAXNG_FILE = "./misc/cluster.ng"
+
 ALT_PATH_TO_RELAXNG_FILE = "/usr/share/system-config-cluster/misc/cluster.ng"
+
+PATH_TO_CLUSTAT = "/sbin/clustat"
+
+ALT_PATH_TO_CLUSTAT = "/usr/sbin/clustat"
 
 PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the following error:\n %s")
 
@@ -221,13 +226,21 @@ class CommandHandler:
       return dataobjs
 
   def getServicesInfo(self):
+
+    clustat_path = ""
+
+    if os.path.exists(PATH_TO_CLUSTAT):
+      clustat_path = PATH_TO_CLUSTAT
+    else:
+      clustat_path = ALT_PATH_TO_CLUSTAT
+
     dataobjs = list()
     args = list()
-    args.append("/sbin/clustat")
+    args.append(clustat_path)
     args.append("-x")
     cmdstr = ' '.join(args)
     try:
-      out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/clustat",args)
+      out,err,res =  rhpl.executil.execWithCaptureErrorStatus(clustat_path,args)
     except RuntimeError, e:
       return dataobjs  #empty list with no services
 

@@ -49,6 +49,12 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue May 03 2005 Jim Parsons <jparsons@redhat.com> 0.9.48-1
+  - Fixed bz156717,156329,156718,156149.
+* Tue May 03 2005 Jim Parsons <jparsons@redhat.com> 0.9.47-1
+  - Version Bump.
+* Tue May 03 2005 Jim Parsons <jparsons@redhat.com> 0.9.46-1
+  - Version Bump.
 * Mon May 02 2005 Stanko Kupcevic <kupcevic@redhat.com> 0.9.45-1
   - Added two node special case
 * Fri Apr 29 2005 Jim Parsons <jparsons@redhat.com> 0.9.44-1

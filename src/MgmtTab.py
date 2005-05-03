@@ -34,6 +34,10 @@ ON_MEMBER=_("On Member: %s")
 
 STATUS=_("Status: %s")
 
+UNKNOWN=_("Status: Unknown")
+                                                                                
+MEMBER=_("Status: Cluster Member")
+
 NO_SERVICES=_("No Services Currently Defined")
 
 PATIENCE_MESSAGE=_("Please be patient.\n Starting and Stopping Services\n can sometimes take a minute or two.")
@@ -210,8 +214,15 @@ class MgmtTab:
                             S_NAME_COL, name) 
 
   def onTimer(self):
-    self.prep_tree()
-    self.prep_service_tree()
+    if self.model_builder.isClusterMember():
+      self.glade_xml.get_widget('label90').set_text(UNKNOWN)
+      self.prep_tree()
+      self.prep_service_tree()
+    else:
+      self.glade_xml.get_widget('label90').set_text(MEMBER)
+      self.nodetree.get_model().clear()
+      self.servicetree.get_model().clear()
+
     gtk.timeout_add(10000,self.onTimer)
 
   def on_svc_enable(self, button):
