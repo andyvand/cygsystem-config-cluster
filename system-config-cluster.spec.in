@@ -51,6 +51,8 @@ rm -rf %{buildroot}
 %changelog
 * Mon May 02 2005 Stanko Kupcevic <kupcevic@redhat.com> 0.9.45-1
   - Added two node special case
+* Fri Apr 29 2005 Jim Parsons <jparsons@redhat.com> 0.9.44-1
+  - Fixed bz149705,156302,155039,156028,149707
 * Thu Apr 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.43-1
   - Fixed bz156263,149705,149128,154891,156143,156302,149128,156282,149124
 * Thu Apr 28 2005 Jim Parsons <jparsons@redhat.com> 0.9.42-1
