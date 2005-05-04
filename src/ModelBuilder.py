@@ -67,8 +67,6 @@ TAGNAMES={ 'cluster':Cluster,
            'nfsclient':NFSClient,
            'device':Device }
 
-#CLUSTER_CONF="../cluster.conf"
-CLUSTER_CONF="/etc/cluster/cluster.conf"
 
 ###---Don't translate strings below---
 CLUSTER_PTR_STR="cluster"
@@ -357,24 +355,30 @@ class ModelBuilder:
     
     #check for dual power fences
     self.dual_power_fence_check()
-    
-    if filename == None:
-      filename = self.filename  
-    fd = open(filename, "w+")
 
-    doc = minidom.Document()
-    self.object_tree.generateXML(doc)
-    #print doc.toprettyxml()
-    fd.write(doc.toprettyxml())
-    self.filename = filename
+    try:
+      if filename == None:
+        filename = self.filename
 
-    self.isModified = FALSE
+      if filename == CLUSTER_CONF_PATH:
+        self.backup_configfile()
+      
+      fd = open(filename, "w+")
 
-    #dual_power_fence_check() adds extra
-    #fence instance entries for dual power controllers
-    #These must be removed from the tree before the UI
-    #can be used
-    self.purgePCDuplicates()
+      doc = minidom.Document()
+      self.object_tree.generateXML(doc)
+      #print doc.toprettyxml()
+      fd.write(doc.toprettyxml())
+      self.filename = filename
+
+      self.isModified = FALSE
+
+    finally:
+      #dual_power_fence_check() adds extra
+      #fence instance entries for dual power controllers
+      #These must be removed from the tree before the UI
+      #can be used
+      self.purgePCDuplicates()
 
     return TRUE
   
@@ -726,11 +730,25 @@ class ModelBuilder:
           if fence.getName() == oldname:
             fence.addAttribute("name",newname)
 
+  def backup_configfile(self, depth = 3):
+    if depth == 0:
+      return
+    dir = os.listdir(CLUSTER_CONF_DIR_PATH)
+    if CLUSTER_CONF_FILE in dir:
+      basename = CLUSTER_CONF_FILE + ROTATE_BACKUP_EXT
+      basepath = CLUSTER_CONF_DIR_PATH + basename
+      for ext in range(depth - 1, 0, -1):
+        if (basename + str(ext)) in dir:
+          os.rename(basepath + str(ext), basepath + str(ext+1))
+      os.rename(CLUSTER_CONF_PATH, basepath + '1')
+      
   def perform_final_check(self):
     if self.check_gulm_count() == FALSE:
       return FALSE
     self.check_two_node()
+
     #add more checks
+    
     return TRUE
 
   def check_gulm_count(self):

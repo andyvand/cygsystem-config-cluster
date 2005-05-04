@@ -1,6 +1,14 @@
 import gettext
 _ = gettext.gettext
 
+
+
+CLUSTER_CONF_FILE="cluster.conf"
+CLUSTER_CONF_DIR_PATH="/etc/cluster/"
+CLUSTER_CONF_PATH = CLUSTER_CONF_DIR_PATH + CLUSTER_CONF_FILE
+ROTATE_BACKUP_EXT = ".backup."
+
+
 DLM_TYPE = 0
 GULM_TYPE = 1
 

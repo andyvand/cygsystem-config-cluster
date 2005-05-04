@@ -22,8 +22,6 @@ from CommandError import CommandError
 PROGNAME = "system-config-cluster"
 VERSION = "@VERSION@"
 INSTALLDIR="/usr/share/system-config-cluster"
-CLUSTER_CONF_PATH="/etc/cluster/cluster.conf"
-CLUSTER_CONF_DIR_PATH="/etc/cluster/"
 
 ### gettext ("_") must come before import gtk ###
 import gettext
