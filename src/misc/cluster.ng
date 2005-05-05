@@ -435,7 +435,8 @@
 
   <define name="CHILDREN">
    <zeroOrMore>
-    <ref name="CHILD"/>
+<!--    <ref name="CHILD"/> for now everything can be a child -->
+    <ref name="ALLCHILDREN"/>
    </zeroOrMore>
   </define>
 
