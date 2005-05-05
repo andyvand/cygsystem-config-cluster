@@ -24,6 +24,8 @@ FI_PROVIDE_IPADDRESS = _("An IP address must be provided for this Fence")
 FI_PROVIDE_ELPAN = _("A LPAN value must be provided for this Egenera Fence")
 FI_PROVIDE_EPSERVER = _("A PServer value must be provided for this Egenera Fence")
 
+ILLEGAL_CHARS_REPLACED = _("Illegal characters were replaced by underscores. Feel free to set a new value.")
+ILLEGAL_CHARS = [':', ' ']
 
 #ADDING A NEW FENCE: fence instance form should be named the same as its agent
 #in gladefile. Then add agent name to this list.
@@ -416,16 +418,18 @@ class FenceHandler:
 
     return returnlist
 
+    
   def val_apc_fd(self, name):
     rectify_fence_name = FALSE
     if self.apc_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.apc_fd_name)
     if name != self.apc_fd_name.get_text():
       res = self.check_unique_fd_name(self.apc_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
       rectify_fence_name = TRUE
-
+    
     if self.apc_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
     if self.apc_fd_login.get_text() == "":
@@ -449,6 +453,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.wti_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.wti_fd_name)
     if name != self.wti_fd_name.get_text():
       res = self.check_unique_fd_name(self.wti_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -475,6 +480,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.brocade_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.brocade_fd_name)
     if name != self.brocade_fd_name.get_text():
       res = self.check_unique_fd_name(self.brocade_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -504,6 +510,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.ilo_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.ilo_fd_name)
     if name != self.ilo_fd_name.get_text():
       res = self.check_unique_fd_name(self.ilo_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -533,6 +540,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.vixel_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.vixel_fd_name)
     if name != self.vixel_fd_name.get_text():
       res = self.check_unique_fd_name(self.vixel_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -559,6 +567,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.mcdata_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.mcdata_fd_name)
     if name != self.mcdata_fd_name.get_text():
       res = self.check_unique_fd_name(self.mcdata_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -587,6 +596,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.manual_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.manual_fd_name)
     if name != self.manual_fd_name.get_text():
       res = self.check_unique_fd_name(self.manual_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -605,6 +615,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.gnbd_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.gnbd_fd_name)
     if name != self.gnbd_fd_name.get_text():
       res = self.check_unique_fd_name(self.gnbd_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -627,6 +638,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.egenera_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.egenera_fd_name)
     if name != self.egenera_fd_name.get_text():
       res = self.check_unique_fd_name(self.egenera_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -650,7 +662,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.sanbox2_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
-
+    self.validateNCName(self.sanbox2_fd_name)
     if name != self.sanbox2_fd_name.get_text():
       res = self.check_unique_fd_name(self.sanbox2_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -681,7 +693,7 @@ class FenceHandler:
     rectify_fence_name = FALSE
     if self.bladecenter_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
-
+    self.validateNCName(self.bladecenter_fd_name)
     if name != self.bladecenter_fd_name.get_text():
       res = self.check_unique_fd_name(self.bladecenter_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -829,3 +841,31 @@ class FenceHandler:
 
   def set_model(self, model_builder):
     self.model_builder = model_builder
+
+
+
+  ### name must conform to relaxNG ID type ##
+  def isNCName(self, name):
+    for ch in ILLEGAL_CHARS:
+      if ch in name:
+        return False
+    return True
+  
+  def makeNCName(self, name):
+    new_name = ''
+    for ch in name:
+      if ch in ILLEGAL_CHARS:
+        new_name = new_name + '_'
+      else:
+        new_name = new_name + ch
+    return new_name
+
+  def validateNCName(self, gtkentry):
+    name = gtkentry.get_text().strip()
+    gtkentry.set_text(name)
+    if not self.isNCName(name):
+      name = self.makeNCName(name)
+      gtkentry.set_text(name)
+      # select text
+      raise ValidationError('FATAL', ILLEGAL_CHARS_REPLACED)
+  
