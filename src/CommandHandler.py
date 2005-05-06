@@ -67,6 +67,12 @@ class CommandHandler:
     return TRUE
 
   def getClusterName(self):
+    #Use  [root@link-08 ~]# ccs_test connect
+    # Connect successful.
+    #Connection descriptor = 0
+    # [root@link-08 ~]# ccs_test get 0 /cluster/\@name
+    #Get successful.
+    # Value = <link-cluster>
     args = list()
     args.append("/sbin/cman_tool")
     args.append("status")
