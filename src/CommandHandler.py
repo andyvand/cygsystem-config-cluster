@@ -73,27 +73,66 @@ class CommandHandler:
     # [root@link-08 ~]# ccs_test get 0 /cluster/\@name
     #Get successful.
     # Value = <link-cluster>
-    args = list()
-    args.append("/sbin/cman_tool")
-    args.append("status")
-    cmdstr = ' '.join(args)
+
+    # get descriptor
     try:
-      out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      out, err, res =  rhpl.executil.execWithCaptureErrorStatus('/sbin/ccs_test', ['/sbin/ccs_test', 'connect'])
     except RuntimeError, e:
       return ""
-
     if res != 0:
       return ""
-
-    #look for Cluster Name string
+    lines = out.splitlines()
+    descr = ''
+    for line in lines:
+      if line.find('Connection descriptor = ') != -1:
+        words = line.split('=')
+        if len(words) != 2:
+          return ''
+        descr = words[1].strip()
+        break
+    if descr == '':
+      return ''
+    # get name
+    try:
+      args = ['/sbin/ccs_test', 'get', descr, '/cluster/\@name']
+      out, err, res =  rhpl.executil.execWithCaptureErrorStatus('/sbin/ccs_test', args)
+    except RuntimeError, e:
+      return ""
+    if res != 0:
+      return ""
     lines = out.splitlines()
     for line in lines:
-      val = line.find("Cluster name:")
-      if val != (-1):  #Found it
-        v = line.find(":")
-        return line[(v+1):].strip()
+      if line.find('Value = ') != -1:
+        words = line.split('=')
+        if len(words) != 2:
+          return ''
+        else:
+          return words[1].strip()
+    return ''
 
-    return ""
+
+    #     args = list()
+    #     args.append("/sbin/cman_tool")
+    #     args.append("status")
+    #     cmdstr = ' '.join(args)
+    #     try:
+    #       out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+    #     except RuntimeError, e:
+    #       return ""
+    # 
+    #     if res != 0:
+    #       return ""
+    # 
+    #     #look for Cluster Name string
+    #     lines = out.splitlines()
+    #     for line in lines:
+    #       val = line.find("Cluster name:")
+    #       if val != (-1):  #Found it
+    #         v = line.find(":")
+    #         return line[(v+1):].strip()
+    # 
+    #     return ""
+  
 
   def getNodeName(self):
     args = list()
