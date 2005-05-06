@@ -211,9 +211,14 @@ class ServiceController:
 
   def on_del_resource(self, button):
     selection = self.svc_treeview.get_selection()
-    model, iter = selection.get_selected()
-    robj = model.get_value(iter, R_OBJ_COL)
-    self.current_service.removeChild(robj)
+    model, riter = selection.get_selected()
+    robj = model.get_value(riter, R_OBJ_COL)
+    rfrom_iter = model.iter_parent(riter)
+    if rfrom_iter == None:
+      self.current_service.removeChild(robj)
+    else:
+      rfrom_obj = model.get_value(rfrom_iter, R_OBJ_COL)
+      rfrom_obj.removeChild(robj)
     self.model_builder.setModified()
     self.prep_service_tree()
 
@@ -231,10 +236,8 @@ class ServiceController:
       #if appropriate, edit selection
       obj = model.get_value(iter, R_OBJ_COL)
       if obj.isRefObject() == TRUE:
-        self.del_rc_button.set_sensitive(FALSE)
         self.edit_rc_button.set_sensitive(FALSE)
       else:
-        self.del_rc_button.set_sensitive(TRUE)
         self.edit_rc_button.set_sensitive(TRUE)
 
   def on_fdom_option_changed(self, *args):
