@@ -22,6 +22,8 @@ S_OBJ_COL = 2
 
 NONE_PLACEHOLDER=_("None")
 
+EXCLUSIVE_STR = "exclusive"
+
 ###YUK! XXX make access to this static in ResourceHandler
 ###This is an awful copy
 RC_OPTS = {"ip":_("IP Address"),
@@ -109,6 +111,8 @@ class ServiceController:
     self.glade_xml.get_widget('on_shared_rc_ok').connect('clicked',self.on_shared_rc_ok)
     self.glade_xml.get_widget('on_shared_rc_cancel').connect('clicked',self.on_shared_rc_cancel)
 
+    self.exclusive_cbox = self.glade_xml.get_widget('exclusive_cbox')
+    self.exclusive_cbox.connect('toggled',self.on_exclusive_cbox_changed)
     self.rc_proxy = self.glade_xml.get_widget('svc_rc_proxy')
     self.rc_handler = ResourceHandler(self.rc_proxy,self.model_builder)
     self.rc_dlg_label = self.glade_xml.get_widget('svc_rc_dlg_label')
@@ -258,6 +262,13 @@ class ServiceController:
     if self.current_service != None:  
       self.service_name_label.set_markup("<span><b>" + svc.getName() + "</b></span>")
 
+      #if necessary, set exclusive checkbox
+      exclusive_state = svc.getAttribute(EXCLUSIVE_STR)
+      if (exclusive_state == None) or (exclusive_state == "0"):
+        self.exclusive_cbox.set_active(FALSE)
+      else:
+        self.exclusive_cbox.set_active(TRUE)
+
       self.populate_fdom_optionmenu()
       self.prep_service_tree()
 
@@ -401,6 +412,14 @@ class ServiceController:
     self.model_builder.setModified()
     self.prep_service_tree()
     self.shared_rc_panel.hide()
+
+  def on_exclusive_cbox_changed(self, *args):
+    if self.exclusive_cbox.get_active() == TRUE:
+      self.current_service.addAttribute(EXCLUSIVE_STR,"1")
+    else:
+      retval = self.current_service.getAttribute(EXCLUSIVE_STR)
+      if retval != None:
+        self.current_service.removeAttribute(EXCLUSIVE_STR)
                                                                                 
   def on_shared_rc_cancel(self, button):
     self.shared_rc_panel.hide()

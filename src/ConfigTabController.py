@@ -1257,6 +1257,7 @@ class ConfigTabController:
     if type == RESOURCES_TYPE: #new resource
       self.rc_handler.clear_rc_forms()
       self.rc_options.set_history(0)
+      self.rc_optionmenu_change(None)
       self.rc_options.show()
       self.rc_dlg_label.set_markup(SELECT_RC_TYPE)
       #self.rc_panel.show()

@@ -307,6 +307,7 @@ class MgmtTab:
     return 
 
   def source_drag_data_get(self,w, context, selection_data, info, time):
+    s_name = ""
     selection=w.get_selection()
     result = selection.get_selected ()
     if result != None:

@@ -17,6 +17,10 @@ NONE_PLACEHOLDER=_("None")
 
 RESOURCE_PROVIDE_NAME=_("Please provide a name for this resource.")
 
+RESOURCE_PROVIDE_UNIQUE_NAME=_("Please provide a unique name for this resource.")
+
+PROVIDE_UNIQUE_IP=_("This IP Address is already declared as a resource. Please choose another.")
+
 #ADDING A NEW RESOURCE: RC form should be named the same as its tagname in
 #the glade file. Then add tagname to this list.
 
@@ -231,8 +235,20 @@ class ResourceHandler:
 
     return returnlist 
 
-  def val_ip(self, name):
+  def val_ip(self, *argname):
+    inaddr = argname[0]
     addr = self.ip.getAddrAsString()
+    if inaddr == None: #New resource...
+      res = self.check_unique_ip(addr)
+      if res == FALSE:  #adress already used
+        raise ValidationError('FATAL',PROVIDE_UNIQUE_IP)
+      
+    else:
+      if inaddr != addr:
+        res = self.check_unique_ip(addr)
+        if res == FALSE:  #address already used
+          raise ValidationError('FATAL',PROVIDE_UNIQUE_IP)
+
     monitor = self.monitor_link.get_active()
     fields = {}
     fields["address"]= addr
@@ -243,17 +259,31 @@ class ResourceHandler:
 
     return fields
 
-  def val_script(self, name):
-
+  def val_script(self, *argname):
+    name = argname[0]
     script_name = self.script_name.get_text()
     if script_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
 
-    if name != None:
+    #This same method is used for validating names for all resources.
+    #This could be a brand new resource, or an edited one.
+    #If new, its name must be checked for duplicates, and if
+    #a duplicate is found, an exception must be raised
+    #If the resource is a new one, then the argname arg will be None
+    #
+    #If this is an edited resource, it's orig name must be
+    #checked against the new name (argname[0])
+
+    if name == None: #New resource...
+      res = self.check_unique_script_name(script_name)
+      if res == FALSE:  #name already used for a script
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+      
+    else:
       if name != script_name:
         res = self.check_unique_script_name(script_name)
         if res == FALSE:  #name already used for a script
-          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     filepath = self.script_filepath.get_text()
     
@@ -264,17 +294,23 @@ class ResourceHandler:
 
     return fields
 
-  def val_nfsclient(self, name):
+  def val_nfsclient(self, *argname):
+    name = argname[0]
 
     nfs_name = self.nfsc_name.get_text()
     if nfs_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
 
-    if name != None:
+    if name == None: #New resource...
+      res = self.check_unique_nfsclient_name(nfs_name)
+      if res == FALSE:  #name already used for a script
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+      
+    else:
       if name != nfs_name:
-        res = self.check_unique_nfsc_name(nfs_name)
-        if res == FALSE:  #name already used for an nfsc
-          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+        res = self.check_unique_nfsclient_name(nfs_name)
+        if res == FALSE:  #name already used for a script
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
     target = self.nfsc_target.get_text()
@@ -290,33 +326,45 @@ class ResourceHandler:
 
     return fields
 
-  def val_nfsexport(self, name):
+  def val_nfsexport(self, *argname):
+    name = argname[0]
 
     nfs_name = self.nfse_name.get_text()
     if nfs_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
 
-    if name != None:
-      if name != nfs_name:
-        res = self.check_unique_nfse_name(nfs_name)
-        if res == FALSE:  #name already used for an nfsc
-          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+    if name == None: #New resource...
+      res = self.check_unique_nfsexport_name(nfse_name)
+      if res == FALSE:  #name already used for a script
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+      
+    else:
+      if name != nfse_name:
+        res = self.check_unique_nfsexport_name(nfse_name)
+        if res == FALSE:  #name already used for a script
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
     fields["name"] = nfs_name
 
     return fields
 
-  def val_netfs(self, name):
+  def val_netfs(self, *argname):
+    name = argname[0]
     netfs_name = self.netfs_name.get_text()
     if netfs_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
 
-    if name != None:
+    if name == None: #New resource...
+      res = self.check_unique_netfs_name(netfs_name)
+      if res == FALSE:  #name already used for a script
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+      
+    else:
       if name != netfs_name:
         res = self.check_unique_netfs_name(netfs_name)
-        if res == FALSE:  #name already used for an netfs
-          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+        if res == FALSE:  #name already used for a script
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
     fields["name"] = netfs_name
@@ -342,16 +390,22 @@ class ResourceHandler:
 
     return fields
 
-  def val_clusterfs(self, name):
+  def val_clusterfs(self, *argname):
+    name = argname[0]
     gfs_name = self.gfs_name.get_text()
     if gfs_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
 
-    if name != None:
+    if name == None: #New resource...
+      res = self.check_unique_gfs_name(gfs_name)
+      if res == FALSE:  #name already used for a script
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+      
+    else:
       if name != gfs_name:
         res = self.check_unique_gfs_name(gfs_name)
-        if res == FALSE:  #name already used for an gfs
-          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+        if res == FALSE:  #name already used for a script
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
     fields["name"] = gfs_name
@@ -365,17 +419,22 @@ class ResourceHandler:
     return fields
 
 
-  def val_fs(self, name):
-
+  def val_fs(self, *argname):
+    name = argname[0]
     fs_name = self.fs_name.get_text()
     if fs_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
 
-    if name != None:
-      if name != fs_name:
+    if name == None: #New resource...
+      res = self.check_unique_fs_name(fs_name)
+      if res == FALSE:  #name already used for a script
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+      
+    else:
+      if name != gfs_name:
         res = self.check_unique_fs_name(fs_name)
-        if res == FALSE:  #name already used for an fs
-          raise ValidationError('FATAL',RESOURCE_PROVIDE_NAME)
+        if res == FALSE:  #name already used for a script
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
     fields["name"] = fs_name
@@ -430,11 +489,58 @@ class ResourceHandler:
     self.model_builder = model_builder
 
   def check_unique_fs_name(self,fs_name):
+    rcs = self.model_builder.getResources()
+    for rc in rcs:
+      if rc.getName() == fs_name:
+        return FALSE
+
     return TRUE
 
   def check_unique_netfs_name(self,netfs_name):
+    rcs = self.model_builder.getResources()
+    for rc in rcs:
+      if rc.getName() == netfs_name:
+        return FALSE
+
     return TRUE
 
   def check_unique_gfs_name(self,gfs_name):
+    rcs = self.model_builder.getResources()
+    for rc in rcs:
+      if rc.getName() == gfs_name:
+        return FALSE
+
+    return TRUE
+
+  def check_unique_script_name(self,name):
+    rcs = self.model_builder.getResources()
+    for rc in rcs:
+      if rc.getName() == name:
+        return FALSE
+
+    return TRUE
+
+  def check_unique_ip(self,addr):
+    rcs = self.model_builder.getResources()
+    for rc in rcs:
+      if rc.getName() == addr:
+        return FALSE
+
+    return TRUE
+
+  def check_unique_nfsexport_name(self,name):
+    rcs = self.model_builder.getResources()
+    for rc in rcs:
+      if rc.getName() == name:
+        return FALSE
+
+    return TRUE
+
+  def check_unique_nfsclient_name(self,name):
+    rcs = self.model_builder.getResources()
+    for rc in rcs:
+      if rc.getName() == name:
+        return FALSE
+
     return TRUE
 
