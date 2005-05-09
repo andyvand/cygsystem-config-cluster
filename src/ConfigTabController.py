@@ -421,7 +421,7 @@ class ConfigTabController:
         return
 
     cptr.addAttribute("name",name)
-    cptr.addAttribute("config_version",version)
+    cptr.setConfigVersion(version)
 
     if postjoin.strip() != "":
       if int(postjoin) < 0:

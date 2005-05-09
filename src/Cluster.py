@@ -93,7 +93,11 @@ class Cluster(TagObject):
     return version
 
   def setConfigVersion(self, version):
-    self.addAttribute(version)
+    current_version = self.getConfigVersion()
+    if current_version == version:
+      return
+
+    self.addAttribute("config_version", version)
     self.is_cfg_version_dirty = TRUE
 
   def incrementConfigVersion(self):
@@ -101,16 +105,16 @@ class Cluster(TagObject):
     intversion = int(version)
     intversion = intversion + 1
     self.addAttribute("config_version", str(intversion))
-    self.is_cfg_version_dirty = TRUE
+    #self.is_cfg_version_dirty = TRUE
 
-  def addAttribute(self, name, value):
-    if name == "config_version":
-      cfg = self.getAttribute("config_version")
-      if cfg != None:
-        if int(value) != int(cfg):
-          self.is_cfg_version_dirty = TRUE
- 
-    self.attr_hash[name] = value
+  #def addAttribute(self, name, value):
+  #  if name == "config_version":
+  #    cfg = self.getAttribute("config_version")
+  #    if cfg != None:
+  #      if int(value) != int(cfg):
+  #        self.is_cfg_version_dirty = TRUE
+  # 
+  #  self.attr_hash[name] = value
 
 
   def generateXML(self, doc, parent=None):
