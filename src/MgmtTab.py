@@ -215,11 +215,11 @@ class MgmtTab:
 
   def onTimer(self):
     if self.model_builder.isClusterMember():
-      self.glade_xml.get_widget('label90').set_text(UNKNOWN)
+      self.glade_xml.get_widget('label90').set_text(MEMBER)
       self.prep_tree()
       self.prep_service_tree()
     else:
-      self.glade_xml.get_widget('label90').set_text(MEMBER)
+      self.glade_xml.get_widget('label90').set_text(UNKNOWN)
       self.nodetree.get_model().clear()
       self.servicetree.get_model().clear()
 

@@ -518,6 +518,11 @@ class ConfigTabController:
                                   FENCE_OBJ_COL, fence)
 
     self.fence_treeview.expand_all()
+    root_iter = treemodel.get_iter_root()
+    selection = self.fence_treeview.get_selection()
+    selection.select_iter(root_iter)
+    #self.fence_prop_renderer.clear_layout_area()
+    self.on_fence_tree_changed(None)
 
 
   def on_fence_panel_close(self, button):
@@ -558,8 +563,12 @@ class ConfigTabController:
     selection = self.fence_treeview.get_selection()
     model,iter = selection.get_selected()
     if iter == None:
-      retval = MessageLibrary.errorMessage(SELECT_LEVEL_FOR_FENCE)
-      return 
+      root_iter = model.get_iter_root()
+      nd = model.get_value(root_iter, FENCE_OBJ_COL)
+      levels = nd.getFenceLevels()
+      if  len(levels) != 1:
+        retval = MessageLibrary.errorMessage(SELECT_LEVEL_FOR_FENCE)
+        return 
     self.prep_fi_options()
     self.fi_options.set_history(0)
     ########Call change listener here
@@ -593,9 +602,18 @@ class ConfigTabController:
     model,iter = selection.get_selected()
     root_iter = model.get_iter_root()
     nd = model.get_value(root_iter, FENCE_OBJ_COL)
-    type = model.get_value(iter,FENCE_TYPE_COL)
-    if type == F_LEVEL_TYPE:  #this is a new fi...
-      level_obj = model.get_value(iter,FENCE_OBJ_COL)
+    levels = nd.getFenceLevels()
+    if iter == None:  #No selection - see if only one level exists
+      type = None
+    else:
+      type = model.get_value(iter,FENCE_TYPE_COL)
+
+    if (type == F_LEVEL_TYPE) or (type == None):  #this is a new fi...
+      if type == F_LEVEL_TYPE:
+        level_obj = model.get_value(iter,FENCE_OBJ_COL)
+      else:  #level_obj needs to be the first fence level
+        level_obj = levels[0]
+
       #get agent type from options menu
       idx = self.fi_options.get_history()
       name = self.fi_optionmenu_hash[idx]
@@ -649,6 +667,8 @@ class ConfigTabController:
   def on_del_level(self, button):
     selection = self.fence_treeview.get_selection()
     model,iter = selection.get_selected()
+    if iter == None:
+      return
     obj = model.get_value(iter, FENCE_OBJ_COL)
     if len(obj.getChildren()) == 0:
       msg = CONFIRM_LEVEL_REMOVE_EMPTY
@@ -658,7 +678,6 @@ class ConfigTabController:
     retval = self.warningMessage(msg)
     if (retval == gtk.RESPONSE_NO):
       return
-
     root_iter = model.get_iter_root()
     nd = model.get_value(root_iter, FENCE_OBJ_COL)
     fence_ptr = nd.getChildren()[0]

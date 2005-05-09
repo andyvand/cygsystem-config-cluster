@@ -73,6 +73,8 @@ UNSAVED=_("Do you want to save your changes? \n\nThe current configuration has n
 
 NO_MCAST_IP=_("Please Provide a Valid Multicast IP Address")
 
+PROPOGATION_CONFIRMATION=_("Success. The current configuration has been propogated to the cluster.")
+
 FILE_DOES_NOT_EXIST=_("The file %s does not exist on the filesystem.")
 ###############################################
 class basecluster:
@@ -425,6 +427,7 @@ class basecluster:
       self.command_handler.propagateConfig(CLUSTER_CONF_PATH)
     except CommandError, e:
       MessageLibrary.errorMessage(e.getMessage())
+      return
     #3 call cman_tool -r with config version
     ltype = self.model_builder.getLockType()
     if ltype == DLM_TYPE:
@@ -434,6 +437,10 @@ class basecluster:
         self.command_handler.propagateCmanConfig(version)
       except CommandError, e:
         MessageLibrary.errorMessage(e.getMessage())
+        return
+
+    #4 Put up nice success message
+    MessageLibrary.infoMessage(PROPOGATION_CONFIRMATION)
 
   def change_lockserver(self, *args):
     #warning message
@@ -481,6 +488,9 @@ def initGlade():
     return glade_xml
                                                                                 
 def runFullGUI():
+
+    signal.signal (signal.SIGINT, signal.SIG_DFL)
+
     glade_xml = initGlade()
     app = glade_xml.get_widget('system-config-cluster')
     baseapp = basecluster(glade_xml, app)
