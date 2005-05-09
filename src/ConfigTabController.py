@@ -1285,6 +1285,7 @@ class ConfigTabController:
     if (retval == gtk.RESPONSE_NO):
       return
     rc_ptr = self.model_builder.getResourcesPtr()
+    self.model_builder.removeReferences(obj)
     rc_ptr.removeChild(obj)
     self.model_builder.setModified()
     args = list()
@@ -1307,6 +1308,7 @@ class ConfigTabController:
         self.rc_panel.hide()
         for k in returnlist.keys():
           r_obj.addAttribute(k, returnlist[k])
+        self.model_builder.updateReferences()
         self.model_builder.setModified()
         args = list()
         args.append( RESOURCES_TYPE)

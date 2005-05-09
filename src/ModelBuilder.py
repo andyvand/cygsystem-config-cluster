@@ -730,6 +730,24 @@ class ModelBuilder:
           if fence.getName() == oldname:
             fence.addAttribute("name",newname)
 
+  def removeReferences(self, tagobj):
+    self.__removeReferences(tagobj, self.cluster_ptr)
+  def __removeReferences(self, tagobj, level):
+    for t in level.getChildren()[:]:
+      if t.isRefObject():
+        if t.getObj() == tagobj:
+          level.removeChild(t)
+          continue
+      self.__removeReferences(tagobj, t)
+  
+  def updateReferences(self):
+    self.__updateReferences(self.cluster_ptr)
+  def __updateReferences(self, level):
+    for t in level.getChildren():
+      if t.isRefObject():
+        t.setRef(t.getObj().getName())
+      self.__updateReferences(t)
+  
   def backup_configfile(self, depth = 3):
     if depth == 0:
       return
