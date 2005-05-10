@@ -94,7 +94,7 @@ class CommandHandler:
       return ''
     # get name
     try:
-      args = ['/sbin/ccs_test', 'get', descr, '/cluster/\@name']
+      args = ['/sbin/ccs_test', 'get', descr, '/cluster/@name']
       out, err, res =  rhpl.executil.execWithCaptureErrorStatus('/sbin/ccs_test', args)
     except RuntimeError, e:
       return ""
