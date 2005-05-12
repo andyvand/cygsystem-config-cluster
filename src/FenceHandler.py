@@ -19,7 +19,8 @@ FD_PROVIDE_PASSWD = _("A password must be provided for this Fence Device")
 FI_PROVIDE_XCATNODENAME = _("An xCAT Nodename must be provided for this Fence")
 FI_PROVIDE_SWITCH = _("A switch address must be provided for this Fence")
 FI_PROVIDE_PORT = _("A port value must be provided for this Fence")
-FI_PROVIDE_PORT = _("A Blade must be specified for this Fence")
+FI_PROVIDE_BLADE = _("A Blade must be specified for this Fence")
+FI_PROVIDE_DOMAIN = _("A Domain must be specified for this Fence")
 FI_PROVIDE_IPADDRESS = _("An IP address must be provided for this Fence")
 FI_PROVIDE_ELPAN = _("A LPAN value must be provided for this Egenera Fence")
 FI_PROVIDE_EPSERVER = _("A PServer value must be provided for this Egenera Fence")
@@ -50,6 +51,8 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_bladecenter":_("IBM Blade Center"),
               "fence_mcdata":_("McDATA SAN Switch"),
               "fence_egenera":_("Egenera SAN Controller"),
+              "fence_bullpap":_("Bull PAP"),
+              "fence_ipmilan":_("IPMI Lan"),
               "fence_manual":_("Manual Fencing") }
 
 FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
@@ -62,6 +65,8 @@ FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_bladecenter":["name","ipaddr","login","passwd"],
               "fence_mcdata":["name","ipaddr","login","passwd"],
               "fence_egenera":["name","cserver"],
+              "fence_ipmilan":["name","ipaddr","login","passwd"],
+              "fence_bullpap":["name","ipaddr","login","passwd"],
               "fence_manual":["name"] }
 
 FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
@@ -74,6 +79,8 @@ FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
               "fence_bladecenter":["blade"],
               "fence_mcdata":["port"],
               "fence_egenera":["lpan","pserver"],
+              "fence_ipmilan":[],
+              "fence_bullpap":["domain"],
               "fence_manual":[] }
 
 PRETTY_NAME_ATTRS = {"port":_("Port"),
@@ -87,6 +94,7 @@ PRETTY_NAME_ATTRS = {"port":_("Port"),
                      "passwd":_("Password"),
                      "name":_("Name"),
                      "server":_("Server"),
+                     "domain":_("Domain"),
                      "hostname":_("Hostname"),
                      "path":_("Path"),
                      "cserver":_("CServer") }  
@@ -122,9 +130,19 @@ class FenceHandler:
     for child in children:
       child.reparent(self.fi_proxy_widget)
     
+    self.fi_container2 = self.fence_xml.get_widget('fence_instance_container2')
+    children2 = self.fi_container2.get_children()
+    for child in children2:
+      child.reparent(self.fi_proxy_widget)
+    
     self.fd_container = self.fence_xml.get_widget('fence_device_container')
     children = self.fd_container.get_children()
     for child in children:
+      child.reparent(self.fd_proxy_widget)
+    
+    self.fd_container2 = self.fence_xml.get_widget('fence_device_container2')
+    children2 = self.fd_container2.get_children()
+    for child in children2:
       child.reparent(self.fd_proxy_widget)
     
     #For testing...
@@ -140,6 +158,8 @@ class FenceHandler:
               "fence_bladecenter":self.pop_bladecenter,
               "fence_mcdata":self.pop_mcdata,
               "fence_egenera":self.pop_egenera,
+              "fence_ipmilan":self.pop_ipmilan,
+              "fence_bullpap":self.pop_bullpap,
               "fence_manual":self.pop_manual }
 
     self.fd_populate = {"fence_apc":self.pop_apc_fd,
@@ -152,6 +172,8 @@ class FenceHandler:
               "fence_bladecenter":self.pop_bladecenter_fd,
               "fence_mcdata":self.pop_mcdata_fd,
               "fence_egenera":self.pop_egenera_fd,
+              "fence_ipmilan":self.pop_ipmilan_fd,
+              "fence_bullpap":self.pop_bullpap_fd,
               "fence_manual":self.pop_manual_fd }
 
     self.fi_validate = {"fence_apc":self.val_apc,
@@ -164,6 +186,8 @@ class FenceHandler:
               "fence_bladecenter":self.val_bladecenter,
               "fence_mcdata":self.val_mcdata,
               "fence_egenera":self.val_egenera,
+              "fence_ipmilan":self.val_ipmilan,
+              "fence_bullpap":self.val_bullpap,
               "fence_manual":self.val_manual }
 
     self.fd_validate = {"fence_apc":self.val_apc_fd,
@@ -176,6 +200,8 @@ class FenceHandler:
               "fence_bladecenter":self.val_bladecenter_fd,
               "fence_mcdata":self.val_mcdata_fd,
               "fence_egenera":self.val_egenera_fd,
+              "fence_ipmilan":self.val_ipmilan_fd,
+              "fence_bullpap":self.val_bullpap_fd,
               "fence_manual":self.val_manual_fd }
 
     self.process_widgets()
@@ -227,6 +253,12 @@ class FenceHandler:
   def pop_bladecenter(self, attrs):
     self.bladecenter_blade.set_text(attrs["blade"])
 
+  def pop_bullpap(self, attrs):
+    self.bullpap_domain.set_text(attrs["domain"])
+
+  def pop_ipmilan(self, attrs):
+    pass
+ 
   def clear_fi_forms(self):
     self.apc_port.set_text("") 
     self.apc_switch.set_text("") 
@@ -239,6 +271,7 @@ class FenceHandler:
     self.mcdata_port.set_text("")
     self.egenera_lpan.set_text("")
     self.egenera_pserver.set_text("")
+    self.bullpap_domain.set_text("")
 
 
   def clear_fd_forms(self):
@@ -277,6 +310,14 @@ class FenceHandler:
     self.bladecenter_fd_ip.set_text("")
     self.bladecenter_fd_login.set_text("")
     self.bladecenter_fd_passwd.set_text("")
+    self.ipmilan_fd_name.set_text("")
+    self.ipmilan_fd_login.set_text("")
+    self.ipmilan_fd_passwd.set_text("")
+    self.ipmilan_fd_ip.set_text("")
+    self.bullpap_fd_name.set_text("")
+    self.bullpap_fd_login.set_text("")
+    self.bullpap_fd_passwd.set_text("")
+    self.bullpap_fd_ip.set_text("")
 
   #Populate form methods for Fence Devices
   def pop_apc_fd(self, attrs):
@@ -343,6 +384,18 @@ class FenceHandler:
     self.bladecenter_fd_login.set_text(attrs["login"])
     self.bladecenter_fd_passwd.set_text(attrs["passwd"])
 
+  def pop_ipmilan_fd(self, attrs):
+    self.ipmilan_fd_name.set_text(attrs["name"])
+    self.ipmilan_fd_login.set_text(attrs["login"])
+    self.ipmilan_fd_passwd.set_text(attrs["passwd"])
+    self.ipmilan_fd_ip.set_text(attrs["ipaddr"])
+
+  def pop_bullpap_fd(self, attrs):
+    self.bullpap_fd_name.set_text(attrs["name"])
+    self.bullpap_fd_login.set_text(attrs["login"])
+    self.bullpap_fd_passwd.set_text(attrs["passwd"])
+    self.bullpap_fd_ip.set_text(attrs["ipaddr"])
+
 
   def process_widgets(self):
     ##Fence Instance Form Fields
@@ -357,7 +410,8 @@ class FenceHandler:
     self.bladecenter_blade = self.fence_xml.get_widget('entry41') 
     self.mcdata_port = self.fence_xml.get_widget('entry9') 
     self.egenera_lpan = self.fence_xml.get_widget('entry10') 
-    self.egenera_pserver = self.fence_xml.get_widget('entry11') 
+    self.egenera_pserver = self.fence_xml.get_widget('entry11')
+    self.bullpap_domain = self.fence_xml.get_widget('entry51') 
 
     ##Fence Device Forms
     self.apc_fd_name = self.fence_xml.get_widget('entry12')
@@ -405,6 +459,16 @@ class FenceHandler:
     self.egenera_fd_cserver = self.fence_xml.get_widget('entry39')
 
     self.manual_fd_name = self.fence_xml.get_widget('entry40')
+
+    self.ipmilan_fd_name = self.fence_xml.get_widget('entry55')
+    self.ipmilan_fd_ip = self.fence_xml.get_widget('entry48')
+    self.ipmilan_fd_login = self.fence_xml.get_widget('entry49')
+    self.ipmilan_fd_passwd = self.fence_xml.get_widget('entry50')
+
+    self.bullpap_fd_name = self.fence_xml.get_widget('entry56')
+    self.bullpap_fd_ip = self.fence_xml.get_widget('entry52')
+    self.bullpap_fd_login = self.fence_xml.get_widget('entry53')
+    self.bullpap_fd_passwd = self.fence_xml.get_widget('entry54')
 
   #####  Validation Methods
   def validate_fencedevice(self, agent_type, name=None):
@@ -720,6 +784,66 @@ class FenceHandler:
 
     return fields
 
+  def val_ipmilan_fd(self, name):
+    rectify_fence_name = FALSE
+    if self.ipmilan_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.ipmilan_fd_name)
+    if name != self.ipmilan_fd_name.get_text():
+      res = self.check_unique_fd_name(self.ipmilan_fd_name.get_text())
+      if res == FALSE:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
+
+    if self.ipmilan_fd_login.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+    if self.ipmilan_fd_passwd.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+    if self.ipmilan_fd_ip.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_IP)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.ipmilan_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.ipmilan_fd_name.get_text()
+    fields["ipaddr"] = self.ipmilan_fd_ip.get_text()
+    fields["login"] = self.ipmilan_fd_login.get_text()
+    fields["passwd"] = self.ipmilan_fd_passwd.get_text()
+
+    return fields
+ 
+ 
+  def val_bullpap_fd(self, name):
+    rectify_fence_name = FALSE
+    if self.bullpap_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.bullpap_fd_name)
+    if name != self.bullpap_fd_name.get_text():
+      res = self.check_unique_fd_name(self.bullpap_fd_name.get_text())
+      if res == FALSE:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
+
+    if self.bullpap_fd_login.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+    if self.bullpap_fd_passwd.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+    if self.bullpap_fd_ip.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_IP)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.bullpap_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.bullpap_fd_name.get_text()
+    fields["ipaddr"] = self.bullpap_fd_ip.get_text()
+    fields["login"] = self.bullpap_fd_login.get_text()
+    fields["passwd"] = self.bullpap_fd_passwd.get_text()
+
+    return fields
+ 
+ 
   #Validation Methods for Fence Instances 
   def validate_fenceinstance(self, agent_type):
     try:
@@ -828,6 +952,21 @@ class FenceHandler:
     fields = {}
     return fields
 
+  def val_ipmilan(self):
+
+    fields = {}
+
+    return fields
+
+  def val_bullpap(self):
+    if self.bullpap_domain.get_text() == "":
+      raise ValidationError('FATAL', FI_PROVIDE_DOMAIN)
+
+    fields = {}
+    fields["domain"] = self.bullpap_domain.get_text()
+
+    return fields
+
   def check_unique_fd_name(self, name):
     fds = self.model_builder.getFenceDevices()
     for fd in fds:
@@ -868,4 +1007,4 @@ class FenceHandler:
       gtkentry.set_text(name)
       # select text
       raise ValidationError('FATAL', ILLEGAL_CHARS_REPLACED)
-  
+ 
