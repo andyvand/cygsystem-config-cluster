@@ -88,6 +88,13 @@ INVALID_GULM_COUNT=_("GuLM locking mechanism may consist of 1, 3, 4 or 5 locking
 
 class ModelBuilder:
   def __init__(self, lock_type, filename=None, mcast_addr=None):
+
+    if os.path.exists("/etc/cluster/") == FALSE:
+      try:
+        os.makedirs("/etc/cluster")
+      except OSError, e:
+        pass
+
     self.filename = filename
     self.lock_type = DLM_TYPE
     self.mcast_address = mcast_addr

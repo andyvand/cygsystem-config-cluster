@@ -49,6 +49,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue May 20 2005 Jim Parsons <jparsons@redhat.com> 0.9.54-1
+  - Fixes for bz156149,158230,157094,158118
+* Tue May 17 2005 Jim Parsons <jparsons@redhat.com> 0.9.53-1
+  - Fixes for bz156975,156976,157011,156866,157388
 * Thu May 12 2005 Jim Parsons <jparsons@redhat.com> 0.9.52-1
   - Added support for IPMilan and Bullpap fence agents.
 * Mon May 09 2005 Jim Parsons <jparsons@redhat.com> 0.9.51-1

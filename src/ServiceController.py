@@ -438,6 +438,12 @@ class ServiceController:
     self.isAttachedResource = FALSE
     return gtk.TRUE
 
+  def cleanup_panels(self):
+    self.isNewResource = FALSE
+    self.isAttachedResource = FALSE
+    self.svc_rc_panel.hide()
+    self.shared_rc_panel.hide()
+
   def all_buttons_on(self): 
     self.attach_new_rc.set_sensitive(TRUE)
     self.attach_shared_rc.set_sensitive(TRUE)

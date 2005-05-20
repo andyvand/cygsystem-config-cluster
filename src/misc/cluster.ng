@@ -136,7 +136,7 @@
      <attribute name="agent"/>
      <optional>
       <choice>
-       <!-- APC, Brocade, McData, SANBox2, Bladecenter -->
+       <!-- APC, Brocade, McData, SANBox2, Bladecenter,bullpap, ipmilan -->
        <group>
         <attribute name="ipaddr"/>
         <attribute name="login"/>
@@ -490,12 +490,16 @@
         <group>
          <attribute name="nodename"/>
         </group>
+        <!-- bullpap -->
+        <group>
+         <attribute name="domain"/>
+        </group>
         <!-- Egenera -->
         <group>
          <attribute name="lpan"/>
          <attribute name="pserver"/>
         </group>
-        <!-- ILO, manual -->
+        <!-- ILO, manual.ipmilan -->
         <group>
          <optional>
           <empty/>

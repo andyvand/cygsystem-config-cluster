@@ -329,8 +329,8 @@ class ResourceHandler:
   def val_nfsexport(self, *argname):
     name = argname[0]
 
-    nfs_name = self.nfse_name.get_text()
-    if nfs_name == "":
+    nfse_name = self.nfse_name.get_text()
+    if nfse_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
 
     if name == None: #New resource...
@@ -345,7 +345,7 @@ class ResourceHandler:
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
-    fields["name"] = nfs_name
+    fields["name"] = nfse_name
 
     return fields
 

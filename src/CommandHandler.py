@@ -22,7 +22,9 @@ PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the
 
 PROPAGATE_ERROR=_("Propagation of configuration file failed with the following error:\n %s")
 
-NODES_INFO_ERROR=_("A problem was encountered when attempting to get information about the nodes in the cluster. The following error message was received from the cman_tool: %s")
+NODES_INFO_ERROR=_("A problem was encountered when attempting to get information about the nodes in the cluster: %s")
+
+GULM_NODES_INFO_ERROR=_("A problem was encountered when attempting to get information about the nodes in the cluster: %s")
 
 MODE_OFFSET = 4
 
@@ -150,10 +152,10 @@ class CommandHandler:
     try:
       out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
-      return FALSE
+      return ""
 
     if res != 0:
-      return FALSE
+      return ""
 
     #look for Node Name string
     lines = out.splitlines()
@@ -249,7 +251,7 @@ class CommandHandler:
         return FALSE
 
       if res != 0:
-        raise CommandError("FATAL", NODES_INFO_ERROR % err)
+        raise CommandError("FATAL", GULM_NODES_INFO_ERROR % err)
 
       lines = out.splitlines()
       line_counter = (-1)
@@ -369,6 +371,9 @@ class CommandHandler:
     except RuntimeError, e:
       raise CommandError("FATAL",PROPAGATE_ERROR % (err))
 
+    if res != 0:
+      raise CommandError("FATAL",PROPAGATE_ERROR % (err))
+
     return res
 
 
@@ -383,6 +388,9 @@ class CommandHandler:
       out,err,res = rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
       raise CommandError("FATAL",PROPAGATE_ERROR2 % (version, err))
+
+    if res != 0:
+      raise CommandError("FATAL",PROPAGATE_ERROR2 % (err))
 
     return res
 

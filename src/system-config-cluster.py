@@ -73,7 +73,7 @@ UNSAVED=_("Do you want to save your changes? \n\nThe current configuration has n
 
 NO_MCAST_IP=_("Please Provide a Valid Multicast IP Address")
 
-PROPOGATION_CONFIRMATION=_("Success. The current configuration has been propogated to the cluster.")
+PROPOGATION_CONFIRMATION=_("Success. The current configuration has been propagated to the cluster.")
 
 FILE_DOES_NOT_EXIST=_("The file %s does not exist on the filesystem.")
 ###############################################
@@ -385,6 +385,14 @@ class basecluster:
 
   def init_widgets(self):
     self.notebook = self.glade_xml.get_widget('notebook1')
+    self.notebook.connect("switch-page",self.on_notebook_change)
+
+    self.tools1 = self.glade_xml.get_widget('tools1')
+    self.new1 = self.glade_xml.get_widget('new1')
+    self.open1 = self.glade_xml.get_widget('open1')
+    self.save1 = self.glade_xml.get_widget('save1')
+    self.save_as1 = self.glade_xml.get_widget('save_as1')
+
     self.nodetree = self.glade_xml.get_widget('nodetree')
     mgmtpageidx = self.notebook.page_num(self.nodetree)
     self.mgmt_tab = self.notebook.get_nth_page(mgmtpageidx)
@@ -428,6 +436,7 @@ class basecluster:
     except CommandError, e:
       MessageLibrary.errorMessage(e.getMessage())
       return
+
     #3 call cman_tool -r with config version
     ltype = self.model_builder.getLockType()
     if ltype == DLM_TYPE:
@@ -440,7 +449,7 @@ class basecluster:
         return
 
     #4 Put up nice success message
-    MessageLibrary.infoMessage(PROPOGATION_CONFIRMATION)
+    MessageLibrary.simpleInfoMessage(PROPOGATION_CONFIRMATION)
 
   def change_lockserver(self, *args):
     #warning message
@@ -468,6 +477,22 @@ class basecluster:
     self.model_builder.swap_multicast_state(address)
     
     self.configtab.prepare_tree(TRUE)
+
+  def on_notebook_change(self, notebook, page, pagenum, *data):
+    if pagenum == 0:  #Config page
+      #turn on all menus
+      self.tools1.set_sensitive(TRUE)
+      self.new1.set_sensitive(TRUE)
+      self.open1.set_sensitive(TRUE)
+      self.save1.set_sensitive(TRUE)
+      self.save_as1.set_sensitive(TRUE)
+    else:
+      #turn off all but quit and help
+      self.tools1.set_sensitive(FALSE)
+      self.new1.set_sensitive(FALSE)
+      self.open1.set_sensitive(FALSE)
+      self.save1.set_sensitive(FALSE)
+      self.save_as1.set_sensitive(FALSE)
 
   def lock_method_dlg_delete(self, *args):
     self.lock_method_dlg.hide()

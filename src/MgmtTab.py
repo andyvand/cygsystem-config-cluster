@@ -40,6 +40,8 @@ MEMBER=_("Status: Cluster Member")
 
 NO_SERVICES=_("No Services Currently Defined")
 
+NODEINFO_ERROR=_("Node information is temporarily unavailable. Here is the error message: \n%s")
+
 PATIENCE_MESSAGE=_("Please be patient.\n Starting and Stopping Services\n can sometimes take a minute or two.")
 
 T_NAME=_("Name")
@@ -107,6 +109,9 @@ class MgmtTab:
     column3 = gtk.TreeViewColumn(T_STATUS,renderer3,text=2)
     self.nodetree.append_column(column3)
 
+    #set up nodetree error message in case node info call fails
+    self.scrolled_window = self.glade_xml.get_widget('scrolledwindow5')
+    self.nodetree_error_label = self.glade_xml.get_widget('nodetree_error_label')
 
     self.prep_tree()
 
@@ -156,7 +161,10 @@ class MgmtTab:
 
     #Now set info labels
     self.glade_xml.get_widget('label90').set_text(STATUS % self.command_handler.getClusterStatus())
-    self.glade_xml.get_widget('label93').set_text(ON_MEMBER % self.command_handler.getNodeName())
+    if self.model_builder.getLockType() == DLM_TYPE:
+      self.glade_xml.get_widget('label93').set_text(ON_MEMBER % self.command_handler.getNodeName())
+    else:
+      self.glade_xml.get_widget('label93').hide()
 
     self.glade_xml.get_widget('button17').connect("clicked",self.on_svc_enable)
     self.glade_xml.get_widget('button18').connect("clicked",self.on_svc_disable)
@@ -165,13 +173,18 @@ class MgmtTab:
     self.onTimer() 
 
   def prep_tree(self):
+    self.scrolled_window.show()
+    self.nodetree_error_label.hide()
     treemodel = self.nodetree.get_model()
     treemodel.clear()
 
     try:
       nodes = self.command_handler.getNodesInfo(self.model_builder.getLockType())
     except CommandError, e:
-      retval = MessageLibrary.errorMessage(e.getMessage())
+      self.nodetree_error_label.set_text(NODEINFO_ERROR % e.getMessage())
+      self.scrolled_window.hide()
+      self.nodetree_error_label.show()
+      #retval = MessageLibrary.errorMessage(e.getMessage())
       return
 
     for node in nodes:
@@ -285,6 +298,10 @@ class MgmtTab:
   def dest_drag_data_received(self,w, context, x, y, selection_data, info, time):
     errorstring1 = ""
     errorstring2 = ""
+    #row = w.get_path_at_pos(x,y-25)[0][0]
+    drop_info = w.get_dest_row_at_pos(x,y)
+    if drop_info == None:
+      return
     row = w.get_path_at_pos(x,y-25)[0][0]
     model=w.get_model()
     iter=model.get_iter_first()

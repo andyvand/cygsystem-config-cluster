@@ -1193,7 +1193,7 @@ class ConfigTabController:
   def on_faildom_add(self, button):
     #launch dialog for faildom name field
     self.faildom_name.set_text("")
-    self.add_faildom_dlg.show()
+    self.add_faildom_dlg.run()
 
   def on_faildom_add_ok(self, button):
     fdoms = self.model_builder.getFailoverDomains()
@@ -1216,7 +1216,8 @@ class ConfigTabController:
     self.faildom_name.set_text("")
     self.faildom_controller.prep_faildom_panel(failover_domain)
     self.model_builder.setModified()
-    self.faildom_panel.show()
+    #self.faildom_panel.show()
+    self.faildom_panel.run()
 
   def on_faildom_add_cancel(self, button):
     self.add_faildom_dlg.hide()
@@ -1356,7 +1357,8 @@ class ConfigTabController:
   def on_svc_add(self, button):
     #launch dialog for service name field
     self.svc_name.set_text("")
-    self.svc_add_dlg.show()
+    #self.svc_add_dlg.show()
+    self.svc_add_dlg.run()
 
   def on_svc_add_ok(self, button):
     svcs = self.model_builder.getServices()
@@ -1392,9 +1394,10 @@ class ConfigTabController:
     #2) populate interface
     self.service_controller.prep_service_panel(obj)
     #3) show dialog
-    self.svc_mgmt.show()
+    self.svc_mgmt.run()
 
   def on_svc_edit_close(self, button):
+    self.service_controller.cleanup_panels()
     self.svc_mgmt.hide()
     args = list()
     args.append( RESOURCE_GROUPS_TYPE)
