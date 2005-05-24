@@ -471,18 +471,14 @@
        <choice>
         <!-- WTI, Brocade, Vixel, McData, SANBox2 -->
         <group>
-         <attribute name="port">
-          <data type="positiveInteger"/>
-         </attribute>
-        <optional>
-         <attribute name="option"/>
-        </optional>
+         <attribute name="port"/>
+         <optional>
+          <attribute name="option"/>
+         </optional>
         </group>
         <!-- APC -->
         <group>
-         <attribute name="port">
-          <data type="positiveInteger"/>
-         </attribute>
+         <attribute name="port"/>
          <attribute name="switch"/>
         </group>
         <!-- BladeCenter -->
