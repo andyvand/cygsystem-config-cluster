@@ -157,6 +157,7 @@ class PropertiesRenderer:
     
 
   def prepare_prop_layout(self, prop_list,type):
+    amended_prop_list = ""
     if prop_list == None:
       return
     pc = self.pango_context
@@ -168,7 +169,12 @@ class PropertiesRenderer:
     prop_layout = pango.Layout(pc)
     prop_layout.set_font_description(desc)
 
-    text_str = "<span size=\"10000\">" + prop_list + "</span>"
+    for item in prop_list:
+      amended_prop_list = amended_prop_list + item
+      if item == "_":
+        amended_prop_list = amended_prop_list + "_"
+
+    text_str = "<span size=\"10000\">" + amended_prop_list + "</span>"
 
     #text_str = prop_list  ##FIX this madness
     #text_str = self.prepare_props_list(prop_list, type)
