@@ -128,12 +128,12 @@ class ModelBuilder:
         pass
 
       self.object_tree = self.buildModel(None)
+      self.check_empty_ptrs()
       self.check_fence_daemon()
       self.resolve_fence_instance_types()
       self.purgePCDuplicates()
       self.resolve_references()
       self.check_for_multicast()
-      self.check_empty_ptrs()
 
 
   def buildModel(self, parent_node):
@@ -483,7 +483,7 @@ class ModelBuilder:
 
   def check_empty_ptrs(self):
     if self.resourcemanager_ptr == None:
-      rm = ResourceManager()
+      rm = Rm()
       self.cluster_ptr.addChild(rm)
       self.resourcemanager_ptr = rm
 

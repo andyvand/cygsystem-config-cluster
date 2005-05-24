@@ -161,7 +161,8 @@ class ServiceController:
   def on_add_shared(self, button):
     self.populate_shared_tree()
     self.isAttachedResource = FALSE
-    self.shared_rc_panel.show()
+    #self.shared_rc_panel.show()
+    self.shared_rc_panel.run()
 
   def on_add_private(self, button):
     self.isNewResource = TRUE
@@ -175,7 +176,8 @@ class ServiceController:
       self.rc_form_hash[rc].hide()
     tagname = self.rc_optionmenu_hash[0]
     self.rc_form_hash[tagname].show()
-    self.svc_rc_panel.show()
+    #self.svc_rc_panel.show()
+    self.svc_rc_panel.run()
  
   def on_attach_private(self, button):
     self.isNewResource = TRUE
@@ -189,12 +191,14 @@ class ServiceController:
       self.rc_form_hash[rc].hide()
     tagname = self.rc_optionmenu_hash[0]
     self.rc_form_hash[tagname].show()
-    self.svc_rc_panel.show()
+    #self.svc_rc_panel.show()
+    self.svc_rc_panel.run()
 
   def on_attach_shared(self, button):
     self.populate_shared_tree()
     self.isAttachedResource = TRUE
-    self.shared_rc_panel.show()
+    #self.shared_rc_panel.show()
+    self.shared_rc_panel.run()
 
   def on_edit_rc(self, button):
     selection = self.svc_treeview.get_selection()
@@ -210,7 +214,8 @@ class ServiceController:
       self.rc_form_hash[rc].hide()
     self.rc_handler.populate_rc_form(tagname, attrs)
     self.rc_form_hash[tagname].show()
-    self.svc_rc_panel.show()
+    #self.svc_rc_panel.show()
+    self.svc_rc_panel.run()
 
 
   def on_del_resource(self, button):

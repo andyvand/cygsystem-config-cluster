@@ -250,10 +250,12 @@ class ConfigTabController:
 
     #Services and Service button panels
     self.svc_add_dlg = self.glade_xml.get_widget('svc_add_dlg')
+    self.svc_add_dlg.connect('delete_event',self.on_svc_add_delete)
     self.glade_xml.get_widget('okbutton18').connect("clicked",self.on_svc_add_ok)
     self.glade_xml.get_widget('cancelbutton18').connect("clicked",self.on_svc_add_cancel)
     self.svc_name = self.glade_xml.get_widget('svc_name')
     self.svc_mgmt = self.glade_xml.get_widget('service_manager')
+    self.svc_mgmt.connect('delete_event',self.on_svc_mgmt_delete)
     self.glade_xml.get_widget('button21').connect('clicked',self.on_svc_edit_close)
     self.svc_treeview = self.glade_xml.get_widget('svc_treeview')
     self.glade_xml.get_widget('service_add_b').connect('clicked',self.on_svc_add)
@@ -1395,6 +1397,7 @@ class ConfigTabController:
     self.service_controller.prep_service_panel(obj)
     #3) show dialog
     self.svc_mgmt.run()
+    #self.svc_mgmt.show()
 
   def on_svc_edit_close(self, button):
     self.service_controller.cleanup_panels()
@@ -1496,6 +1499,14 @@ class ConfigTabController:
 
   def rc_panel_delete(self, *args):
     self.rc_panel.hide()
+    return gtk.TRUE
+
+  def on_svc_mgmt_delete(self, *args):
+    self.svc_mgmt.hide()
+    return gtk.TRUE
+
+  def on_svc_add_delete(self, *args):
+    self.svc_add_dlg.hide()
     return gtk.TRUE
 
   def fd_delete_delete(self, *args):
