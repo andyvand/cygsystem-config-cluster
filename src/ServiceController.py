@@ -259,6 +259,7 @@ class ServiceController:
         return
       lbl = self.svc_fdom_optionmenu.get_children()[0]
       self.current_service.addAttribute("domain",lbl.get_text())
+      self.model_builder.setModified()
 
     
 

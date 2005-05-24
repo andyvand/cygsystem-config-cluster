@@ -49,6 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue May 24 2005 Jim Parsons <jparsons@redhat.com> 0.9.57-1
+  - Fix for bz157077,158419,158415
 * Tue May 24 2005 Jim Parsons <jparsons@redhat.com> 0.9.56-1
   - Fix for bz158610
 * Mon May 23 2005 Jim Parsons <jparsons@redhat.com> 0.9.55-1
