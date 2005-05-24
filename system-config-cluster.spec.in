@@ -50,7 +50,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Tue May 24 2005 Jim Parsons <jparsons@redhat.com> 0.9.58-1
-  - Fix for bz158341
+  - Fix for bz158341 and 156302
 * Tue May 24 2005 Jim Parsons <jparsons@redhat.com> 0.9.57-1
   - Fix for bz157077,158419,158415
 * Tue May 24 2005 Jim Parsons <jparsons@redhat.com> 0.9.56-1
