@@ -37,9 +37,16 @@
       <attribute name="name">
        <data type="ID"/>
       </attribute>
-      <attribute name="votes">
-       <data type="positiveInteger"/>
-      </attribute>
+      <optional>
+       <attribute name="votes">
+        <data type="positiveInteger"/>
+       </attribute>
+      </optional>
+      <optional>
+       <attribute name="nodeid">
+        <data type="positiveInteger"/>
+       </attribute>
+      </optional>
       <optional>
        <element name="multicast">
         <attribute name="addr"/>
