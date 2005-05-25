@@ -20,7 +20,7 @@ ALT_PATH_TO_CLUSTAT = "/usr/sbin/clustat"
 
 PROPAGATE_ERROR=_("Propagation of configuration file version #%s failed with the following error:\n %s")
 
-PROPAGATE_ERROR=_("Propagation of configuration file failed with the following error:\n %s")
+PROPAGATE_ERROR2=_("Propagation of configuration file failed with the following error:\n %s")
 
 NODES_INFO_ERROR=_("A problem was encountered when attempting to get information about the nodes in the cluster: %s")
 
