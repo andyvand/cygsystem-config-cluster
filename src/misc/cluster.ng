@@ -47,17 +47,19 @@
         <data type="positiveInteger"/>
        </attribute>
       </optional>
-      <optional>
-       <element name="multicast">
-        <attribute name="addr"/>
-        <optional>
-         <attribute name="interface"/>
-        </optional>
-       </element>
-      </optional> 
-      <optional>
-       <ref name="FENCE"/>
-      </optional>
+      <interleave>
+       <optional>
+        <element name="multicast">
+         <attribute name="addr"/>
+         <optional>
+          <attribute name="interface"/>
+         </optional>
+        </element>
+       </optional> 
+       <optional>
+        <ref name="FENCE"/>
+       </optional>
+      </interleave>
      </element>
     </zeroOrMore>
    </element>
