@@ -49,6 +49,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed May 25 2005 Jim Parsons <jparsons@redhat.com> 0.9.63-1
+  -  Version Bump for Fedora
 * Wed May 25 2005 Jim Parsons <jparsons@redhat.com> 0.9.62-1
   - Fixes for bz158765 and 157077 
 * Tue May 24 2005 Jim Parsons <jparsons@redhat.com> 0.9.61-1
