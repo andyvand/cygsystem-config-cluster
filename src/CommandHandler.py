@@ -117,7 +117,24 @@ class CommandHandler:
         if len(words) != 2:
           return ''
         else:
-          return words[1].strip()
+         str_with_brackets =  words[1].strip()
+         str_len = len(str_with_brackets)
+         sbuffer = ""
+         if str_with_brackets.find('<') == 0: #the string is wrapped in brackets
+           dex = 0
+           for item in str_with_brackets:
+             if item == '<' and dex == 0:
+               dex = dex + 1
+               continue
+             elif item == '>' and dex == (str_len - 1):
+               break
+             else:
+               sbuffer = sbuffer + item
+               dex = dex + 1
+           return sbuffer
+         else:
+           return str_with_brackets
+
     return ''
 
 
