@@ -205,6 +205,7 @@ class ServiceController:
     model,iter = selection.get_selected()
     self.rc_options.hide()
     rc_obj = model.get_value(iter, R_OBJ_COL)
+    self.isNewResource = FALSE
     attrs = rc_obj.getAttributes()
     tagname = rc_obj.getTagName()
     self.rc_dlg_label.set_markup(RC_PROPS % (self.rc_prettyname_hash[tagname],rc_obj.getName()))
