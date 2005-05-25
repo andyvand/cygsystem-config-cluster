@@ -95,19 +95,26 @@ class CommandHandler:
         break
     if descr == '':
       return ''
-    # make sure descriptor gets disconnected
-    class DescrCleaner:
-      def __init__(self, descr):
-        self.descr = descr
-      def __del__(self):
-        rhpl.executil.execWithCapture('/sbin/ccs_test', ['/sbin/ccs_test', 'disconnect', self.descr])
-    cleaner = DescrCleaner(descr)
+    
+    
     # get name
     try:
       args = ['/sbin/ccs_test', 'get', descr, '/cluster/@name']
       out, err, res =  rhpl.executil.execWithCaptureErrorStatus('/sbin/ccs_test', args)
     except RuntimeError, e:
+      try:
+        # make sure descriptor gets disconnected
+        rhpl.executil.execWithCapture('/sbin/ccs_test', ['/sbin/ccs_test', 'disconnect', descr])
+      except RuntimeError, e:
+        pass
       return ""
+    try:
+      # make sure descriptor gets disconnected
+      rhpl.executil.execWithCapture('/sbin/ccs_test', ['/sbin/ccs_test', 'disconnect', descr])
+    except RuntimeError, e:
+      pass
+    
+    
     if res != 0:
       return ""
     lines = out.splitlines()
