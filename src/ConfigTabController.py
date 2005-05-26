@@ -1402,6 +1402,9 @@ class ConfigTabController:
     #self.svc_mgmt.show()
 
   def on_svc_edit_close(self, button):
+      self.service_controller_close()
+      
+  def service_controller_close(self):
     self.service_controller.cleanup_panels()
     self.svc_mgmt.hide()
     args = list()
@@ -1504,7 +1507,7 @@ class ConfigTabController:
     return gtk.TRUE
 
   def on_svc_mgmt_delete(self, *args):
-    self.svc_mgmt.hide()
+    self.service_controller_close()
     return gtk.TRUE
 
   def on_svc_add_delete(self, *args):
