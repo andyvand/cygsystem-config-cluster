@@ -109,6 +109,8 @@ CONFIRM_SVC_REMOVE=_("Are you certain that you wish to remove service %s ?")
 
 SERVICE_NAME_REQUIRED=_("Please provide a name for this service.")
 
+UNIQUE_SERVICE_NAME=_("Services must have unique names. The name %s is already in use. Please provide a unique name.")
+
 CONFIRM_LEVEL_REMOVE=_("Are you certain that you wish to remove this fence level and all fences contained within it??")
 
 CONFIRM_LEVEL_REMOVE_EMPTY=_("Are you certain that you wish to remove this fence level?")
