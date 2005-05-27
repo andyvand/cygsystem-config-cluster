@@ -1,0 +1,12 @@
+[Desktop Entry]
+_Name=Cluster Management
+_GenericName=Cluster
+_Comment=Configure and manage clusters in a graphical setting
+StartupNotify=true
+Icon=/usr/share/system-config-lvm/pixmaps/node.png
+Exec=/usr/bin/system-config-cluster
+Type=Application
+Terminal=false
+Encoding=UTF-8
+Categories=Application;System;X-Red-Hat-Base;X-Red-Hat-ServerConfig;
+X-Desktop-File-Install-Version=0.2
