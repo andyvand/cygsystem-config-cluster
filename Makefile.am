@@ -5,6 +5,8 @@ SUBDIRS = src po
 
 EXTRA_DIST = \
 	system-config-cluster.spec		\
+	system-config-cluster.desktop.in	\
+	system-config-cluster.desktop		\
 	system-config-cluster.console		\
 	system-config-cluster.pam		\
 	src/pixmaps/fence.png			\
@@ -23,6 +25,10 @@ MAINTAINERCLEANFILES=ChangeLog
 @INTLTOOL_DESKTOP_RULE@
 
 .PHONY: changelog srpm
+
+applicationsdir=$(datadir)/applications
+applications_DATA=system-config-cluster.desktop
+applications_in_files=$(applications_DATA:.desktop=.desktop.in)
 
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/security/console.apps
@@ -51,6 +57,7 @@ changelog:
 		-e 's|@.*\.redhat\.com|@redhat.com|g' > ChangeLog
 
 clean:
+	rm -f system-config-cluster.desktop
 	rm -f *~
 
 PKGNAME=${PACKAGE}

@@ -146,6 +146,21 @@ class ServiceController:
     self.prepset = TRUE
     self.svc_fdom_optionmenu.set_menu(menu)
 
+  def on_fdom_option_changed(self, *args):
+    if self.prepset == TRUE:
+      print "PREPSET is TRUE"
+      self.prepset = FALSE
+      return
+    else:
+      if self.svc_fdom_optionmenu.get_history() == 0:
+        print "history == 0"
+        retval = self.current_service.removeAttribute("domain")
+        return
+      lbl = self.svc_fdom_optionmenu.get_children()[0]
+      self.current_service.addAttribute("domain",lbl.get_text())
+      self.model_builder.setModified()
+
+    
   def populate_shared_tree(self):
     listmodel = self.shared_treeview.get_model()
     listmodel.clear()
@@ -250,19 +265,6 @@ class ServiceController:
       else:
         self.edit_rc_button.set_sensitive(TRUE)
 
-  def on_fdom_option_changed(self, *args):
-    if self.prepset == TRUE:
-      self.prepset = FALSE
-      return
-    else:
-      if self.svc_fdom_optionmenu.get_history() == 0:
-        retval = self.current_service.removeAttribute("domain")
-        return
-      lbl = self.svc_fdom_optionmenu.get_children()[0]
-      self.current_service.addAttribute("domain",lbl.get_text())
-      self.model_builder.setModified()
-
-    
 
   def prep_service_panel(self, svc):
     self.current_service = svc
@@ -293,7 +295,7 @@ class ServiceController:
     self.del_rc_button.set_sensitive(FALSE)
     self.edit_rc_button.set_sensitive(FALSE)
 
-    self.prepset = TRUE
+    #self.prepset = TRUE
     domain = self.current_service.getAttribute("domain")
     if domain == None:
       self.svc_fdom_optionmenu.set_history(0)
