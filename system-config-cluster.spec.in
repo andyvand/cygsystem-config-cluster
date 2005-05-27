@@ -44,11 +44,16 @@ rm -rf %{buildroot}
 #%doc docs/html/*
 %{_sbindir}/*
 %{_bindir}/*
+%{_datadir}/applications/system-config-cluster.desktop
 %{_datadir}/system-config-cluster
 %config %{_sysconfdir}/pam.d/system-config-cluster
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Fri May 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.69-1
+  -  version bump
+* Fri May 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.67-1
+  -  Fix spec file datadir issue
 * Fri May 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.66-1
   -  Fixes for bz158918, 158418
 * Wed May 25 2005 Jim Parsons <jparsons@redhat.com> 0.9.65-1
