@@ -393,10 +393,10 @@ class CommandHandler:
     try:
       out,err,res = rhpl.executil.execWithCaptureErrorStatus("/sbin/ccs_tool",args)
     except RuntimeError, e:
-      raise CommandError("FATAL",PROPAGATE_ERROR % (err))
+      raise CommandError("FATAL",PROPAGATE_ERROR2 % (err))
 
     if res != 0:
-      raise CommandError("FATAL",PROPAGATE_ERROR % (err))
+      raise CommandError("FATAL",PROPAGATE_ERROR2 % (err))
 
     return res
 
@@ -411,7 +411,7 @@ class CommandHandler:
     try:
       out,err,res = rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
-      raise CommandError("FATAL",PROPAGATE_ERROR2 % (version, err))
+      raise CommandError("FATAL",PROPAGATE_ERROR % (version, err))
 
     if res != 0:
       raise CommandError("FATAL",PROPAGATE_ERROR2 % (err))
