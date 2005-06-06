@@ -28,3 +28,6 @@ class RefObject(TagObject):
       return self.attr_hash["ref"]
     except KeyError, e:
       return ""
+
+  def isDenyAll(self):
+    return self.obj_ptr.isDenyAll()

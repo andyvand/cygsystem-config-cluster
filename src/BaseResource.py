@@ -8,7 +8,11 @@ class BaseResource(TagObject):
     TagObject.__init__(self)
     self.TAG_NAME = TAG_NAME
     self.resource_type = ""
+    self.deny_all_children = False
 
   def getResourceType(self):
     return self.resource_type
+
+  def isDenyAll(self):
+    return self.deny_all_children
     

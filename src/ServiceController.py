@@ -24,6 +24,8 @@ NONE_PLACEHOLDER=_("None")
 
 EXCLUSIVE_STR = "exclusive"
 
+AUTOSTART_STR = "autostart"
+
 ###YUK! XXX make access to this static in ResourceHandler
 ###This is an awful copy
 RC_OPTS = {"ip":_("IP Address"),
@@ -37,6 +39,7 @@ RC_OPTS = {"ip":_("IP Address"),
 
 SHARED_RESOURCE=_("Shared")
 PRIVATE_RESOURCE=_("Private")
+CANT_ATTACH=_("The selected Resource Type: \"%s\", does not support attached children of any type. Sorry.")
 
 class ServiceController:
   def __init__(self, glade_xml,model_builder,reset_tree_model):
@@ -111,6 +114,9 @@ class ServiceController:
     self.glade_xml.get_widget('on_shared_rc_ok').connect('clicked',self.on_shared_rc_ok)
     self.glade_xml.get_widget('on_shared_rc_cancel').connect('clicked',self.on_shared_rc_cancel)
 
+    self.autostart_cbox = self.glade_xml.get_widget('autostart_cbox')
+    self.autostart_cbox.connect('toggled',self.on_autostart_cbox_changed)
+
     self.exclusive_cbox = self.glade_xml.get_widget('exclusive_cbox')
     self.exclusive_cbox.connect('toggled',self.on_exclusive_cbox_changed)
     self.rc_proxy = self.glade_xml.get_widget('svc_rc_proxy')
@@ -148,12 +154,10 @@ class ServiceController:
 
   def on_fdom_option_changed(self, *args):
     if self.prepset == TRUE:
-      print "PREPSET is TRUE"
       self.prepset = FALSE
       return
     else:
       if self.svc_fdom_optionmenu.get_history() == 0:
-        print "history == 0"
         retval = self.current_service.removeAttribute("domain")
         return
       lbl = self.svc_fdom_optionmenu.get_children()[0]
@@ -195,6 +199,16 @@ class ServiceController:
     self.svc_rc_panel.run()
  
   def on_attach_private(self, button):
+    #Hold it -- before we do ANYTHING here, let's check if the 
+    #object selected to have an attached child will allow children...
+    selection = self.svc_treeview.get_selection()
+    model, iter = selection.get_selected()
+    if iter == None:
+      return
+    obj = model.get_value(iter, R_OBJ_COL)
+    if obj.isDenyAll() == True:
+      retval = MessageLibrary.errorMessage(CANT_ATTACH % self.rc_prettyname_hash[obj.getTagName()])
+      return
     self.isNewResource = TRUE
     self.isAttachedResource = TRUE
     self.rc_handler.clear_rc_forms()
@@ -210,6 +224,16 @@ class ServiceController:
     self.svc_rc_panel.run()
 
   def on_attach_shared(self, button):
+    #Once again (as above) -- before we do ANYTHING here, let's check if the 
+    #object selected to have an attached child will allow children...
+    selection = self.svc_treeview.get_selection()
+    model, iter = selection.get_selected()
+    if iter == None:
+      return
+    obj = model.get_value(iter, R_OBJ_COL)
+    if obj.isDenyAll() == True:
+      retval = MessageLibrary.errorMessage(CANT_ATTACH % self.rc_prettyname_hash[obj.getTagName()])
+      return
     self.populate_shared_tree()
     self.isAttachedResource = TRUE
     #self.shared_rc_panel.show()
@@ -278,6 +302,13 @@ class ServiceController:
       else:
         self.exclusive_cbox.set_active(TRUE)
 
+      #and if necessary, set autostart checkbox
+      autostart_state = svc.getAttribute(AUTOSTART_STR)
+      if (autostart_state == None) or (autostart_state == "0"):
+        self.autostart_cbox.set_active(FALSE)
+      else:
+        self.autostart_cbox.set_active(TRUE)
+
       self.populate_fdom_optionmenu()
       self.prep_service_tree()
 
@@ -288,6 +319,8 @@ class ServiceController:
     for child in resources:
       iter = treemodel.append(None)
       self.add_tree_children(child, iter)
+
+    self.svc_treeview.expand_all()
 
     self.svc_treeview.get_selection().unselect_all()
     self.attach_new_rc.set_sensitive(FALSE)
@@ -429,6 +462,14 @@ class ServiceController:
       retval = self.current_service.getAttribute(EXCLUSIVE_STR)
       if retval != None:
         self.current_service.removeAttribute(EXCLUSIVE_STR)
+                                                                                
+  def on_autostart_cbox_changed(self, *args):
+    if self.autostart_cbox.get_active() == TRUE:
+      self.current_service.addAttribute(AUTOSTART_STR,"1")
+    else:
+      retval = self.current_service.getAttribute(AUTOSTART_STR)
+      if retval != None:
+        self.current_service.removeAttribute(AUTOSTART_STR)
                                                                                 
   def on_shared_rc_cancel(self, button):
     self.shared_rc_panel.hide()
