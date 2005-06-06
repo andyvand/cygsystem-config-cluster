@@ -116,7 +116,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/TagObject.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ValidationError.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/pixmaps/fence.png  $(DESTDIR)$(pkgdatadir)/pixmaps/
-	install -m 0640 $(srcdir)/pixmaps/node.png  $(DESTDIR)$(pkgdatadir)/pixmaps/
+	install -m 0644 $(srcdir)/pixmaps/node.png  $(DESTDIR)$(pkgdatadir)/pixmaps/
 	install -m 0640 $(srcdir)/misc/cluster.ng  $(DESTDIR)$(pkgdatadir)/misc/
 	softdir=$(pkgdatadir); \
 	p=$(DESTDIR) ; \
