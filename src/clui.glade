@@ -5473,7 +5473,7 @@ Configurattion</property>
 	  <child>
 	    <widget class="GtkCheckButton" id="autostart_cbox">
 	      <property name="visible">True</property>
-	      <property name="tooltip" translatable="yes">Automatically start this service if node is fenced or rebooted.</property>
+	      <property name="tooltip" translatable="yes">Check this to start a service automatically after a quorum transition.</property>
 	      <property name="can_focus">True</property>
 	      <property name="label" translatable="yes">Autostart This Service</property>
 	      <property name="use_underline">True</property>

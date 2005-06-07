@@ -36,6 +36,12 @@ DEAD_STR=_("Dead")
 
 MEMBER_STR=_("Member")
 
+NAMESTR="name=\""
+STATESTR="state_str=\""
+OWNERSTR="owner=\""
+LOWNERSTR="last_owner=\""
+RESTARTSSTR="restarts=\""
+
 class CommandHandler:
 
   def __init__(self):
@@ -355,34 +361,33 @@ class CommandHandler:
     for service in servicelist:
       words = service.split()
 
-      namestr = words[1]
-      start = namestr.find("\"")
-      end = namestr.rfind("\"")
-      name = namestr[start+1:end]
+      namedex = service.find(NAMESTR)
+      start = namedex + len(NAMESTR)
+      name = self.extract_attr(start, service)
       
-      statestr = words[3]
-      start = statestr.find("\"")
-      end = statestr.rfind("\"")
-      state = statestr[start+1:end]
+      statedex = service.find(STATESTR)
+      start = statedex + len(STATESTR)
+      state = self.extract_attr(start, service)
       
-      ownstr = words[4]
-      start = ownstr.find("\"")
-      end = ownstr.rfind("\"")
-      owner = ownstr[start+1:end]
+      ownerdex = service.find(OWNERSTR)
+      start = ownerdex + len(OWNERSTR)
+      owner = self.extract_attr(start, service)
       
-      lownstr = words[5]
-      start = lownstr.find("\"")
-      end = lownstr.rfind("\"")
-      lastowner = lownstr[start+1:end]
+      lownerdex = service.find(LOWNERSTR)
+      start = lownerdex + len(LOWNERSTR)
+      lastowner = self.extract_attr(start, service)
       
-      resstr = words[6]
-      start = resstr.find("\"")
-      end = resstr.rfind("\"")
-      restarts = resstr[start+1:end]
+      resdex = service.find(RESTARTSSTR)
+      start = resdex + len(RESTARTSSTR)
+      restarts = self.extract_attr(start, service)
       
       dataobjs.append(ServiceData(name,state,owner,lastowner,restarts))
 
     return dataobjs
+
+  def extract_attr(self, index, line):
+    end = line.find("\"",index)
+    return line[index:end]
 
   def propagateConfig(self, file):
     args = list()

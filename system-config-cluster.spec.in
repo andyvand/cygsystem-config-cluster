@@ -50,6 +50,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue Jun 07 2005 Jim Parsons <jparsons@redhat.com> 1.0.12-1
+  -  Fix for bz159681.
 * Mon Jun 06 2005 Jim Parsons <jparsons@redhat.com> 0.9.70-1
   -  Fixes for bz158909 and 156865, also desktop icon now works.
 * Fri May 27 2005 Jim Parsons <jparsons@redhat.com> 0.9.69-1
