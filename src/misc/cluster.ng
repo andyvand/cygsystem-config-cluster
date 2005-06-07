@@ -390,7 +390,7 @@
       <attribute name="name"/>
     </choice>
     <zeroOrMore>
-     <ref name="NFSCLIENT"/>
+     <ref name="ALLCHILDREN"/>
     </zeroOrMore>
    </element>
   </define>
