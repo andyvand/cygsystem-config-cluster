@@ -62,7 +62,8 @@ gnome.app_version = VERSION
 FORMALNAME=_("system-config-cluster")
 ABOUT_VERSION=_("%s %s") % ('system-config-cluster',VERSION)
  
-NO_CONF_PRESENT=_("The cluster configuration file, '/etc/cluster/cluster.conf' does not exist on this system. This application will help you build an initial configuration file, or you can open an existing configuration file in another location by selecting 'Open' in the file drop down menu.") 
+NO_CONF_PRESENT=_("The cluster configuration file, '/etc/cluster/cluster.conf' does not exist on this system. This application will help you build an initial configuration file, or you can open an existing configuration file in another location.")
+NO_CONF_PRESENT_INVALID=_("The cluster configuration file, '/etc/cluster/cluster.conf' is not valid. This application will help you build an initial configuration file, or you can open an existing configuration file in another location.")
 
 NOT_CLUSTER_MEMBER=_("Because this node is not currently part of a cluster, the management tab for this application is not available.")
 
@@ -96,59 +97,47 @@ class basecluster:
 
     mb = ModelBuilder(1)
     is_cluster_member = mb.isClusterMember()
-
-    if (conf_exists == FALSE):
-      #hide mgmt tab
-      self.mgmt_tab.hide()
-      self.no_conf_label.set_text(NO_CONF_PRESENT + "\n\n" + NOT_CLUSTER_MEMBER)
-      self.propagate_button.hide()
-      #self.no_conf_dlg.show()
-      self.no_conf_dlg.run()
-    elif ((conf_exists == TRUE) and (is_cluster_member == FALSE)):
-      self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
-      self.mgmt_tab.hide()
-      MessageLibrary.simpleInfoMessage(NOT_CLUSTER_MEMBER)
-      self.propagate_button.hide()
-      try:
-        self.command_handler.check_xml(CLUSTER_CONF_PATH)
-      except CommandError, e:
-        self.bad_xml_label.set_text(XML_CONFIG_ERROR % CLUSTER_CONF_PATH)
-        self.bad_xml_text.get_buffer().set_text(e.getMessage())
-        retval = self.bad_xml_dlg.run()
-        if retval == gtk.RESPONSE_CANCEL:
-          #gtk.main_quit() 
-          sys.exit(0)
-        elif retval == gtk.RESPONSE_APPLY:
-          #make new cfg file
-          self.bad_xml_dlg.hide()
-          self.no_conf_dlg.run()
-        else:  #Proceed anyway...
-          self.bad_xml_dlg.hide()
-          self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
+    
+    if conf_exists:
+        use_default_clusterconf_path = True
+        try:
+            self.command_handler.check_xml(CLUSTER_CONF_PATH)
+        except CommandError, e:
+            self.bad_xml_label.set_text(XML_CONFIG_ERROR % CLUSTER_CONF_PATH)
+            self.bad_xml_text.get_buffer().set_text(e.getMessage())
+            retval = self.bad_xml_dlg.run()
+            self.bad_xml_dlg.hide()
+            if retval == gtk.RESPONSE_APPLY:
+                # make new cfg file
+                use_default_clusterconf_path = False
+                self.on_no_conf_create(None)
+            elif retval == gtk.RESPONSE_OK:
+                # Proceed anyway...
+                pass
+            else:
+                use_default_clusterconf_path = False
+                self.no_conf_label.set_text(NO_CONF_PRESENT_INVALID)
+                self.no_conf_dlg.run()
+        if use_default_clusterconf_path:
+            self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
+        if is_cluster_member:
+            self.propagate_button.show()
+            self.mgmttab = MgmtTab(glade_xml, self.model_builder,self.winMain)
+        else:
+            self.mgmt_tab.hide()
+            MessageLibrary.simpleInfoMessage(NOT_CLUSTER_MEMBER)
+            self.propagate_button.hide()
     else:
-      self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
-      self.propagate_button.show()
-      try:
-        self.command_handler.check_xml(CLUSTER_CONF_PATH)
-      except CommandError, e:
-        self.bad_xml_label.set_text(XML_CONFIG_ERROR % CLUSTER_CONF_PATH)
-        self.bad_xml_text.get_buffer().set_text(e.getMessage())
-        retval = self.bad_xml_dlg.run()
-        if retval == gtk.RESPONSE_CANCEL:
-          #gtk.main_quit()
-          sys.exit(0)
-        elif retval == gtk.RESPONSE_APPLY:
-          #make new cfg file
-          self.bad_xml_dlg.hide()
-          self.no_conf_dlg.run()
-        else:  #Proceed anyway...
-          self.bad_xml_dlg.hide()
-          self.model_builder = ModelBuilder(1, CLUSTER_CONF_PATH)
-      self.mgmttab = MgmtTab(glade_xml, self.model_builder,self.winMain)
-
+        #hide mgmt tab
+        self.mgmt_tab.hide()
+        self.no_conf_label.set_text(NO_CONF_PRESENT + "\n\n" + NOT_CLUSTER_MEMBER)
+        self.propagate_button.hide()
+        # self.no_conf_dlg.show()
+        self.no_conf_dlg.run()
+    
     self.configtab = ConfigTab(glade_xml, self.model_builder)
-
-
+    
+    
     self.glade_xml.signal_autoconnect(
       {
         "on_quit1_activate" : self.quit,
@@ -198,48 +187,38 @@ class basecluster:
     popup.hide_fileop_buttons()
     popup.set_select_multiple(FALSE)
     popup.show_all()
-    rc = popup.run()
-    filepath = popup.get_filename()
-
-    #Check to see if file actually exists
-    path_exists = os.path.exists(filepath)
-    if path_exists == FALSE:
-      MessageLibrary.errorMessage(FILE_DOES_NOT_EXIST % filepath)
-      popup.destroy()
-      return
+    
+    while popup.run() == gtk.RESPONSE_OK:
+        filepath = popup.get_filename()
+        #Check to see if file actually exists
+        if not os.path.exists(filepath):
+            MessageLibrary.errorMessage(FILE_DOES_NOT_EXIST % filepath)
+            continue
+        elif os.path.isdir(filepath):
+            continue
+        # process file
+        try:
+            self.command_handler.check_xml(filepath)
+        except CommandError, e:
+            self.bad_xml_label.set_text(XML_CONFIG_ERROR % filepath)
+            self.bad_xml_text.get_buffer().set_text(e.getMessage())
+            retval = self.bad_xml_dlg.run()
+            self.bad_xml_dlg.hide()
+            if retval == gtk.RESPONSE_OK:
+                #Proceed anyway...
+                pass
+            elif retval == gtk.RESPONSE_APPLY:
+                # make new cfg file
+                popup.destroy()
+                self.on_no_conf_create(None)
+                return
+            else:
+                continue
+        self.model_builder = ModelBuilder(DLM_TYPE, filepath)
+        self.configtab.set_model(self.model_builder)
+        break
+    popup.destroy()
   
-    if os.path.isdir(filepath):
-      popup.destroy()
-      return
-    if not rc == gtk.RESPONSE_OK:
-      popup.destroy()
-      return
-    else:
-      try:
-        self.command_handler.check_xml(filepath)
-      except CommandError, e:
-        self.bad_xml_label.set_text(XML_CONFIG_ERROR % filepath)
-        self.bad_xml_text.get_buffer().set_text(e.getMessage())
-        retval = self.bad_xml_dlg.run()
-        if retval == gtk.RESPONSE_CANCEL:
-          sys.exit(0)
-          #gtk.main_quit() 
-        elif retval == gtk.RESPONSE_APPLY:
-          #make new cfg file
-          popup.destroy()
-          self.bad_xml_dlg.hide()
-          self.no_conf_dlg.run()
-          return
-        else:  #Proceed anyway...
-          self.bad_xml_dlg.hide()
-          self.model_builder = ModelBuilder(DLM_TYPE, filepath)
-          self.configtab.set_model(self.model_builder)
-          popup.destroy()
-          return
-      self.model_builder = ModelBuilder(DLM_TYPE, filepath)
-      self.configtab.set_model(self.model_builder)
-      popup.destroy()
-
   def open_limited(self, *args):
     #offer fileselection
     popup = gtk.FileSelection()
@@ -247,29 +226,46 @@ class basecluster:
     popup.hide_fileop_buttons()
     popup.set_select_multiple(FALSE)
     popup.show_all()
-    rc = popup.run()
-    filepath = popup.get_filename()
-
-    #Check to see if file actually exists
-    path_exists = os.path.exists(filepath)
-    if path_exists == FALSE:
-      MessageLibrary.errorMessage(FILE_DOES_NOT_EXIST % filepath)
-      popup.destroy()
-      self.model_builder = ModelBuilder(DLM_TYPE, None)
-      return
+    
+    while True:
+        rc = popup.run()
+        
+        if rc != gtk.RESPONSE_OK:
+            popup.destroy()
+            self.no_conf_dlg.run()
+            return
+        
+        filepath = popup.get_filename()
+        #Check to see if file actually exists
+        if not os.path.exists(filepath):
+            MessageLibrary.errorMessage(FILE_DOES_NOT_EXIST % filepath)
+            continue
+        elif os.path.isdir(filepath):
+            continue
+        # process file
+        try:
+            self.command_handler.check_xml(filepath)
+        except CommandError, e:
+            self.bad_xml_label.set_text(XML_CONFIG_ERROR % filepath)
+            self.bad_xml_text.get_buffer().set_text(e.getMessage())
+            retval = self.bad_xml_dlg.run()
+            self.bad_xml_dlg.hide()
+            if retval == gtk.RESPONSE_OK:
+                #Proceed anyway...
+                popup.destroy()
+                self.model_builder = ModelBuilder(DLM_TYPE, filepath)
+                return
+            elif retval == gtk.RESPONSE_APPLY:
+                # make new cfg file
+                popup.destroy()
+                self.on_no_conf_create(None)
+                return
+            else:  
+                continue
+        popup.destroy()
+        self.model_builder = ModelBuilder(DLM_TYPE, filepath)
+        return
   
-    if os.path.isdir(filepath):
-      popup.destroy()
-      self.model_builder = ModelBuilder(DLM_TYPE, None)
-      return
-    if not rc == gtk.RESPONSE_OK:
-      popup.destroy()
-      self.model_builder = ModelBuilder(DLM_TYPE, None)
-      return
-    else:
-      self.model_builder = ModelBuilder(DLM_TYPE, filepath)
-      popup.destroy()
-
   def save(self, *args):
     if self.model_builder.has_filepath():
       fp = self.model_builder.getFilepath()
@@ -359,11 +355,14 @@ class basecluster:
     retval = self.lock_method_dlg.run()
     self.lock_method_dlg.hide()
     self.model_builder = ModelBuilder(self.lock_type)
-    
+  
   def on_no_conf_open(self, button):
     self.no_conf_dlg.hide()
     self.open_limited(None)
-
+  
+  def on_no_conf_quit(self, button):
+      sys.exit(0)
+  
   def on_mcast_cbox_changed(self, *args):
     if self.mcast_cbox.get_active() == FALSE:
       self.ip.set_sensitive(FALSE)
@@ -406,6 +405,7 @@ class basecluster:
     self.no_conf_label = self.glade_xml.get_widget('no_conf_label')
     self.glade_xml.get_widget('no_conf_create').connect('clicked',self.on_no_conf_create)
     self.glade_xml.get_widget('no_conf_open').connect('clicked',self.on_no_conf_open)
+    self.glade_xml.get_widget('no_conf_quit').connect('clicked',self.on_no_conf_quit)
     self.propagate_button = self.glade_xml.get_widget('propagate')
     self.propagate_button.connect('clicked', self.propagate)
     self.bad_xml_dlg = self.glade_xml.get_widget('bad_xml_dlg')

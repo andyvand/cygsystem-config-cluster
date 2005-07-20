@@ -5100,6 +5100,19 @@ Failover Domain: </property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 
 	  <child>
+	    <widget class="GtkButton" id="no_conf_quit">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-quit</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <property name="response_id">-2</property>
+	    </widget>
+	  </child>
+
+	  <child>
 	    <widget class="GtkButton" id="no_conf_open">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
@@ -5109,7 +5122,7 @@ Failover Domain: </property>
 	      <property name="response_id">0</property>
 
 	      <child>
-		<widget class="GtkAlignment" id="alignment32">
+		<widget class="GtkAlignment" id="alignment43">
 		  <property name="visible">True</property>
 		  <property name="xalign">0.5</property>
 		  <property name="yalign">0.5</property>
@@ -5121,13 +5134,13 @@ Failover Domain: </property>
 		  <property name="right_padding">0</property>
 
 		  <child>
-		    <widget class="GtkHBox" id="hbox80">
+		    <widget class="GtkHBox" id="hbox95">
 		      <property name="visible">True</property>
 		      <property name="homogeneous">False</property>
 		      <property name="spacing">2</property>
 
 		      <child>
-			<widget class="GtkImage" id="image40">
+			<widget class="GtkImage" id="image51">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
 			  <property name="icon_size">4</property>
@@ -5144,7 +5157,7 @@ Failover Domain: </property>
 		      </child>
 
 		      <child>
-			<widget class="GtkLabel" id="label100">
+			<widget class="GtkLabel" id="label126">
 			  <property name="visible">True</property>
 			  <property name="label" translatable="yes">Open
 Existing</property>
@@ -5181,7 +5194,7 @@ Existing</property>
 	      <property name="response_id">0</property>
 
 	      <child>
-		<widget class="GtkAlignment" id="alignment33">
+		<widget class="GtkAlignment" id="alignment42">
 		  <property name="visible">True</property>
 		  <property name="xalign">0.5</property>
 		  <property name="yalign">0.5</property>
@@ -5193,13 +5206,13 @@ Existing</property>
 		  <property name="right_padding">0</property>
 
 		  <child>
-		    <widget class="GtkHBox" id="hbox81">
+		    <widget class="GtkHBox" id="hbox94">
 		      <property name="visible">True</property>
 		      <property name="homogeneous">False</property>
 		      <property name="spacing">2</property>
 
 		      <child>
-			<widget class="GtkImage" id="image41">
+			<widget class="GtkImage" id="image50">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-new</property>
 			  <property name="icon_size">4</property>
@@ -5216,10 +5229,10 @@ Existing</property>
 		      </child>
 
 		      <child>
-			<widget class="GtkLabel" id="label101">
+			<widget class="GtkLabel" id="label125">
 			  <property name="visible">True</property>
 			  <property name="label" translatable="yes">Create New
-Configurattion</property>
+Configuration</property>
 			  <property name="use_underline">True</property>
 			  <property name="use_markup">False</property>
 			  <property name="justify">GTK_JUSTIFY_LEFT</property>
