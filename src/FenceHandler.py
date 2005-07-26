@@ -9,6 +9,7 @@ import ModelBuilder
 INSTALLDIR="/usr/share/system-config-cluster"
 
 FD_PROVIDE_NAME = _("A unique name must be provided for each Fence Device")
+FD_NAME_EQUAL_TO_NODE_NAME = _("There is a Cluster Node named \"%s\". Fence Devices cannot have the same names as Cluster Nodes. Please choose another name for this Fence Device.")
 
 FD_PROVIDE_PATH = _("An xCAT path must be provided for each xCAT Fence Device")
 FD_PROVIDE_SERVER = _("A server address must be provided for this Fence Device")
@@ -968,11 +969,18 @@ class FenceHandler:
     return fields
 
   def check_unique_fd_name(self, name):
+    # check fencedevice name uniqueness
     fds = self.model_builder.getFenceDevices()
     for fd in fds:
       if fd.getName() == name:
         return FALSE
-
+    # fencedevice name may not be equal to cluster node name
+    nodes = self.model_builder.getNodes()
+    for node in nodes:
+      if node.getName() == name:
+        #return FALSE
+        raise ValidationError('FATAL', FD_NAME_EQUAL_TO_NODE_NAME % name)
+    # everything OK
     return TRUE
 
   def getFENCE_OPTS(self):

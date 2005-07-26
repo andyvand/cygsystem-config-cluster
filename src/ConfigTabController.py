@@ -87,6 +87,8 @@ NEED_CLUSTER_NAME=_("Please provide a name for the cluster")
 
 NODE_UNIQUE_NAME=_("Names for Cluster Nodes must be Unique. Please choose another name for this Node.")
 
+NODE_NAME_EQUAL_TO_FD_NAME = _("There is a Fence Device named \"%s\". Cluster Nodes cannot have the same names as Fence Devices. Please choose another name for this Node.")
+
 NODE_NAME_REQUIRED=_("Please provide a name for this Cluster Node.")
 
 NODE_NAME_LENGTH_EXCEEDED=_("Node names may not exceed 64 characters. Please reduce the length of this node name")
@@ -860,10 +862,19 @@ class ConfigTabController:
       nds = self.model_builder.getNodes()
       for n in nds:
         if n.getName() == nameattr:
+          self.node_props_name.select_region(0, (-1))
+          self.node_props_name.grab_focus()
           self.errorMessage(NODE_UNIQUE_NAME)
-          self.node_props_name.set_text("")
           return 
-
+      # node's name may not be equal to fencedevice's name
+      fds = self.model_builder.getFenceDevices()
+      for fd in fds:
+        if fd.getName() == nameattr:
+          self.node_props_name.select_region(0, (-1))
+          self.node_props_name.grab_focus()
+          self.errorMessage(NODE_NAME_EQUAL_TO_FD_NAME % nameattr)
+          return
+      
       cn = ClusterNode()
       cn.addAttribute(NAME_ATTR,nameattr)
       cn.addAttribute(VOTES_ATTR,votesattr)
@@ -895,9 +906,18 @@ class ConfigTabController:
         nds = self.model_builder.getNodes()
         for n in nds:
           if n.getName() == nameattr:
+            #self.node_props_name.set_text("ndname")
+            self.node_props_name.select_region(0, (-1))
+            self.node_props_name.grab_focus()
             self.errorMessage(NODE_UNIQUE_NAME)
-            self.node_props_name.set_text("ndname")
-            return 
+            return
+        # node's name may not be equal to fencedevice's name
+        for fd in self.model_builder.getFenceDevices():
+          if fd.getName() == nameattr:
+            self.node_props_name.select_region(0, (-1))
+            self.node_props_name.grab_focus()
+            self.errorMessage(NODE_NAME_EQUAL_TO_FD_NAME % nameattr)
+            return
         if self.model_builder.getLockType() == GULM_TYPE:
           if islockserver and (self.gulm_lockserver.get_active() == TRUE):
             lsn = self.model_builder.getLockServer(ndname)
