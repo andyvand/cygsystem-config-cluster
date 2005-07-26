@@ -428,8 +428,11 @@ class basecluster:
     retval = MessageLibrary.warningMessage(CONFIRM_PROPAGATE)
     if retval == gtk.RESPONSE_NO:
       return
+
     #1 save file to /etc/cluster/cluster.conf
-    if self.model_builder.exportModel(CLUSTER_CONF_PATH) == False:
+    if self.model_builder.exportModel(CLUSTER_CONF_PATH) == True:
+        self.configtab.prepare_tree(TRUE)
+    else:
         return
     #2 call ccs_tool
     try:
