@@ -605,7 +605,7 @@ class ModelBuilder:
             node.removeChild(mnode)
         node.removeAttribute(VOTES_ATTR)
 
-      self.usesMulticast = None
+      self.usesMulticast = False
       self.mcast_address = None
 
       #reset self.lock_type
