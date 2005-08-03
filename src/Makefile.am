@@ -22,6 +22,7 @@ FenceDevices.py \
 FenceHandler.py \
 Fence.py \
 ForkedCommand.py	\
+executil.py \
 Fs.py \
 Ip.py \
 IPAddrEntry.py	\
@@ -92,6 +93,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/FenceHandler.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fence.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ForkedCommand.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/executil.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fs.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Ip.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/IPAddrEntry.py  $(DESTDIR)$(pkgdatadir)/

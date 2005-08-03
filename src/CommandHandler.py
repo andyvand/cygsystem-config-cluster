@@ -5,7 +5,7 @@ from CommandError import CommandError
 from NodeData import NodeData
 from ServiceData import ServiceData
 from clui_constants import *
-import rhpl.executil
+import executil
 
 import gettext
 _ = gettext.gettext
@@ -58,7 +58,7 @@ class CommandHandler:
     args.append("quorum")
     cmdstr = ' '.join(args)
     try:
-      out, err, res = rhpl.executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
+      out, err, res = executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
     except RuntimeError, e:
       return FALSE
 
@@ -85,7 +85,7 @@ class CommandHandler:
     # 
     # get descriptor
     try:
-      out, err, res =  rhpl.executil.execWithCaptureErrorStatus('/sbin/ccs_test', ['/sbin/ccs_test', 'connect'])
+      out, err, res =  executil.execWithCaptureErrorStatus('/sbin/ccs_test', ['/sbin/ccs_test', 'connect'])
     except RuntimeError, e:
       return ""
     if res != 0:
@@ -106,17 +106,17 @@ class CommandHandler:
     # get name
     try:
       args = ['/sbin/ccs_test', 'get', descr, '/cluster/@name']
-      out, err, res =  rhpl.executil.execWithCaptureErrorStatus('/sbin/ccs_test', args)
+      out, err, res =  executil.execWithCaptureErrorStatus('/sbin/ccs_test', args)
     except RuntimeError, e:
       try:
         # make sure descriptor gets disconnected
-        rhpl.executil.execWithCapture('/sbin/ccs_test', ['/sbin/ccs_test', 'disconnect', descr])
+        executil.execWithCapture('/sbin/ccs_test', ['/sbin/ccs_test', 'disconnect', descr])
       except RuntimeError, e:
         pass
       return ""
     try:
       # make sure descriptor gets disconnected
-      rhpl.executil.execWithCapture('/sbin/ccs_test', ['/sbin/ccs_test', 'disconnect', descr])
+      executil.execWithCapture('/sbin/ccs_test', ['/sbin/ccs_test', 'disconnect', descr])
     except RuntimeError, e:
       pass
     
@@ -180,7 +180,7 @@ class CommandHandler:
     args.append("status")
     cmdstr = ' '.join(args)
     try:
-      out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
       return ""
 
@@ -203,7 +203,7 @@ class CommandHandler:
     args.append("status")
     cmdstr = ' '.join(args)
     try:
-      out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
       return FALSE
 
@@ -226,7 +226,7 @@ class CommandHandler:
     args.append("quorum")
     cmdstr = ' '.join(args)
     try:
-      out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
+      out,err,res =  executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
     except RuntimeError, e:
       return FALSE
 
@@ -250,9 +250,9 @@ class CommandHandler:
       args.append("nodes")
       cmdstr = ' '.join(args)
       try:
-        out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+        out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
       except RuntimeError, e:
-        return FALSE
+        return dataobjs  #empty list with no nodes
 
       if res != 0:
         raise CommandError("FATAL", NODES_INFO_ERROR % err)
@@ -276,9 +276,9 @@ class CommandHandler:
       args.append("localhost:core")
       cmdstr = ' '.join(args)
       try:
-        out,err,res =  rhpl.executil.execWithCaptureErrorStatus("/sbin/gulm_tool",args)
+        out,err,res =  executil.execWithCaptureErrorStatus("/sbin/gulm_tool",args)
       except RuntimeError, e:
-        return FALSE
+        return dataobjs  #empty list with no nodes
 
       if res != 0:
         raise CommandError("FATAL", GULM_NODES_INFO_ERROR % err)
@@ -325,7 +325,7 @@ class CommandHandler:
     args.append("-x")
     cmdstr = ' '.join(args)
     try:
-      out,err,res =  rhpl.executil.execWithCaptureErrorStatus(clustat_path,args)
+      out,err,res =  executil.execWithCaptureErrorStatus(clustat_path,args)
     except RuntimeError, e:
       return dataobjs  #empty list with no services
 
@@ -396,7 +396,7 @@ class CommandHandler:
     args.append(file)
     cmdstr = ' '.join(args)
     try:
-      out,err,res = rhpl.executil.execWithCaptureErrorStatus("/sbin/ccs_tool",args)
+      out,err,res = executil.execWithCaptureErrorStatus("/sbin/ccs_tool",args)
     except RuntimeError, e:
       raise CommandError("FATAL",PROPAGATE_ERROR2 % (err))
 
@@ -414,7 +414,7 @@ class CommandHandler:
     args.append(version)
     cmdstr = ' '.join(args)
     try:
-      out,err,res = rhpl.executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      out,err,res = executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
       raise CommandError("FATAL",PROPAGATE_ERROR % (version, err))
 
@@ -432,7 +432,7 @@ class CommandHandler:
     args.append(self.relaxng_file)
     args.append(file)
     try:
-      out,err,res = rhpl.executil.execWithCaptureErrorStatus("/usr/bin/xmllint",args)
+      out,err,res = executil.execWithCaptureErrorStatus("/usr/bin/xmllint",args)
     except RuntimeError, e:
       raise CommandError("FATAL", str(e))
 
