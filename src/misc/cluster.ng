@@ -8,130 +8,26 @@
  <!-- the second for a gulm cluster -->
  <interleave>
  <choice>
-  <interleave>
-   <element name="cman">
-    <choice>
-     <group>
-      <attribute name="two_node"/>
-      <attribute name="expected_votes">
-       <data type="positiveInteger"/>
-      </attribute>
-     </group>
-     <group>
-      <optional>
-       <attribute name="expected_votes">
-        <data type="positiveInteger"/>
-       </attribute>
-      </optional>
-     </group>
-    </choice>
-    <optional>
-     <element name="multicast">
-      <attribute name="addr"/>
-     </element>
-    </optional> 
-   </element>
-   <element name="clusternodes">
-    <zeroOrMore>
-     <element name="clusternode">
-      <attribute name="name">
-       <data type="ID"/>
-      </attribute>
-      <optional>
-       <attribute name="votes">
-        <data type="positiveInteger"/>
-       </attribute>
-      </optional>
-      <optional>
-       <attribute name="nodeid">
-        <data type="positiveInteger"/>
-       </attribute>
-      </optional>
-      <interleave>
-       <optional>
-        <element name="multicast">
-         <attribute name="addr"/>
-         <optional>
-          <attribute name="interface"/>
-         </optional>
-        </element>
-       </optional> 
-       <optional>
-        <ref name="FENCE"/>
-       </optional>
-      </interleave>
-     </element>
-    </zeroOrMore>
-   </element>
-  </interleave>
-  <interleave>
-   <element name="gulm">
-    <optional>
-     <attribute name="heartbeat_rate">
-      <data type="positiveInteger"/>
-     </attribute>
-    </optional>
-    <optional>
-     <attribute name="allowed_misses">
-      <data type="positiveInteger"/>
-     </attribute>
-    </optional>
-    <optional>
-     <attribute name="coreport">
-      <data type="positiveInteger"/>
-     </attribute>
-    </optional>  
-    <optional>
-     <attribute name="ltpxport">
-      <data type="positiveInteger"/>
-     </attribute>
-    </optional>
-    <optional>
-     <attribute name="ltport">
-      <data type="positiveInteger"/>
-     </attribute>
-    </optional>
-    <optional>
-     <attribute name="lt_partitions">
-      <data type="positiveInteger"/>
-     </attribute>
-    </optional>
-    <optional>
-     <attribute name="master_scan_delay">
-      <data type="positiveInteger"/>
-     </attribute>
-    </optional>
-    <optional>
-     <attribute name="new_connection_timeout">
-      <data type="positiveInteger"/>
-     </attribute>
-    </optional>
-    <oneOrMore>
-     <element name="lockserver">
-      <attribute name="name">
-       <data type="IDREF"/>
-      </attribute>
-     </element>
-    </oneOrMore> 
-   </element>
-   <element name="clusternodes">
-    <zeroOrMore>
-     <element name="clusternode">
-      <attribute name="name">
-       <data type="ID"/>
-      </attribute>
-      <optional>
-       <attribute name="votes">
-        <data type="positiveInteger"/>
-       </attribute>
-      </optional>
-      <optional>
-        <ref name="FENCE"/>
-      </optional>
-     </element>
-    </zeroOrMore>
-   </element>
-  </interleave>
+  <choice>
+   <group>
+    <ref name="cman_definition"/>
+    <ref name="cman_clusternodes"/>
+   </group>
+   <group>    
+    <ref name="cman_clusternodes"/>
+    <ref name="cman_definition"/>
+   </group>
+  </choice>
+  <choice>
+   <group>
+    <ref name="gulm_definition"/>
+    <ref name="gulm_clusternodes"/>
+   </group>
+   <group>    
+    <ref name="gulm_clusternodes"/>
+    <ref name="gulm_definition"/>
+   </group>
+  </choice>
  </choice>
  
  
@@ -266,7 +162,138 @@
 </element> <!-- cluster end -->
 </start>
 
-
+  <define name="cman_definition">
+    <element name="cman">
+    <choice>
+     <group>
+      <attribute name="two_node"/>
+      <attribute name="expected_votes">
+       <data type="positiveInteger"/>
+      </attribute>
+     </group>
+     <group>
+      <optional>
+       <attribute name="expected_votes">
+        <data type="positiveInteger"/>
+       </attribute>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <element name="multicast">
+      <attribute name="addr"/>
+     </element>
+    </optional> 
+   </element>
+  </define>
+  <define name="cman_clusternodes">
+    <element name="clusternodes">
+    <zeroOrMore>
+     <element name="clusternode">
+      <attribute name="name">
+       <data type="ID"/>
+      </attribute>
+      <optional>
+       <attribute name="votes">
+        <data type="positiveInteger"/>
+       </attribute>
+      </optional>
+      <optional>
+       <attribute name="nodeid">
+        <data type="positiveInteger"/>
+       </attribute>
+      </optional>
+      <interleave>
+       <optional>
+        <element name="multicast">
+         <attribute name="addr"/>
+         <optional>
+          <attribute name="interface"/>
+         </optional>
+        </element>
+       </optional> 
+       <optional>
+        <ref name="FENCE"/>
+       </optional>
+      </interleave>
+     </element>
+    </zeroOrMore>
+   </element>
+  </define>
+  
+  <define name="gulm_definition">
+    <element name="gulm">
+    <optional>
+     <attribute name="heartbeat_rate">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="allowed_misses">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="coreport">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>  
+    <optional>
+     <attribute name="ltpxport">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="ltport">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="lt_partitions">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="master_scan_delay">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <optional>
+     <attribute name="new_connection_timeout">
+      <data type="positiveInteger"/>
+     </attribute>
+    </optional>
+    <oneOrMore>
+     <element name="lockserver">
+      <attribute name="name">
+       <data type="IDREF"/>
+      </attribute>
+     </element>
+    </oneOrMore> 
+   </element>
+  </define>
+  <define name="gulm_clusternodes">
+    <element name="clusternodes">
+    <zeroOrMore>
+     <element name="clusternode">
+      <attribute name="name">
+       <data type="ID"/>
+      </attribute>
+      <optional>
+       <attribute name="votes">
+        <data type="positiveInteger"/>
+       </attribute>
+      </optional>
+      <optional>
+        <ref name="FENCE"/>
+      </optional>
+     </element>
+    </zeroOrMore>
+   </element>
+  </define>
+  
+  
+  
   <define name="IP">
    <element name="ip">
     <choice>
