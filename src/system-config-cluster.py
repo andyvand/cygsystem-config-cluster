@@ -77,6 +77,9 @@ NO_MCAST_IP=_("Please Provide a Valid Multicast IP Address")
 PROPOGATION_CONFIRMATION=_("Success. The current configuration has been propagated to the cluster.")
 
 FILE_DOES_NOT_EXIST=_("The file %s does not exist on the filesystem.")
+
+CONFFILE_NOT_SAVED_MESSAGE=_("Configuration file not saved.")
+
 ###############################################
 class basecluster:
   def __init__(self, glade_xml, app):
@@ -272,6 +275,8 @@ class basecluster:
       if self.model_builder.exportModel() == TRUE:
           retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % fp)
           self.configtab.prepare_tree(TRUE)
+      else:
+          MessageLibrary.errorMessage(CONFFILE_NOT_SAVED_MESSAGE)
     else:  #Must have been a 'New' instance...
       self.save_as(None)
 
@@ -298,6 +303,8 @@ class basecluster:
         if self.model_builder.exportModel(filepath) == TRUE:
             retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % filepath)
             self.glade_xml.get_widget("filename_entry").set_text(filepath)
+        else:
+            MessageLibrary.errorMessage(CONFFILE_NOT_SAVED_MESSAGE)
       except IOError, e:
         MessageLibrary.errorMessage("Something ugly happened when attempting to write output file")
     popup.destroy()
@@ -433,6 +440,7 @@ class basecluster:
     if self.model_builder.exportModel(CLUSTER_CONF_PATH) == True:
         self.configtab.prepare_tree(TRUE)
     else:
+        MessageLibrary.errorMessage(_("Propagation aborted."))
         return
     #2 call ccs_tool
     try:

@@ -366,12 +366,18 @@ class ModelBuilder:
     try:
       if filename == None:
         filename = self.filename
-
+      
       if filename == CLUSTER_CONF_PATH:
+        if os.access(CLUSTER_CONF_DIR_PATH, os.F_OK) == 0:
+          message = _("Directory %s does not exist. Should it be created?") % CLUSTER_CONF_DIR_PATH
+          if MessageLibrary.infoMessage(message) == MessageLibrary.gtk.RESPONSE_YES:
+            os.mkdir(CLUSTER_CONF_DIR_PATH)
+          else:
+            return False
         self.backup_configfile()
       
       fd = open(filename, "w+")
-
+      
       doc = minidom.Document()
       self.object_tree.generateXML(doc)
       #print doc.toprettyxml()

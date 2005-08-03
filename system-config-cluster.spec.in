@@ -50,8 +50,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
-* Wed Jul 26 2005 Stanko Kupcevic <kupcevic@redhat.com> 1.0.13-1
-  -  Fixes for bz161344, 160264, 160127, 163673, 163237.
+* Wed Aug 03 2005 Stanko Kupcevic <kupcevic@redhat.com> 1.0.13-1
+  -  Fixes for bz161344, 160264, 160127, 163673, 163237, 160240.
 * Tue Jun 07 2005 Jim Parsons <jparsons@redhat.com> 1.0.12-1
   -  Fix for bz159681.
 * Mon Jun 06 2005 Jim Parsons <jparsons@redhat.com> 0.9.70-1
