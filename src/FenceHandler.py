@@ -12,7 +12,7 @@ FD_PROVIDE_NAME = _("A unique name must be provided for each Fence Device")
 FD_NAME_EQUAL_TO_NODE_NAME = _("There is a Cluster Node named \"%s\". Fence Devices cannot have the same names as Cluster Nodes. Please choose another name for this Fence Device.")
 
 FD_PROVIDE_PATH = _("An xCAT path must be provided for each xCAT Fence Device")
-FD_PROVIDE_SERVER = _("A server address must be provided for this Fence Device")
+FD_PROVIDE_SERVERS = _("Servers' names or addresses, separated by whitespaces, must be provided for this Fence Device")
 FD_PROVIDE_CSERVER = _("A cserver address must be provided for this Egenera Fence Device")
 FD_PROVIDE_IP = _("An IP address must be provided for this Fence Device")
 FD_PROVIDE_LOGIN = _("A login name must be provided for this Fence Device")
@@ -60,7 +60,7 @@ FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_wti":["name","ipaddr","passwd"],
               "fence_brocade":["name","ipaddr","login","passwd"],
               "fence_vixel":["name","ipaddr","passwd"],
-              "fence_gnbd":["name","server"],
+              "fence_gnbd":["name","servers"],
               "fence_ilo":["name","hostname","login","passwd"],
               "fence_sanbox2":["name","ipaddr","login","passwd"],
               "fence_bladecenter":["name","ipaddr","login","passwd"],
@@ -74,7 +74,7 @@ FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
               "fence_wti":["port"],
               "fence_brocade":["port"],
               "fence_vixel":["port"],
-              "fence_gnbd":["ipaddress"],
+              "fence_gnbd":[],
               "fence_ilo":[],
               "fence_sanbox2":["port"],
               "fence_bladecenter":["blade"],
@@ -242,7 +242,7 @@ class FenceHandler:
     pass
  
   def pop_gnbd(self, attrs):
-    self.gnbd_ip.set_text(attrs["ipaddress"])
+    pass
  
   def pop_egenera(self, attrs):
     self.egenera_lpan.set_text(attrs["lpan"])
@@ -266,7 +266,6 @@ class FenceHandler:
     self.wti_port.set_text("") 
     self.brocade_port.set_text("")
     self.vixel_port.set_text("")
-    self.gnbd_ip.set_text("") 
     self.sanbox2_port.set_text("")
     self.bladecenter_blade.set_text("")
     self.mcdata_port.set_text("")
@@ -300,7 +299,7 @@ class FenceHandler:
     self.mcdata_fd_login.set_text("")
     self.mcdata_fd_passwd.set_text("")
     self.gnbd_fd_name.set_text("")
-    self.gnbd_fd_server.set_text("")
+    self.gnbd_fd_servers.set_text("")
     self.egenera_fd_name.set_text("")
     self.egenera_fd_cserver.set_text("")
     self.sanbox2_fd_name.set_text("")
@@ -365,7 +364,7 @@ class FenceHandler:
  
   def pop_gnbd_fd(self, attrs):
     self.gnbd_fd_name.set_text(attrs["name"])
-    self.gnbd_fd_server.set_text(attrs["server"])
+    self.gnbd_fd_servers.set_text(attrs["servers"])
 
  
   def pop_egenera_fd(self, attrs):
@@ -405,7 +404,6 @@ class FenceHandler:
     self.wti_port = self.fence_xml.get_widget('entry3') 
     self.brocade_port = self.fence_xml.get_widget('entry4') 
     self.vixel_port = self.fence_xml.get_widget('entry5') 
-    self.gnbd_ip = self.fence_xml.get_widget('entry6') 
     self.ilo_port = self.fence_xml.get_widget('entry7') 
     self.sanbox2_port = self.fence_xml.get_widget('entry8') 
     self.bladecenter_blade = self.fence_xml.get_widget('entry41') 
@@ -434,7 +432,7 @@ class FenceHandler:
     self.vixel_fd_passwd = self.fence_xml.get_widget('entry25')
 
     self.gnbd_fd_name = self.fence_xml.get_widget('entry26')
-    self.gnbd_fd_server = self.fence_xml.get_widget('entry27')
+    self.gnbd_fd_servers = self.fence_xml.get_widget('entry27')
 
     self.ilo_fd_name = self.fence_xml.get_widget('entry28')
     self.ilo_fd_login = self.fence_xml.get_widget('entry29')
@@ -678,26 +676,30 @@ class FenceHandler:
     return fields
  
   def val_gnbd_fd(self, name):
-    rectify_fence_name = FALSE
+    self.validateNCName(self.gnbd_fd_name)
     if self.gnbd_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
-    self.validateNCName(self.gnbd_fd_name)
+    
+    rectify_fence_name = FALSE
     if name != self.gnbd_fd_name.get_text():
       res = self.check_unique_fd_name(self.gnbd_fd_name.get_text())
       if res == FALSE:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
       rectify_fence_name = TRUE
-
-    if self.gnbd_fd_server.get_text() == "":
-      raise ValidationError('FATAL', FD_PROVIDE_SERVER)
-
+    
+    servers_new = self.gnbd_fd_servers.get_text().strip()
+    if servers_new == "":
+      raise ValidationError('FATAL', FD_PROVIDE_SERVERS)
+    for ch in ':;,':
+      if ch in servers_new:
+        raise ValidationError('FATAL', FD_PROVIDE_SERVERS)
+    
     if rectify_fence_name == TRUE:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.gnbd_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.gnbd_fd_name.get_text()
-    fields["server"] = self.gnbd_fd_server.get_text()
-
+    fields["servers"] = servers_new
     return fields
  
   def val_egenera_fd(self, name):
@@ -896,12 +898,8 @@ class FenceHandler:
     return fields
 
   def val_gnbd(self):
-    if self.gnbd_ip.get_text() == "": 
-      raise ValidationError('FATAL', FI_PROVIDE_IPADDRESS)
-
     fields = {}
-    fields["ipaddress"] = self.gnbd_ip.get_text()
-
+    fields["nodename"] = "real value will be set at ModelBuilder.perform_final_check()"
     return fields
 
   def val_ilo(self):

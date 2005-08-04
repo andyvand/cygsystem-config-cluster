@@ -60,7 +60,7 @@
        </group>
        <!-- GNBD -->
        <group>
-        <attribute name="server"/>
+        <attribute name="servers"/>
        </group>
        <!-- Egenera -->
        <group>
@@ -514,11 +514,7 @@
         <group>
          <attribute name="blade"/>
         </group>
-        <!-- GNBD -->
-        <group>
-         <attribute name="ipaddress"/>
-        </group>
-        <!-- xCAT, manual -->
+        <!-- xCAT, GNBD, manual -->
         <group>
          <attribute name="nodename"/>
         </group>
