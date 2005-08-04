@@ -496,25 +496,19 @@ class ConfigTabController:
 
     self.fence_panel_label.set_use_markup(TRUE)
     self.fence_panel_label.set_markup(FENCE_PANEL_LABEL % nd.getName())
-    fence_placeholder = nd.getChildren()
-    if len(fence_placeholder) == 0:
-      fens = Fence()
-      nd.addChild(fens)
-    kids = fence_placeholder[0].getChildren()
-    #kids holds a list of fence levels
-    for kid in kids:
+    for fence_level in nd.getFenceLevels():
       flevel_iter = treemodel.append(node_iter)
       flevel_substr = FENCE_LEVEL % level_index
       ##The next line mutates the incoming obj tree to issue sensible 
       ##level names
-      kid.addAttribute("name",str(level_index))
+      fence_level.addAttribute("name",str(level_index))
       level_index = level_index + 1
       flevel_str = "<span size=\"11000\"><b>" + flevel_substr + "</b></span>"
       treemodel.set(flevel_iter, FENCE_NAME_COL, flevel_str,
                                  FENCE_TYPE_COL, F_LEVEL_TYPE,
-                                 FENCE_OBJ_COL, kid )
+                                 FENCE_OBJ_COL, fence_level )
 
-      fences = kid.getChildren()
+      fences = fence_level.getChildren()
       for fence in fences:
         fence_iter = treemodel.append(flevel_iter)
         fence_str = "<span size=\"11000\"><b>" + fence.getName() + "</b></span>"
@@ -655,20 +649,18 @@ class ConfigTabController:
     selection = self.fence_treeview.get_selection()
     model,iter = selection.get_selected()
     root_iter = model.get_iter_root()
-    obj = model.get_value(root_iter, FENCE_OBJ_COL) #node
-    fence_ptr = obj.getChildren()[0]
+    nd = model.get_value(root_iter, FENCE_OBJ_COL) #node
     #find out how many levels
-    kin = fence_ptr.getChildren()
-    num_kin = len(kin)
-    if num_kin > 0:
-      attr_val = num_kin + 1
+    num_levels = len(nd.getFenceLevels())
+    if num_levels > 0:
+      attr_val = num_levels + 1
     else:
       attr_val = 1
     method = Method()
     method.addAttribute("name",str(attr_val))
-    fence_ptr.addChild(method)
+    nd.getFence().addChild(method)
     self.model_builder.setModified()
-    self.prep_fence_panel(obj)
+    self.prep_fence_panel(nd)
 
   def on_del_level(self, button):
     selection = self.fence_treeview.get_selection()
@@ -686,7 +678,7 @@ class ConfigTabController:
       return
     root_iter = model.get_iter_root()
     nd = model.get_value(root_iter, FENCE_OBJ_COL)
-    fence_ptr = nd.getChildren()[0]
+    fence_ptr = nd.getFence()
     fence_ptr.removeChild(obj)
     self.model_builder.setModified()
     self.prep_fence_panel(nd)

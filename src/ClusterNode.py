@@ -1,6 +1,6 @@
 import string
 from TagObject import TagObject
-from gtk import TRUE, FALSE
+from Fence import Fence
 
 TAG_NAME = "clusternode"
 import gettext
@@ -19,17 +19,21 @@ class ClusterNode(TagObject):
     TagObject.__init__(self)
     self.TAG_NAME = TAG_NAME
 
+  def getFence(self):
+    children = self.getChildren()
+    for child in children:
+      if child.getTagName() == "fence":
+        return child
+    fence = Fence()
+    self.addChild(fence)
+    return fence
+  
   def getFenceLevels(self):
     #under this node will be a 'fence' block, then 0 or more 'method'  blocks.
     #This method returns the set of 'method' objs. 'method' blocks represent
     #fence levels
-    child = self.getChildren()
-    if len(child) > 0:
-      return child[0].getChildren()
-    else:
-      retval = list()
-      return retval
-
+    return self.getFence().getChildren()
+  
   def getMulticastNode(self):
     children = self.getChildren()
     for child in children:
@@ -83,12 +87,12 @@ class ClusterNode(TagObject):
     fence_sum = 0
     flevels = self.getFenceLevels()
     if len(flevels) == 0:
-      return FALSE
+      return False
 
     for flevel in flevels:
       fence_sum = fence_sum + len(flevel.getChildren())
 
     if fence_sum > 0:
-      return TRUE
+      return True
     else:
-      return FALSE
+      return False

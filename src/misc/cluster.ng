@@ -489,7 +489,7 @@
 
  <define name="FENCE">
   <element name="fence">
-   <oneOrMore>
+   <zeroOrMore>
     <element name="method">
      <attribute name="name"/>
      <zeroOrMore>
@@ -541,7 +541,7 @@
       </element>
      </zeroOrMore>
     </element>
-   </oneOrMore>
+   </zeroOrMore>
   </element>
  </define>
 
