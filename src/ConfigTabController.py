@@ -560,6 +560,9 @@ class ConfigTabController:
     self.fi_panel.hide()
 
   def on_create_fi(self, button):
+    if len(self.model_builder.getFenceDevices()) == 0:
+      MessageLibrary.errorMessage(_("No configured Fence Devices available.\nConfigure Fence Device first."))
+      return
     selection = self.fence_treeview.get_selection()
     model,iter = selection.get_selected()
     if iter == None:
