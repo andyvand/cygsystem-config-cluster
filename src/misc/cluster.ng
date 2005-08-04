@@ -518,7 +518,7 @@
         <group>
          <attribute name="ipaddress"/>
         </group>
-        <!-- xCAT -->
+        <!-- xCAT, manual -->
         <group>
          <attribute name="nodename"/>
         </group>
@@ -531,7 +531,7 @@
          <attribute name="lpan"/>
          <attribute name="pserver"/>
         </group>
-        <!-- ILO, manual.ipmilan -->
+        <!-- ILO, ipmilan -->
         <group>
          <optional>
           <empty/>

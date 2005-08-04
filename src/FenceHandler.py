@@ -658,10 +658,11 @@ class FenceHandler:
     return fields
  
   def val_manual_fd(self, name):
-    rectify_fence_name = FALSE
+    self.validateNCName(self.manual_fd_name)
     if self.manual_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
-    self.validateNCName(self.manual_fd_name)
+    
+    rectify_fence_name = FALSE
     if name != self.manual_fd_name.get_text():
       res = self.check_unique_fd_name(self.manual_fd_name.get_text())
       if res == FALSE:  #name is already used
@@ -949,8 +950,8 @@ class FenceHandler:
     return fields
 
   def val_manual(self): 
-
     fields = {}
+    fields["nodename"] = "real value will be set at ModelBuilder.perform_final_check()"
     return fields
 
   def val_ipmilan(self):

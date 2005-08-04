@@ -777,11 +777,19 @@ class ModelBuilder:
     if self.check_gulm_count() == FALSE:
       return FALSE
     self.check_two_node()
-
+    self.check_fi_nodenames()
+    
     #add more checks
     
     return TRUE
-
+  
+  def check_fi_nodenames(self):
+    for node in self.clusternodes_ptr.getChildren():
+      for fence_level in node.getFenceLevels():
+        for fence in fence_level.getChildren():
+          if fence.getAttribute("nodename") != None:
+            fence.addAttribute("nodename", node.getName())
+  
   def check_gulm_count(self):
     if self.getLockType() == GULM_TYPE:
       gulm_count = len(self.getGULMPtr().getChildren())
