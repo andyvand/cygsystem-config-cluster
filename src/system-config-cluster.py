@@ -325,13 +325,13 @@ class basecluster:
     #self.configtab.set_model(self.model_builder)
 
   def lock_ok(self, button):
-
     if self.radio_dlm.get_active() == TRUE:
       if self.mcast_cbox.get_active() == TRUE: #User wishes to use multicast
         if self.ip.isValid() == FALSE:
           retval = MessageLibrary.errorMessage(NO_MCAST_IP)
           self.mcast_address = None
-          return
+          self.lock_method_dlg.response(gtk.RESPONSE_NO)
+          return True
         else:
           self.mcast_address = self.ip.getAddrAsString() 
       self.lock_type = DLM_TYPE
@@ -346,11 +346,6 @@ class basecluster:
     if self.configtab != None:
       self.configtab.set_model(self.model_builder)
 
-  def lock_method_delete(self, *args):
-    self.lock_type = DLM_TYPE
-    self.lock_method_dlg.hide()
-    return gtk.TRUE
-
   def on_no_conf_create(self, button):
     self.no_conf_dlg.hide()
     self.radio_dlm.set_active(TRUE)
@@ -358,10 +353,9 @@ class basecluster:
     self.mcast_cbox.set_active(FALSE)
     self.ip.set_sensitive(FALSE)
     self.mcast_addr_label.set_sensitive(FALSE)
-    self.lock_method_dlg.show_all()
-    retval = self.lock_method_dlg.run()
-    self.lock_method_dlg.hide()
-    self.model_builder = ModelBuilder(self.lock_type)
+    while self.lock_method_dlg.run() != gtk.RESPONSE_OK:
+        # continue ONLY after self.model_builder has been set up
+        pass
   
   def on_no_conf_open(self, button):
     self.no_conf_dlg.hide()
@@ -429,7 +423,6 @@ class basecluster:
     self.glade_xml.get_widget('mcast_addr_entry_proxy').add(self.mcast_addr_entry)
     self.mcast_ip_dlg = self.glade_xml.get_widget('mcast_ip_dlg')
     self.mcast_ip_dlg.connect("delete_event", self.mcast_ip_dlg_delete)
-    self.lock_method_dlg.connect("delete_event", self.lock_method_dlg_delete)
 
   def propagate(self, button):
     retval = MessageLibrary.warningMessage(CONFIRM_PROPAGATE)
@@ -507,7 +500,6 @@ class basecluster:
       self.save_as1.set_sensitive(FALSE)
 
   def lock_method_dlg_delete(self, *args):
-    self.lock_method_dlg.hide()
     return gtk.TRUE
 
   def mcast_ip_dlg_delete(self, *args):
