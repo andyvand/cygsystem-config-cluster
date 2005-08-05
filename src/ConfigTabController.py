@@ -61,13 +61,26 @@ FI_TYPE=_("Fence Device Type: \n %s")
 
 AFF_NODES=_("Affected Cluster Nodes")
 
+FD_DELETION_WARNING=_("Fence Device Deletion Warning")
+AFFECTED_CLUSTER_NODES=_("Affected Cluster Nodes")
 WARNING1=_("The following Cluster Node depends on Fence Device %s.")
-
 WARNINGS1=_("The following Cluster Nodes depend on Fence Device %s.")
-
 WARNING2=_("Removing this Fence Device will alter Fencing on this Cluster Node.\n Are you certain that you wish to continue?")
-
 WARNINGS2=_("Removing this Fence Device will alter Fencing on these Cluster Nodes.\n Are you certain that you wish to continue?")
+
+FAILDOM_DELETION_WARNING=_("Failover Domain Deletion Warning")
+AFFECTED_SERVICES=_("Affected Services")
+WARNING3=_("The following Service depends on Failover Domain %s.")
+WARNINGS3=_("The following Services depend on Failover Domain %s.")
+WARNING4=_("Removing this Failover Domain will alter this Service.\n Are you certain that you wish to continue?")
+WARNINGS4=_("Removing this Failover Domain will alter these Services.\n Are you certain that you wish to continue?")
+
+RESOURCE_DELETION_WARNING=_("Resource Deletion Warning")
+#AFFECTED_SERVICES=_("Affected Services")
+WARNING5=_("The following Service depends on Resource %s.")
+WARNINGS5=_("The following Services depend on Resource %s.")
+WARNING6=_("Removing this Resource will alter this Service.\n Are you certain that you wish to continue?")
+WARNINGS6=_("Removing this Resource will alter these Services.\n Are you certain that you wish to continue?")
 
 ADD_FENCE_DEVICE=_("Add a New Fence Device")
 
@@ -282,7 +295,6 @@ class ConfigTabController:
     self.glade_xml.get_widget('okbutton12').connect('clicked',self.on_fd_panel_ok)
 
     self.fd_delete = self.glade_xml.get_widget('fd_delete')
-    self.fd_delete.connect("delete_event",self.fd_delete_delete)
     self.fd_delete_warning1 = self.glade_xml.get_widget('fd_delete_warning1')
     self.fd_delete_warning2 = self.glade_xml.get_widget('fd_delete_warning2')
     self.fd_delete_treeview = self.glade_xml.get_widget('fd_delete_treeview')
@@ -298,10 +310,7 @@ class ConfigTabController:
     renderer0 = gtk.CellRendererText()
     column0 = gtk.TreeViewColumn(AFF_NODES,renderer0, text=0)
     self.fd_delete_treeview.append_column(column0)
-
-    self.glade_xml.get_widget('okbutton15').connect('clicked',self.on_fd_delete_ok)
-    self.glade_xml.get_widget('cancelbutton15').connect('clicked',self.on_fd_delete_cancel)
-
+    
     self.rc_options = self.glade_xml.get_widget('rc_options')
     self.rc_options.connect('changed',self.rc_optionmenu_change)
     self.prep_rc_options()
@@ -1104,7 +1113,9 @@ class ConfigTabController:
                                 2, fd_name)
 
       self.fd_delete_treeview.get_selection().unselect_all()
-
+      
+      self.fd_delete.set_title(FD_DELETION_WARNING)
+      self.fd_delete_treeview.get_column(0).set_title(AFFECTED_CLUSTER_NODES)
       if num_kees == 1:
         self.fd_delete_warning1.set_text(WARNING1 % fd_name)
         self.fd_delete_warning2.set_text(WARNING2)
@@ -1112,40 +1123,24 @@ class ConfigTabController:
         self.fd_delete_warning1.set_text(WARNINGS1 % fd_name)
         self.fd_delete_warning2.set_text(WARNINGS2)
 
-      self.fd_delete.show()
-
-  def on_fd_delete_ok(self, button):
-    selection = self.treeview.get_selection()
-    outer_model,outer_iter = selection.get_selected()
-    obj = outer_model.get_value(outer_iter, OBJ_COL)
-    fd_ptr = self.model_builder.getFenceDevicePtr()
-    fd_ptr.removeChild(obj)
-    model = self.fd_delete_treeview.get_model()
-    model.foreach(self.remove_fence_from_node, None)
-    self.fd_delete.hide()
-    self.model_builder.setModified()
-    args = list()
-    args.append(FENCE_DEVICES_TYPE)
-    apply(self.reset_tree_model, args)
-
-  def remove_fence_from_node(self, model,path,iter, *args):
-    node = model.get_value(iter, 1)
-    fd_name = model.get_value(iter, 2)
-    got_one = 1
-    while got_one > 0:
-      got_one = 0
-      flevels = node.getFenceLevels()
-      for flevel in flevels:
-        kids = flevel.getChildren()
-        for kid in kids:
-          if kid.getName().strip() == fd_name.strip():
-            flevel.removeChild(kid)
-            got_one = 1
-      
-  def on_fd_delete_cancel(self, button):
-    self.fd_delete.hide()
-      
-
+      response = self.fd_delete.run()
+      self.fd_delete.hide()
+      if response == gtk.RESPONSE_YES:
+        fd_ptr = self.model_builder.getFenceDevicePtr()
+        fd_ptr.removeChild(obj)
+        
+        # update nodes' fences
+        for node in kees:
+          for fence_level in node.getFenceLevels():
+            for fence in fence_level.getChildren()[:]:
+              if fence.getName().strip() == obj.getName().strip():
+                fence_level.removeChild(fence)
+        
+        self.model_builder.setModified()
+        args = list()
+        args.append(FENCE_DEVICES_TYPE)
+        apply(self.reset_tree_model, args)
+  
   def on_fd_panel_cancel(self, button):
     self.fd_panel.hide()
     self.fence_handler.clear_fd_forms()
@@ -1251,13 +1246,48 @@ class ConfigTabController:
   def on_faildom_delete(self, button):
     selection = self.treeview.get_selection()
     model,iter = selection.get_selected()
-    obj = model.get_value(iter, OBJ_COL)
-    retval = self.warningMessage(CONFIRM_FAILDOM_REMOVE % obj.getName())
-    if (retval == gtk.RESPONSE_NO):
-      return
+    faildom = model.get_value(iter, OBJ_COL)
+    
+    # find affected services
+    services = []
+    for service in self.model_builder.getServices():
+      domain = service.getAttribute('domain')
+      if domain == faildom.getName():
+        services.append(service)
+    
+    # prompt
+    if len(services) == 0:  #simple warning...
+      retval = self.warningMessage(CONFIRM_FAILDOM_REMOVE % faildom.getName())
+      if retval != gtk.RESPONSE_YES:
+        return
+    else:
+      treemodel = self.fd_delete_treeview.get_model()
+      treemodel.clear()
+      for service in services:
+        new_iter = treemodel.append()
+        treemodel.set(new_iter, 0, service.getName())
+      self.fd_delete_treeview.get_selection().unselect_all()
+      self.fd_delete.set_title(FAILDOM_DELETION_WARNING)
+      self.fd_delete_treeview.get_column(0).set_title(AFFECTED_SERVICES)
+      if len(services) == 1:
+        self.fd_delete_warning1.set_text(WARNING3 % faildom.getName())
+        self.fd_delete_warning2.set_text(WARNING4)
+      else:
+        self.fd_delete_warning1.set_text(WARNINGS3 % faildom.getName())
+        self.fd_delete_warning2.set_text(WARNINGS4)
+      response = self.fd_delete.run()
+      self.fd_delete.hide()
+      if response != gtk.RESPONSE_YES:
+        return
+    
+    # remove failover domain
     ###XXX-FIX should be wrapped in exception handler
     faildoms_ptr = self.model_builder.getFailoverDomainPtr()
-    faildoms_ptr.removeChild(obj)
+    faildoms_ptr.removeChild(faildom)
+    # update services
+    for service in services:
+      service.removeAttribute('domain')
+    
     self.model_builder.setModified()
     args = list()
     args.append(FAILOVER_DOMAINS_TYPE)
@@ -1319,18 +1349,57 @@ class ConfigTabController:
   def on_rc_delete(self, button):
     selection = self.treeview.get_selection()
     model,iter = selection.get_selected()
-    obj = model.get_value(iter, OBJ_COL)
-    retval = self.warningMessage(CONFIRM_RC_REMOVE % obj.getName())
-    if (retval == gtk.RESPONSE_NO):
-      return
-    rc_ptr = self.model_builder.getResourcesPtr()
-    self.model_builder.removeReferences(obj)
-    rc_ptr.removeChild(obj)
+    rc = model.get_value(iter, OBJ_COL)
+    
+    # find affected services
+    services = []
+    for service in self.model_builder.getServices():
+      if self.__on_rc_delete_recurse(rc, service):
+        services.append(service)
+    
+    # prompt
+    if len(services) == 0:  #simple warning...
+      retval = self.warningMessage(CONFIRM_RC_REMOVE % rc.getName())
+      if retval != gtk.RESPONSE_YES:
+        return
+    else:
+      treemodel = self.fd_delete_treeview.get_model()
+      treemodel.clear()
+      for service in services:
+        new_iter = treemodel.append()
+        treemodel.set(new_iter, 0, service.getName())
+      self.fd_delete_treeview.get_selection().unselect_all()
+      self.fd_delete.set_title(RESOURCE_DELETION_WARNING)
+      self.fd_delete_treeview.get_column(0).set_title(AFFECTED_SERVICES)
+      if len(services) == 1:
+        self.fd_delete_warning1.set_text(WARNING5 % rc.getName())
+        self.fd_delete_warning2.set_text(WARNING6)
+      else:
+        self.fd_delete_warning1.set_text(WARNINGS5 % rc.getName())
+        self.fd_delete_warning2.set_text(WARNINGS6)
+      response = self.fd_delete.run()
+      self.fd_delete.hide()
+      if response != gtk.RESPONSE_YES:
+        return
+    
+    # remove
+    self.model_builder.removeReferences(rc)
+    rcs_ptr = self.model_builder.getResourcesPtr()
+    rcs_ptr.removeChild(rc)
     self.model_builder.setModified()
+    
     args = list()
     args.append(RESOURCES_TYPE)
     apply(self.reset_tree_model, args)
-
+  def __on_rc_delete_recurse(self, tagobj, level):
+    for t in level.getChildren():
+      if t.isRefObject():
+        if t.getObj() == tagobj:
+          return True
+      if self.__on_rc_delete_recurse(tagobj, t):
+        return True
+    return False
+  
   def rc_panel_ok(self, button):
     #first, find out if this is for edited props, or a new device
     selection = self.treeview.get_selection()
@@ -1528,8 +1597,3 @@ class ConfigTabController:
   def on_svc_add_delete(self, *args):
     self.svc_add_dlg.hide()
     return gtk.TRUE
-
-  def fd_delete_delete(self, *args):
-    self.fd_delete.hide()
-    return gtk.TRUE
-
