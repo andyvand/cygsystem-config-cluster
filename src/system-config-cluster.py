@@ -488,6 +488,7 @@ class basecluster:
     
     self.model_builder.swap_multicast_state(address)
     self.configtab.prepare_tree(TRUE)
+    self.configtab.reset_tree_model(None)
   
   def on_notebook_change(self, notebook, page, pagenum, *data):
     if pagenum == 0:  #Config page

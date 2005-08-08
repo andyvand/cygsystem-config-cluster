@@ -19,6 +19,8 @@ RESOURCE_PROVIDE_NAME=_("Please provide a name for this resource.")
 
 RESOURCE_PROVIDE_UNIQUE_NAME=_("Please provide a unique name for this resource.")
 
+INVALID_IP=_("Please Provide a Valid IP Address")
+
 PROVIDE_UNIQUE_IP=_("This IP Address is already declared as a resource. Please choose another.")
 
 #ADDING A NEW RESOURCE: RC form should be named the same as its tagname in
@@ -236,6 +238,10 @@ class ResourceHandler:
     return returnlist 
 
   def val_ip(self, *argname):
+    if self.ip.isValid() != True:
+      MessageLibrary.errorMessage(INVALID_IP)
+      return None
+    
     inaddr = argname[0]
     addr = self.ip.getAddrAsString()
     if inaddr == None: #New resource...
