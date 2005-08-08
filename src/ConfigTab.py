@@ -112,7 +112,8 @@ class ConfigTab:
     self.prepare_tree()
     self.treeview.expand_all()
     self.controller.set_model(self.model_builder, self.treeview)
-
+    self.reset_tree_model(None)
+    
   def on_tree_selection_changed(self, *args):
     selection = self.treeview.get_selection()
     model,iter = selection.get_selected()
