@@ -313,6 +313,7 @@ class basecluster:
     #Ask what type of lockserver to employ
     self.mcast_cbox.set_sensitive(TRUE)
     self.mcast_cbox.set_active(FALSE)
+    self.ip.clear()
     self.ip.set_sensitive(FALSE)
     self.mcast_address = None
     self.mcast_addr_label.set_sensitive(FALSE)
@@ -351,6 +352,7 @@ class basecluster:
     self.radio_dlm.set_active(TRUE)
     self.mcast_cbox.set_sensitive(TRUE)
     self.mcast_cbox.set_active(FALSE)
+    self.ip.clear()
     self.ip.set_sensitive(FALSE)
     self.mcast_addr_label.set_sensitive(FALSE)
     while self.lock_method_dlg.run() != gtk.RESPONSE_OK:
@@ -470,19 +472,23 @@ class basecluster:
   def swap_multicast_state(self, *args):
     address = None
     if self.model_builder.isMulticast() == FALSE:
-      self.mcast_addr_entry.clear()
-      retval = self.mcast_ip_dlg.run()
-      if retval == gtk.RESPONSE_OK:
-        address = self.mcast_addr_entry.getAddrAsString()
-        self.mcast_ip_dlg.hide()
-      else:
-        self.mcast_ip_dlg.hide()
-        return
-         
-    self.model_builder.swap_multicast_state(address)
+        self.mcast_addr_entry.clear()
+        while address == None:
+            retval = self.mcast_ip_dlg.run()
+            if retval == gtk.RESPONSE_OK:
+                if self.mcast_addr_entry.isValid():
+                    address = self.mcast_addr_entry.getAddrAsString()
+                    self.mcast_ip_dlg.hide()
+                else:
+                    MessageLibrary.errorMessage(NO_MCAST_IP)
+                    continue
+            else:
+                self.mcast_ip_dlg.hide()
+                return
     
+    self.model_builder.swap_multicast_state(address)
     self.configtab.prepare_tree(TRUE)
-
+  
   def on_notebook_change(self, notebook, page, pagenum, *data):
     if pagenum == 0:  #Config page
       #turn on all menus

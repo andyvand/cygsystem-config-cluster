@@ -41,19 +41,19 @@ class IP (gtk.HBox):
     self.e4.set_text("")
 
   def getAddrAsString(self):
-    rtval = self.e1.get_text() + "." + \
-            self.e2.get_text() + "." + \
-            self.e3.get_text() + "." + \
-            self.e4.get_text()
+    rtval = self.e1.get_text().strip() + "." + \
+            self.e2.get_text().strip() + "." + \
+            self.e3.get_text().strip() + "." + \
+            self.e4.get_text().strip()
 
     return rtval
 
   def getAddrAsList(self):
     rtlist = list()
-    rtlist.append(self.e1.get_text())
-    rtlist.append(self.e2.get_text())
-    rtlist.append(self.e3.get_text())
-    rtlist.append(self.e4.get_text())
+    rtlist.append(self.e1.get_text().strip())
+    rtlist.append(self.e2.get_text().strip())
+    rtlist.append(self.e3.get_text().strip())
+    rtlist.append(self.e4.get_text().strip())
 
     return rtlist
 
@@ -66,16 +66,13 @@ class IP (gtk.HBox):
 
   def setAddrFromList(self, addr):
     pass
-
-  #This method just checks that all fields are filled in
+  
   def isValid(self):
-    if self.e1.get_text().strip() == "":
-      return FALSE
-    elif self.e2.get_text().strip() == "":
-      return FALSE
-    elif self.e3.get_text().strip() == "":
-      return FALSE
-    elif self.e4.get_text().strip() == "":
-      return FALSE
-
-    return TRUE
+    for num_str in self.getAddrAsList():
+      try:
+        num = int(num_str)
+        if num > 255 or num < 0:
+          return False
+      except:
+        return False
+    return True
