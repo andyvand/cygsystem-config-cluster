@@ -100,13 +100,26 @@ class ResourceHandler:
   def pop_nfsclient(self, attrs):
     self.nfsc_name.set_text(attrs["name"])
     self.nfsc_target.set_text(attrs["target"])
-    if attrs["options"] == "rw":
-      self.nfsc_rw.set_active(TRUE)
-      self.nfsc_ro.set_active(FALSE)
-    else:
+    
+    options = attrs['options'].strip().split(',')
+    if 'ro' in options:
       self.nfsc_ro.set_active(TRUE)
       self.nfsc_rw.set_active(FALSE)
-
+    else:
+      self.nfsc_rw.set_active(TRUE)
+      self.nfsc_ro.set_active(FALSE)
+    if 'rw' in options:
+      options.remove('rw')
+    if 'ro' in options:
+      options.remove('ro')
+    
+    option_string = ''
+    if len(options) != 0:
+      option_string = options[0]
+      for opt in options[1:]:
+        option_string += ',' + opt
+    self.nfsc_options.set_text(option_string)
+      
   def pop_nfsexport(self, attrs):
     self.nfse_name.set_text(attrs["name"])
 
@@ -205,6 +218,7 @@ class ResourceHandler:
 
     self.nfsc_name.set_text("")
     self.nfsc_target.set_text("")
+    self.nfsc_options.set_text("")
     self.nfsc_rw.set_active(TRUE)
 
     self.fs_name.set_text("")
@@ -318,17 +332,36 @@ class ResourceHandler:
         if res == FALSE:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
+    
+    options_dir = {}
+    for opt in self.nfsc_options.get_text().strip().split(','):
+      opt = opt.strip()
+      if opt == '':
+        continue
+      options_dir[opt] = ''
+    
+    use_radios = False
+    if ('rw' in options_dir) and ('ro' in options_dir):
+      options_dir.pop('ro')
+      options_dir.pop('rw')
+      use_radios = True
+    if not(('rw' in options_dir) or ('ro' in options_dir)):
+      use_radios = True
+    if use_radios:
+      if self.nfsc_rw.get_active():
+        options_dir['rw'] = ''
+      else:
+        options_dir['ro'] = ''
+    
+    options_list = options_dir.keys()
+    options_string = options_list[0]
+    for opt in options_list[1:]:
+      options_string += ',' + opt
+    
     fields = {}
-    target = self.nfsc_target.get_text()
-    opt = self.nfsc_rw.get_active()
-    if opt == TRUE:
-      option = "rw"
-    else:
-      option = "ro"
-
     fields["name"] = nfs_name
-    fields["target"] = target
-    fields["options"] = option
+    fields["target"] = self.nfsc_target.get_text().strip()
+    fields["options"] = options_string
 
     return fields
 
@@ -470,6 +503,7 @@ class ResourceHandler:
 
     self.nfsc_name = self.rc_xml.get_widget('entry8')
     self.nfsc_target = self.rc_xml.get_widget('entry9')
+    self.nfsc_options = self.rc_xml.get_widget('entry23')
     self.nfsc_rw = self.rc_xml.get_widget('radiobutton1')
     self.nfsc_ro = self.rc_xml.get_widget('radiobutton2')
 
