@@ -168,7 +168,8 @@ class MgmtTab:
     self.glade_xml.get_widget('button17').connect("clicked",self.on_svc_enable)
     self.glade_xml.get_widget('button18').connect("clicked",self.on_svc_disable)
     self.glade_xml.get_widget('button19').connect("clicked",self.on_svc_restart)
-                                                                                
+    
+    self.timer_id = 0
     self.onTimer() 
 
   def prep_tree(self):
@@ -235,8 +236,11 @@ class MgmtTab:
       self.nodetree.get_model().clear()
       self.servicetree.get_model().clear()
 
-    gtk.timeout_add(10000,self.onTimer)
-
+    if self.timer_id == 0:
+        self.timer_id = gtk.timeout_add(10000, self.onTimer)
+    
+    return True
+    
   def on_svc_enable(self, button):
     selection = self.servicetree.get_selection()
     model,iter = selection.get_selected()
@@ -309,14 +313,17 @@ class MgmtTab:
     m_name = model.get_value (iter, NAME_COL)
     #if s.getStateString() == 'Disabled':
     ###XXX Fix - find out how to get state info on service here
-    if True:
+    s_name, s_state = selection_data.data.split(' -- ')
+    if s_name.strip() == '' or s_state.strip() == '':
+        return
+    if s_state.strip().lower() == 'disabled':
       ### Service is 'Disabled' - just 'enable' on new member
-      commandstring = "clusvcadm -e " + selection_data.data + " -m " + m_name
+      commandstring = "clusvcadm -e \"" + s_name + "\" -m " + m_name
       self.grayOutMainWindow()
       fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring1, self.ungrayOutAndResetMainWindow)
     else:
       ### Service is not 'Disabled' - restart it on new member
-      commandstring = "clusvcadm -r \"" + selection_data.data + "\" -m " + m_name
+      commandstring = "clusvcadm -r \"" + s_name + "\" -m " + m_name
       self.grayOutMainWindow()
       fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring2, self.ungrayOutAndResetMainWindow)
                                                                             
@@ -324,13 +331,19 @@ class MgmtTab:
 
   def source_drag_data_get(self,w, context, selection_data, info, time):
     s_name = ""
+    s_state = ""
     selection=w.get_selection()
     result = selection.get_selected ()
     if result != None:
       (model, iter) = result
       try:
-        s_name = model.get_value (iter, S_NAME_COL)
+        s_name = model.get_value(iter, S_NAME_COL)
+        s_state = model.get_value(iter, S_STATE_COL)
+        
+        if '<span' in s_state:
+            s_state = s_state.replace('</span>', '')
+            s_state = s_state.replace(s_state[s_state.find('<span'):s_state.find('>')+1], '').strip()
       except:
         pass
-    selection_data.set(selection_data.target, 0, s_name)
+    selection_data.set(selection_data.target, 0, s_name + ' -- ' + s_state)
     return
