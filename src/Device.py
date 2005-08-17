@@ -1,7 +1,6 @@
 import string
 import FenceHandler
 from TagObject import TagObject
-from gtk import TRUE,FALSE
 
 TAG_NAME = "device"
 
@@ -32,9 +31,9 @@ class Device(TagObject):
   def isPowerController(self):
     for item in power_controller_list:
       if self.agent_type == item:
-        return TRUE
+        return True
 
-    return FALSE
+    return False
 
   def getProperties(self):
     stringbuf = ""

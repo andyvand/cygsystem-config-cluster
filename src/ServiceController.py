@@ -1,7 +1,6 @@
 from Service import Service
 from ResourceHandler import *
 import gobject
-from gtk import TRUE, FALSE
 from clui_constants import *
 from RefObject import RefObject
 
@@ -51,10 +50,10 @@ class ServiceController:
     self.process_widgets()
     self.rm_ptr = self.model_builder.getResourceManagerPtr()
     self.current_service = None
-    self.prepset = FALSE
-    self.foreach_found_sentinel = FALSE
-    self.isNewResource = FALSE
-    self.isAttachedResource = FALSE
+    self.prepset = False
+    self.foreach_found_sentinel = False
+    self.isNewResource = False
+    self.isAttachedResource = False
     
 
   def process_widgets(self):
@@ -149,12 +148,12 @@ class ServiceController:
         m = gtk.MenuItem(fdom.getName())
         m.show()
         menu.append(m)
-    self.prepset = TRUE
+    self.prepset = True
     self.svc_fdom_optionmenu.set_menu(menu)
 
   def on_fdom_option_changed(self, *args):
-    if self.prepset == TRUE:
-      self.prepset = FALSE
+    if self.prepset == True:
+      self.prepset = False
       return
     else:
       if self.svc_fdom_optionmenu.get_history() == 0:
@@ -179,13 +178,13 @@ class ServiceController:
 
   def on_add_shared(self, button):
     self.populate_shared_tree()
-    self.isAttachedResource = FALSE
+    self.isAttachedResource = False
     #self.shared_rc_panel.show()
     self.shared_rc_panel.run()
 
   def on_add_private(self, button):
-    self.isNewResource = TRUE
-    self.isAttachedResource = FALSE
+    self.isNewResource = True
+    self.isAttachedResource = False
     self.rc_handler.clear_rc_forms()
     self.rc_options.set_history(0)
     self.rc_options.show()
@@ -209,8 +208,8 @@ class ServiceController:
     if obj.isDenyAll() == True:
       retval = MessageLibrary.errorMessage(CANT_ATTACH % self.rc_prettyname_hash[obj.getTagName()])
       return
-    self.isNewResource = TRUE
-    self.isAttachedResource = TRUE
+    self.isNewResource = True
+    self.isAttachedResource = True
     self.rc_handler.clear_rc_forms()
     self.rc_options.set_history(0)
     self.rc_options.show()
@@ -235,7 +234,7 @@ class ServiceController:
       retval = MessageLibrary.errorMessage(CANT_ATTACH % self.rc_prettyname_hash[obj.getTagName()])
       return
     self.populate_shared_tree()
-    self.isAttachedResource = TRUE
+    self.isAttachedResource = True
     #self.shared_rc_panel.show()
     self.shared_rc_panel.run()
 
@@ -244,7 +243,7 @@ class ServiceController:
     model,iter = selection.get_selected()
     self.rc_options.hide()
     rc_obj = model.get_value(iter, R_OBJ_COL)
-    self.isNewResource = FALSE
+    self.isNewResource = False
     attrs = rc_obj.getAttributes()
     tagname = rc_obj.getTagName()
     self.rc_dlg_label.set_markup(RC_PROPS % (self.rc_prettyname_hash[tagname],rc_obj.getName()))
@@ -276,18 +275,18 @@ class ServiceController:
     selection = self.svc_treeview.get_selection()
     model,iter = selection.get_selected()
     if iter == None:
-      self.attach_new_rc.set_sensitive(FALSE)
-      self.attach_shared_rc.set_sensitive(FALSE)
-      self.del_rc_button.set_sensitive(FALSE)
-      self.edit_rc_button.set_sensitive(FALSE)
+      self.attach_new_rc.set_sensitive(False)
+      self.attach_shared_rc.set_sensitive(False)
+      self.del_rc_button.set_sensitive(False)
+      self.edit_rc_button.set_sensitive(False)
       return
     else:
       #if appropriate, edit selection
       obj = model.get_value(iter, R_OBJ_COL)
-      if obj.isRefObject() == TRUE:
-        self.edit_rc_button.set_sensitive(FALSE)
+      if obj.isRefObject() == True:
+        self.edit_rc_button.set_sensitive(False)
       else:
-        self.edit_rc_button.set_sensitive(TRUE)
+        self.edit_rc_button.set_sensitive(True)
 
 
   def prep_service_panel(self, svc):
@@ -298,16 +297,16 @@ class ServiceController:
       #if necessary, set exclusive checkbox
       exclusive_state = svc.getAttribute(EXCLUSIVE_STR)
       if (exclusive_state == None) or (exclusive_state == "0"):
-        self.exclusive_cbox.set_active(FALSE)
+        self.exclusive_cbox.set_active(False)
       else:
-        self.exclusive_cbox.set_active(TRUE)
+        self.exclusive_cbox.set_active(True)
 
       #and if necessary, set autostart checkbox
       autostart_state = svc.getAttribute(AUTOSTART_STR)
       if (autostart_state == None) or (autostart_state == "0"):
-        self.autostart_cbox.set_active(FALSE)
+        self.autostart_cbox.set_active(False)
       else:
-        self.autostart_cbox.set_active(TRUE)
+        self.autostart_cbox.set_active(True)
 
       self.populate_fdom_optionmenu()
       self.prep_service_tree()
@@ -323,12 +322,12 @@ class ServiceController:
     self.svc_treeview.expand_all()
 
     self.svc_treeview.get_selection().unselect_all()
-    self.attach_new_rc.set_sensitive(FALSE)
-    self.attach_shared_rc.set_sensitive(FALSE)
-    self.del_rc_button.set_sensitive(FALSE)
-    self.edit_rc_button.set_sensitive(FALSE)
+    self.attach_new_rc.set_sensitive(False)
+    self.attach_shared_rc.set_sensitive(False)
+    self.del_rc_button.set_sensitive(False)
+    self.edit_rc_button.set_sensitive(False)
 
-    #self.prepset = TRUE
+    #self.prepset = True
     domain = self.current_service.getAttribute("domain")
     if domain == None:
       self.svc_fdom_optionmenu.set_history(0)
@@ -345,7 +344,7 @@ class ServiceController:
 
   def add_tree_children(self, obj, iter):
     treemodel = self.svc_treeview.get_model()
-    if obj.isRefObject() == TRUE:
+    if obj.isRefObject() == True:
       str_buf = SHARED_RESOURCE
     else:
       str_buf = PRIVATE_RESOURCE
@@ -399,7 +398,7 @@ class ServiceController:
     if iter != None:
       type = model.get_value(iter, R_TYPE_COL)
       r_obj = model.get_value(iter, R_OBJ_COL)
-    if self.isNewResource == FALSE:  #edit
+    if self.isNewResource == False:  #edit
       tagname = r_obj.getTagName()
       if tagname == "ip":
         returnlist = self.rc_handler.validate_resource(tagname, r_obj.getAttribute("address"))
@@ -421,7 +420,7 @@ class ServiceController:
         self.svc_rc_panel.hide()
         for x in returnlist.keys():
           newobj.addAttribute(x,returnlist[x])
-        if self.isAttachedResource == FALSE:
+        if self.isAttachedResource == False:
           self.current_service.addChild(newobj)
         else:
           r_obj.addChild(newobj)
@@ -430,8 +429,8 @@ class ServiceController:
                                                                                 
   def rc_panel_cancel(self, button):
     self.svc_rc_panel.hide()
-    self.isNewResource = FALSE
-    self.isAttachedResource = FALSE
+    self.isNewResource = False
+    self.isAttachedResource = False
     self.rc_handler.clear_rc_forms()
 
   def on_shared_rc_ok(self, button):
@@ -439,12 +438,12 @@ class ServiceController:
     model,iter = selection.get_selected()
     if iter == None:
       self.shared_rc_panel.hide()
-      self.isNewResource = FALSE
-      self.isAttachedResource = FALSE
+      self.isNewResource = False
+      self.isAttachedResource = False
       return
     r_obj = model.get_value(iter, S_OBJ_COL)
     rf = RefObject(r_obj)
-    if self.isAttachedResource == TRUE:
+    if self.isAttachedResource == True:
       selection = self.svc_treeview.get_selection()
       smodel,iter = selection.get_selected()
       rc_obj = smodel.get_value(iter, R_OBJ_COL)
@@ -456,7 +455,7 @@ class ServiceController:
     self.shared_rc_panel.hide()
 
   def on_exclusive_cbox_changed(self, *args):
-    if self.exclusive_cbox.get_active() == TRUE:
+    if self.exclusive_cbox.get_active() == True:
       self.current_service.addAttribute(EXCLUSIVE_STR,"1")
     else:
       retval = self.current_service.getAttribute(EXCLUSIVE_STR)
@@ -464,7 +463,7 @@ class ServiceController:
         self.current_service.removeAttribute(EXCLUSIVE_STR)
                                                                                 
   def on_autostart_cbox_changed(self, *args):
-    if self.autostart_cbox.get_active() == TRUE:
+    if self.autostart_cbox.get_active() == True:
       self.current_service.addAttribute(AUTOSTART_STR,"1")
     else:
       retval = self.current_service.getAttribute(AUTOSTART_STR)
@@ -473,29 +472,29 @@ class ServiceController:
                                                                                 
   def on_shared_rc_cancel(self, button):
     self.shared_rc_panel.hide()
-    self.isNewResource = FALSE
-    self.isAttachedResource = FALSE
+    self.isNewResource = False
+    self.isAttachedResource = False
                                                                                 
   def svc_rc_panel_delete(self, *args):
     self.svc_rc_panel.hide()
-    self.isNewResource = FALSE
-    self.isAttachedResource = FALSE
-    return gtk.TRUE
+    self.isNewResource = False
+    self.isAttachedResource = False
+    return True
  
   def shared_rc_panel_delete(self, *args):
     self.shared_rc_panel.hide()
-    self.isNewResource = FALSE
-    self.isAttachedResource = FALSE
-    return gtk.TRUE
+    self.isNewResource = False
+    self.isAttachedResource = False
+    return True
 
   def cleanup_panels(self):
-    self.isNewResource = FALSE
-    self.isAttachedResource = FALSE
+    self.isNewResource = False
+    self.isAttachedResource = False
     self.svc_rc_panel.hide()
     self.shared_rc_panel.hide()
 
   def all_buttons_on(self): 
-    self.attach_new_rc.set_sensitive(TRUE)
-    self.attach_shared_rc.set_sensitive(TRUE)
-    self.del_rc_button.set_sensitive(TRUE)
-    self.edit_rc_button.set_sensitive(TRUE)
+    self.attach_new_rc.set_sensitive(True)
+    self.attach_shared_rc.set_sensitive(True)
+    self.del_rc_button.set_sensitive(True)
+    self.edit_rc_button.set_sensitive(True)

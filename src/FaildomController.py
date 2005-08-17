@@ -1,7 +1,6 @@
 from FailoverDomainNode import FailoverDomainNode
 from FailoverDomain import FailoverDomain
 import gobject
-from gtk import TRUE, FALSE
 from clui_constants import *
 
 import gettext
@@ -26,7 +25,7 @@ class FaildomController:
     self.process_widgets()
     self.faildoms = self.model_builder.getFailoverDomainPtr()
     self.current_faildom = None
-    self.foreach_found_sentinel = FALSE
+    self.foreach_found_sentinel = False
     
 
   def process_widgets(self):
@@ -37,19 +36,19 @@ class FaildomController:
                                    gobject.TYPE_INT) #Priority integer val
     self.listmodel.set_sort_column_id(3,gtk.SORT_ASCENDING)
     self.faildom_treeview.set_model(self.listmodel)
-    self.faildom_treeview.set_headers_clickable(TRUE)
+    self.faildom_treeview.set_headers_clickable(True)
     selection = self.faildom_treeview.get_selection()
     selection.connect('changed',self.on_list_selection_changed)
 
     renderer = gtk.CellRendererText()
     self.column1 = gtk.TreeViewColumn("Member Node",renderer,markup=0)
-    self.column1.set_clickable(TRUE)
+    self.column1.set_clickable(True)
     self.column1.connect("clicked",self.on_header_clicked)
     self.faildom_treeview.append_column(self.column1)
 
     renderer2 = gtk.CellRendererText()
     self.column2 = gtk.TreeViewColumn("Priority",renderer2,markup=1)
-    self.column2.set_clickable(TRUE)
+    self.column2.set_clickable(True)
     self.column2.connect("clicked",self.on_header_clicked)
     self.faildom_treeview.append_column(self.column2)
 
@@ -102,23 +101,23 @@ class FaildomController:
     selection = self.faildom_treeview.get_selection()
     model,iter = selection.get_selected()
     if iter == None:
-      self.priority_up.set_sensitive(FALSE)
-      self.priority_down.set_sensitive(FALSE)
-      self.del_from_faildom.set_sensitive(FALSE)
-      self.priority_label.set_sensitive(FALSE)
+      self.priority_up.set_sensitive(False)
+      self.priority_down.set_sensitive(False)
+      self.del_from_faildom.set_sensitive(False)
+      self.priority_label.set_sensitive(False)
     else:
       #set delete button annd spinner sensitive
-      self.del_from_faildom.set_sensitive(TRUE)
-      if self.priority_cbox.get_active() == TRUE:
-        self.priority_label.set_sensitive(TRUE)
+      self.del_from_faildom.set_sensitive(True)
+      if self.priority_cbox.get_active() == True:
+        self.priority_label.set_sensitive(True)
         obj = model.get_value(iter, OBJ_COL)
         priority_val = obj.getPriorityLevel()
         if priority_val > 1:
-          self.priority_up.set_sensitive(TRUE)
-          self.priority_down.set_sensitive(TRUE)
+          self.priority_up.set_sensitive(True)
+          self.priority_down.set_sensitive(True)
         else:
-          self.priority_up.set_sensitive(FALSE)
-          self.priority_down.set_sensitive(TRUE)
+          self.priority_up.set_sensitive(False)
+          self.priority_down.set_sensitive(True)
         
       
       #get selection value for priority and set 
@@ -155,13 +154,13 @@ class FaildomController:
       self.prep_faildom_panel(self.current_faildom)
 
   def select_faildomnode(self, name):
-    self.foreach_found_sentinel = FALSE
+    self.foreach_found_sentinel = False
     selection = self.faildom_treeview.get_selection()
     model, iter = selection.get_selected()
     model.foreach(self.select_node,name)
 
   def select_node(self,model, path, iter, *args):
-    if self.foreach_found_sentinel == TRUE:
+    if self.foreach_found_sentinel == True:
       return
     selection = self.faildom_treeview.get_selection()
     selection_args = list()
@@ -171,30 +170,30 @@ class FaildomController:
     name = obj.getName()
     in_name = args[0]
     if in_name == name.strip():
-      self.foreach_found_sentinel = TRUE
+      self.foreach_found_sentinel = True
       selection.select_iter(iter)
       
 
   def on_priority_cbox_change(self, cb):
     selected = self.priority_cbox.get_active()
-    if selected == TRUE:
-      self.priority_down.set_sensitive(TRUE)
-      self.priority_up.set_sensitive(TRUE)
-      self.priority_label.set_sensitive(TRUE)
+    if selected == True:
+      self.priority_down.set_sensitive(True)
+      self.priority_up.set_sensitive(True)
+      self.priority_label.set_sensitive(True)
       self.current_faildom.addAttribute("ordered","1")
-      self.column2.set_visible(TRUE)
+      self.column2.set_visible(True)
       self.model_builder.setModified()
     else:
-      self.priority_down.set_sensitive(FALSE)
-      self.priority_up.set_sensitive(FALSE)
-      self.priority_label.set_sensitive(FALSE)
+      self.priority_down.set_sensitive(False)
+      self.priority_up.set_sensitive(False)
+      self.priority_label.set_sensitive(False)
       self.current_faildom.addAttribute("ordered","0")
-      self.column2.set_visible(FALSE)
+      self.column2.set_visible(False)
       self.model_builder.setModified()
     
   def on_restricted_cbox_change(self, cb):
     selected = self.restricted_cbox.get_active()
-    if selected == TRUE:
+    if selected == True:
       self.current_faildom.addAttribute("restricted","1")
       self.model_builder.setModified()
     else:
@@ -211,35 +210,35 @@ class FaildomController:
       val = self.current_faildom.getAttribute("restricted")
       if val != None:
         if int(val) > 0:
-          self.restricted_cbox.set_active(TRUE)
+          self.restricted_cbox.set_active(True)
         else:
-          self.restricted_cbox.set_active(FALSE)
+          self.restricted_cbox.set_active(False)
       else:
-        self.restricted_cbox.set_active(FALSE)
+        self.restricted_cbox.set_active(False)
    
 
       val = self.current_faildom.getAttribute("ordered")
       if val != None:
         if int(val) > 0:
-          self.priority_cbox.set_active(TRUE)
+          self.priority_cbox.set_active(True)
         else:
-          self.priority_cbox.set_active(FALSE)
+          self.priority_cbox.set_active(False)
       else:
-        self.priority_cbox.set_active(FALSE)
+        self.priority_cbox.set_active(False)
 
       self.prep_optionmenu()
       self.prep_faildom_tree()
 
   def prep_optionmenu(self):
-    found = FALSE
+    found = False
     optionmenu_candidates = list()
     nodes = self.model_builder.getNodes()
     for node in nodes:
-      found = FALSE
+      found = False
       children = self.current_faildom.getChildren()
       for child in children:
         if child.getName().strip() == node.getName().strip():
-          found = TRUE
+          found = True
           break
       if found:
         continue
@@ -268,10 +267,10 @@ class FaildomController:
     if len(children) == 0:
       self.treeview_window.hide()
       self.no_nodes_notice.show()
-      self.priority_up.set_sensitive(FALSE)
-      self.priority_down.set_sensitive(FALSE)
-      self.del_from_faildom.set_sensitive(FALSE)
-      self.priority_label.set_sensitive(FALSE)
+      self.priority_up.set_sensitive(False)
+      self.priority_down.set_sensitive(False)
+      self.del_from_faildom.set_sensitive(False)
+      self.priority_label.set_sensitive(False)
     else:
       self.treeview_window.show()
       self.no_nodes_notice.hide()
@@ -288,7 +287,7 @@ class FaildomController:
       
 
   def on_faildom_panel_close(self, button):
-    if self.priority_cbox.get_active() == FALSE:
+    if self.priority_cbox.get_active() == False:
       children = self.current_faildom.getChildren()
       for child in children:
         child.setPriorityLevel(1)

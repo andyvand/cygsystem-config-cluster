@@ -1,4 +1,3 @@
-from gtk import TRUE, FALSE
 import string
 import gobject
 import sys
@@ -154,10 +153,10 @@ class MgmtTab:
     self.clustername = self.glade_xml.get_widget('entry25')
     self.clustername.set_text(self.command_handler.getClusterName())
     self.qbox = self.glade_xml.get_widget('checkbutton3')
-    if self.command_handler.isClusterQuorate() == TRUE:
-      self.qbox.set_active(TRUE)
+    if self.command_handler.isClusterQuorate() == True:
+      self.qbox.set_active(True)
     else:
-      self.qbox.set_active(FALSE)
+      self.qbox.set_active(False)
 
     #Now set info labels
     self.glade_xml.get_widget('label90').set_text(STATUS % self.command_handler.getClusterStatus())
@@ -284,15 +283,15 @@ class MgmtTab:
     #Temporarily mothball main window
     watch = gtk.gdk.Cursor (gtk.gdk.WATCH)
     self.winMain.window.set_cursor(watch)
-    self.winMain.set_sensitive(FALSE)
+    self.winMain.set_sensitive(False)
                                                                               
   def ungrayOutMainWindow(self):
     self.winMain.window.set_cursor(None)
-    self.winMain.set_sensitive(TRUE)
+    self.winMain.set_sensitive(True)
                                                                               
   def ungrayOutAndResetMainWindow(self):
     self.winMain.window.set_cursor(None)
-    self.winMain.set_sensitive(TRUE)
+    self.winMain.set_sensitive(True)
     self.prep_service_tree()
 
   def dest_drag_data_received(self,w, context, x, y, selection_data, info, time):
@@ -310,7 +309,7 @@ class MgmtTab:
     m_name = model.get_value (iter, NAME_COL)
     #if s.getStateString() == 'Disabled':
     ###XXX Fix - find out how to get state info on service here
-    if TRUE:
+    if True:
       ### Service is 'Disabled' - just 'enable' on new member
       commandstring = "clusvcadm -e " + selection_data.data + " -m " + m_name
       self.grayOutMainWindow()

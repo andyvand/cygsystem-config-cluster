@@ -12,7 +12,6 @@ import gobject
 import pango
 import string
 import os
-from gtk import TRUE, FALSE
 from clui_constants import *
 import stat
 import gettext

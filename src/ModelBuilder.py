@@ -6,7 +6,6 @@ import string
 import os
 ### gettext ("_") must come before gtk ###
 import gettext
-from gtk import TRUE, FALSE
 from TagObject import TagObject
 from Cluster import Cluster
 from ClusterNode import ClusterNode
@@ -89,7 +88,7 @@ INVALID_GULM_COUNT=_("GuLM locking mechanism may consist of 1, 3, 4 or 5 locking
 class ModelBuilder:
   def __init__(self, lock_type, filename=None, mcast_addr=None):
 
-    if os.path.exists("/etc/cluster/") == FALSE:
+    if os.path.exists("/etc/cluster/") == False:
       try:
         os.makedirs("/etc/cluster")
       except OSError, e:
@@ -108,11 +107,11 @@ class ModelBuilder:
     self.resources_ptr = None
     self.fence_daemon_ptr = None
     self.command_handler = CommandHandler()
-    self.isModified = FALSE
+    self.isModified = False
     if mcast_addr == None:
-      self.usesMulticast = FALSE
+      self.usesMulticast = False
     else:
-      self.usesMulticast = TRUE
+      self.usesMulticast = True
 
     if filename == None:
       if lock_type == DLM_TYPE:
@@ -176,7 +175,7 @@ class ModelBuilder:
       elif parent_node.nodeName == CMAN_PTR_STR:
         self.CMAN_ptr = new_object
       elif parent_node.nodeName == MCAST_STR:
-        self.usesMulticast = TRUE
+        self.usesMulticast = True
 
     else:
       return None
@@ -206,7 +205,7 @@ class ModelBuilder:
     self.CMAN_ptr = cman
     obj_tree.addChild(cman)
 
-    if self.usesMulticast == TRUE:
+    if self.usesMulticast == True:
       mcast = Multicast()
       mcast.addAttribute("addr",self.mcast_address)
       cman.addChild(mcast)
@@ -227,7 +226,7 @@ class ModelBuilder:
     rm.addChild(rcs)
     self.resources_ptr = rcs
 
-    self.isModified = FALSE
+    self.isModified = False
 
     return obj_tree
     
@@ -264,7 +263,7 @@ class ModelBuilder:
     rm.addChild(rcs)
     self.resources_ptr = rcs
 
-    self.isModified = FALSE
+    self.isModified = False
 
     return obj_tree
     
@@ -292,19 +291,19 @@ class ModelBuilder:
   ##This method builds RefObject containers for appropriate
   ##entities after the object tree is built. 
   def resolve_references(self):
-    reset_list_sentinel = TRUE
-    while(reset_list_sentinel == TRUE):
-      reset_list_sentinel = FALSE
+    reset_list_sentinel = True
+    while(reset_list_sentinel == True):
+      reset_list_sentinel = False
       resource_children = self.resourcemanager_ptr.getChildren()
       for r_child in resource_children:
         if r_child.getTagName() == SERVICE:
          reset_list_sentinel = self.find_references(r_child)
-         if reset_list_sentinel == TRUE:
+         if reset_list_sentinel == True:
            break
                                                                                 
   def find_references(self, entity, parent=None):
-    result = FALSE
-    if (entity.getAttribute("ref") != None) and (entity.isRefObject() == FALSE):
+    result = False
+    if (entity.getAttribute("ref") != None) and (entity.isRefObject() == False):
       result = self.transform_reference(entity, parent)
       return result
                                                                                 
@@ -312,13 +311,13 @@ class ModelBuilder:
     if len(children) > 0:
       for child in children:
         result = self.find_references(child, entity)
-        if result == TRUE:
+        if result == True:
           return result
                                                                                 
     return result
                                                                                 
   def transform_reference(self, entity, parent):
-    result = FALSE
+    result = False
     #This entity has a "ref" attr...need to walk through resources list
     #and look for a match
     recs = self.resources_ptr.getChildren()
@@ -330,7 +329,7 @@ class ModelBuilder:
             kids = entity.getChildren()
             for kid in kids:
               rf.addChild(kid)
-            result = TRUE
+            result = True
             break
         else:
           if entity.getAttribute("ref") == rec.getName():
@@ -338,27 +337,27 @@ class ModelBuilder:
             kids = entity.getChildren()
             for kid in kids:
               rf.addChild(kid)
-            result = TRUE
+            result = True
             break
                                                                                 
-    if result == FALSE:
+    if result == False:
       return result
                                                                                 
     if parent == None:  #Must be a service
       self.resourcemanager_ptr.addChild(rf)
       self.resourcemanager_ptr.removeChild(entity)
-      return TRUE
+      return True
     else:
       parent.addChild(rf)
       parent.removeChild(entity)
-      return TRUE
+      return True
 
   def testexportModel(self, *args):
     self.exportModel("/tmp/cluster.conf")
 
   def exportModel(self, filename=None):
-    if self.perform_final_check() == FALSE: # failed
-      return FALSE
+    if self.perform_final_check() == False: # failed
+      return False
     
     #check for dual power fences
     self.dual_power_fence_check()
@@ -384,7 +383,7 @@ class ModelBuilder:
       fd.write(doc.toprettyxml())
       self.filename = filename
 
-      self.isModified = FALSE
+      self.isModified = False
 
     finally:
       #dual_power_fence_check() adds extra
@@ -393,13 +392,13 @@ class ModelBuilder:
       #can be used
       self.purgePCDuplicates()
 
-    return TRUE
+    return True
   
   def has_filepath(self):
     if self.filename == None:
-      return FALSE
+      return False
     else:
-      return TRUE
+      return True
 
   def getFilepath(self):
     return self.filename
@@ -413,12 +412,12 @@ class ModelBuilder:
 
   def addNode(self, clusternode):
     self.clusternodes_ptr.addChild(clusternode)
-    if self.usesMulticast == TRUE:
+    if self.usesMulticast == True:
       mcast = Multicast()
       mcast.addAttribute("addr",self.mcast_address)
       mcast.addAttribute("interface","eth0")  #eth0 is the default
       clusternode.addChild(mcast)
-    self.isModified = TRUE
+    self.isModified = True
 
   def deleteNode(self, clusternode):
     #1) delete node
@@ -429,25 +428,25 @@ class ModelBuilder:
 
     self.clusternodes_ptr.removeChild(clusternode)
 
-    found_one = TRUE
+    found_one = True
 
-    while found_one == TRUE:
-      found_one = FALSE
+    while found_one == True:
+      found_one = False
       fdoms = self.getFailoverDomains()
       for fdom in fdoms:
         children = fdom.getChildren()
         for child in children:
           if child.getName() == name:
             fdom.removeChild(child)
-            found_one = TRUE
+            found_one = True
             break
 
       lock_type = self.getLockType()
       if lock_type == GULM_TYPE:
-        if self.isNodeLockserver(clusternode.getName()) == TRUE:
+        if self.isNodeLockserver(clusternode.getName()) == True:
           self.removeLockserver(clusternode)
 
-    self.isModified = TRUE
+    self.isModified = True
 
   def getFenceDevices(self):
     if self.fencedevices_ptr == None:
@@ -471,7 +470,7 @@ class ModelBuilder:
     return self.usesMulticast
 
   def check_for_multicast(self):
-    if self.usesMulticast == TRUE:
+    if self.usesMulticast == True:
       #set mcast address
       children = self.CMAN_ptr.getChildren()
       for child in children:
@@ -562,13 +561,13 @@ class ModelBuilder:
   def isNodeLockserver(self,name):
     gptr = self.getGULMPtr()
     if gptr == None:  #Obviously not GuLM
-      return FALSE
+      return False
     children = gptr.getChildren()
     for child in children:
       if child.getName() == name:
-        return TRUE
+        return True
 
-    return FALSE
+    return False
 
   def removeLockserver(self, clusternode):
     gptr = self.getGULMPtr()
@@ -580,7 +579,7 @@ class ModelBuilder:
         gptr.removeChild(child)
         break  #Only one will be found
 
-    self.isModified = TRUE
+    self.isModified = True
 
   def switch_lockservers(self):
     #first get what type of locking is currently in place
@@ -599,7 +598,7 @@ class ModelBuilder:
       #remove votes attr from each node
       nodes = self.getNodes()
       for node in nodes:
-        if self.usesMulticast == TRUE:
+        if self.usesMulticast == True:
           mnode = node.getMulticastNode()
           if mnode != None:
             node.removeChild(mnode)
@@ -621,7 +620,7 @@ class ModelBuilder:
  
 
       #set modified
-      self.isModified = TRUE
+      self.isModified = True
 
     else:
       #remove <gulm> tag
@@ -648,10 +647,10 @@ class ModelBuilder:
         nd.addAttribute(VOTES_ATTR, ONE_VOTE)
 
       #set modified
-      self.isModified = TRUE
+      self.isModified = True
 
   def swap_multicast_state(self, address=None):
-    if self.usesMulticast == TRUE:
+    if self.usesMulticast == True:
       #First, eliminate <multicast> tag
       if self.CMAN_ptr != None:
         children = self.CMAN_ptr.getChildren()
@@ -660,23 +659,23 @@ class ModelBuilder:
             if child.getTagName() == MCAST_STR:
               self.CMAN_ptr.removeChild(child)
               break
-      found_one = TRUE
-      while found_one == TRUE:
-        found_one = FALSE
+      found_one = True
+      while found_one == True:
+        found_one = False
         nodes = self.clusternodes_ptr.getChildren()
         for node in nodes:
           node_children = node.getChildren()
           for node_child in node_children:
             if node_child.getTagName() == MCAST_STR:
               node.removeChild(node_child)
-              found_one = TRUE
+              found_one = True
               break
-          if found_one == TRUE:
+          if found_one == True:
             break
 
-      self.usesMulticast = FALSE 
+      self.usesMulticast = False 
       self.mcast_address = None
-      self.isModified = TRUE
+      self.isModified = True
           
 
     else:
@@ -685,24 +684,24 @@ class ModelBuilder:
         mcast.addAttribute("addr",address)
         self.CMAN_ptr.addChild(mcast)
 
-      has_one = FALSE
+      has_one = False
       nodes = self.getNodes()
       for node in nodes:
-        has_one = FALSE
+        has_one = False
         node_children = node.getChildren()
         for node_child in node_children:
           if node_child.getTagName() == MCAST_STR:
-            has_one = TRUE
+            has_one = True
             break;
-        if has_one == FALSE:
+        if has_one == False:
           mcast = Multicast()
           mcast.addAttribute("addr",address)
           mcast.addAttribute("interface","eth0")
           node.addChild(mcast)
 
       self.mcast_address = address
-      self.usesMulticast = TRUE
-      self.isModified = TRUE
+      self.usesMulticast = True
+      self.isModified = True
         
     
 
@@ -719,7 +718,7 @@ class ModelBuilder:
 
   def setModified(self, modified=None):
     if modified == None:
-      self.isModified = TRUE
+      self.isModified = True
     else:
       self.isModified = modified
 
@@ -774,14 +773,14 @@ class ModelBuilder:
       os.rename(CLUSTER_CONF_PATH, basepath + '1')
       
   def perform_final_check(self):
-    if self.check_gulm_count() == FALSE:
-      return FALSE
+    if self.check_gulm_count() == False:
+      return False
     self.check_two_node()
     self.check_fi_nodenames()
     
     #add more checks
     
-    return TRUE
+    return True
   
   def check_fi_nodenames(self):
     for node in self.clusternodes_ptr.getChildren():
@@ -795,8 +794,8 @@ class ModelBuilder:
       gulm_count = len(self.getGULMPtr().getChildren())
       if not (gulm_count in (1, 3, 4, 5)):
         MessageLibrary.errorMessage(INVALID_GULM_COUNT % gulm_count)
-        return FALSE
-    return TRUE
+        return False
+    return True
 
   def check_two_node(self):
     if self.getLockType() == DLM_TYPE:
@@ -826,7 +825,7 @@ class ModelBuilder:
         kids = level.getChildren()
         l = list()
         for kid in kids:
-          if kid.isPowerController() == TRUE:
+          if kid.isPowerController() == True:
             l.append(kid)
         if len(l) > 1:  #Means we found multiple PCs in the same level
           for fence in l:
@@ -843,9 +842,9 @@ class ModelBuilder:
               level.addChild(d)
           
   def purgePCDuplicates(self):
-    found_one = TRUE
-    while found_one == TRUE:
-      found_one = FALSE
+    found_one = True
+    while found_one == True:
+      found_one = False
       nodes = self.getNodes()
       for node in nodes:
         levels = node.getFenceLevels()
@@ -858,9 +857,9 @@ class ModelBuilder:
                 kid.removeAttribute("option")
               else:
                 level.removeChild(kid)
-                found_one = TRUE
+                found_one = True
                 break
-        if found_one == TRUE:
+        if found_one == True:
           break
           
     

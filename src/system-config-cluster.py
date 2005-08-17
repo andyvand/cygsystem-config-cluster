@@ -14,7 +14,6 @@ import select
 import signal
 import string
 import os
-from gtk import TRUE, FALSE
 import MessageLibrary
 from CommandHandler import CommandHandler
 from CommandError import CommandError
@@ -174,10 +173,10 @@ class basecluster:
   def quit(self, *args):
     path = self.model_builder.getFilepath()
     mod = self.model_builder.isFileModified()
-    if (path == "") or (path == None) or (mod == TRUE):
+    if (path == "") or (path == None) or (mod == True):
       retval = MessageLibrary.warningMessage(UNSAVED)
       if retval == gtk.RESPONSE_YES:
-        return gtk.TRUE
+        return True
       else:
         gtk.main_quit()
 
@@ -188,7 +187,7 @@ class basecluster:
     popup = gtk.FileSelection()
     popup.set_filename(CLUSTER_CONF_DIR_PATH)
     popup.hide_fileop_buttons()
-    popup.set_select_multiple(FALSE)
+    popup.set_select_multiple(False)
     popup.show_all()
     
     while popup.run() == gtk.RESPONSE_OK:
@@ -227,7 +226,7 @@ class basecluster:
     popup = gtk.FileSelection()
     popup.set_filename(CLUSTER_CONF_DIR_PATH)
     popup.hide_fileop_buttons()
-    popup.set_select_multiple(FALSE)
+    popup.set_select_multiple(False)
     popup.show_all()
     
     while True:
@@ -272,9 +271,9 @@ class basecluster:
   def save(self, *args):
     if self.model_builder.has_filepath():
       fp = self.model_builder.getFilepath()
-      if self.model_builder.exportModel() == TRUE:
+      if self.model_builder.exportModel() == True:
           retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % fp)
-          self.configtab.prepare_tree(TRUE)
+          self.configtab.prepare_tree(True)
       else:
           MessageLibrary.errorMessage(CONFFILE_NOT_SAVED_MESSAGE)
     else:  #Must have been a 'New' instance...
@@ -291,7 +290,7 @@ class basecluster:
     popup = gtk.FileSelection()
     popup.set_filename(fname)
     popup.show_fileop_buttons()
-    popup.set_select_multiple(FALSE)
+    popup.set_select_multiple(False)
     popup.show_all()
     rc = popup.run()
     filepath = popup.get_filename()
@@ -300,7 +299,7 @@ class basecluster:
       return
     else:
       try:
-        if self.model_builder.exportModel(filepath) == TRUE:
+        if self.model_builder.exportModel(filepath) == True:
             retval = MessageLibrary.simpleInfoMessage(SAVED_FILE % filepath)
             self.glade_xml.get_widget("filename_entry").set_text(filepath)
         else:
@@ -311,13 +310,13 @@ class basecluster:
 
   def new(self, *args):
     #Ask what type of lockserver to employ
-    self.mcast_cbox.set_sensitive(TRUE)
-    self.mcast_cbox.set_active(FALSE)
+    self.mcast_cbox.set_sensitive(True)
+    self.mcast_cbox.set_active(False)
     self.ip.clear()
-    self.ip.set_sensitive(FALSE)
+    self.ip.set_sensitive(False)
     self.mcast_address = None
-    self.mcast_addr_label.set_sensitive(FALSE)
-    self.radio_dlm.set_active(TRUE)
+    self.mcast_addr_label.set_sensitive(False)
+    self.radio_dlm.set_active(True)
     self.lock_method_dlg.show()
     #print "So now the mcast_addr == %s" % self.mcast_address
     #self.model_builder = ModelBuilder(self.lock_type, None, self.mcast_address)
@@ -326,9 +325,9 @@ class basecluster:
     #self.configtab.set_model(self.model_builder)
 
   def lock_ok(self, button):
-    if self.radio_dlm.get_active() == TRUE:
-      if self.mcast_cbox.get_active() == TRUE: #User wishes to use multicast
-        if self.ip.isValid() == FALSE:
+    if self.radio_dlm.get_active() == True:
+      if self.mcast_cbox.get_active() == True: #User wishes to use multicast
+        if self.ip.isValid() == False:
           retval = MessageLibrary.errorMessage(NO_MCAST_IP)
           self.mcast_address = None
           self.lock_method_dlg.response(gtk.RESPONSE_NO)
@@ -349,12 +348,12 @@ class basecluster:
 
   def on_no_conf_create(self, button):
     self.no_conf_dlg.hide()
-    self.radio_dlm.set_active(TRUE)
-    self.mcast_cbox.set_sensitive(TRUE)
-    self.mcast_cbox.set_active(FALSE)
+    self.radio_dlm.set_active(True)
+    self.mcast_cbox.set_sensitive(True)
+    self.mcast_cbox.set_active(False)
     self.ip.clear()
-    self.ip.set_sensitive(FALSE)
-    self.mcast_addr_label.set_sensitive(FALSE)
+    self.ip.set_sensitive(False)
+    self.mcast_addr_label.set_sensitive(False)
     while self.lock_method_dlg.run() != gtk.RESPONSE_OK:
         # continue ONLY after self.model_builder has been set up
         pass
@@ -367,22 +366,22 @@ class basecluster:
       sys.exit(0)
   
   def on_mcast_cbox_changed(self, *args):
-    if self.mcast_cbox.get_active() == FALSE:
-      self.ip.set_sensitive(FALSE)
-      self.mcast_addr_label.set_sensitive(FALSE)
+    if self.mcast_cbox.get_active() == False:
+      self.ip.set_sensitive(False)
+      self.mcast_addr_label.set_sensitive(False)
     else:
-      self.ip.set_sensitive(TRUE)
-      self.mcast_addr_label.set_sensitive(TRUE)
+      self.ip.set_sensitive(True)
+      self.mcast_addr_label.set_sensitive(True)
 
   def on_radio_change(self, *args):
-    if self.radio_dlm.get_active() == FALSE:
-      self.mcast_cbox.set_sensitive(FALSE)
-      self.ip.set_sensitive(FALSE)
-      self.mcast_addr_label.set_sensitive(FALSE)
+    if self.radio_dlm.get_active() == False:
+      self.mcast_cbox.set_sensitive(False)
+      self.ip.set_sensitive(False)
+      self.mcast_addr_label.set_sensitive(False)
     else:
-      self.mcast_cbox.set_sensitive(TRUE)
-      self.ip.set_sensitive(TRUE)
-      self.mcast_addr_label.set_sensitive(TRUE)
+      self.mcast_cbox.set_sensitive(True)
+      self.ip.set_sensitive(True)
+      self.mcast_addr_label.set_sensitive(True)
     
 
   def init_widgets(self):
@@ -433,7 +432,7 @@ class basecluster:
 
     #1 save file to /etc/cluster/cluster.conf
     if self.model_builder.exportModel(CLUSTER_CONF_PATH) == True:
-        self.configtab.prepare_tree(TRUE)
+        self.configtab.prepare_tree(True)
     else:
         MessageLibrary.errorMessage(_("Propagation aborted."))
         return
@@ -466,12 +465,12 @@ class basecluster:
     #call model builder call
     self.model_builder.switch_lockservers()
     #call configtab.prepare_tree()
-    #self.configtab.prepare_tree(TRUE)
+    #self.configtab.prepare_tree(True)
     self.configtab.reset_tree_model(None)
 
   def swap_multicast_state(self, *args):
     address = None
-    if self.model_builder.isMulticast() == FALSE:
+    if self.model_builder.isMulticast() == False:
         self.mcast_addr_entry.clear()
         while address == None:
             retval = self.mcast_ip_dlg.run()
@@ -487,31 +486,31 @@ class basecluster:
                 return
     
     self.model_builder.swap_multicast_state(address)
-    self.configtab.prepare_tree(TRUE)
+    self.configtab.prepare_tree(True)
     self.configtab.reset_tree_model(None)
   
   def on_notebook_change(self, notebook, page, pagenum, *data):
     if pagenum == 0:  #Config page
       #turn on all menus
-      self.tools1.set_sensitive(TRUE)
-      self.new1.set_sensitive(TRUE)
-      self.open1.set_sensitive(TRUE)
-      self.save1.set_sensitive(TRUE)
-      self.save_as1.set_sensitive(TRUE)
+      self.tools1.set_sensitive(True)
+      self.new1.set_sensitive(True)
+      self.open1.set_sensitive(True)
+      self.save1.set_sensitive(True)
+      self.save_as1.set_sensitive(True)
     else:
       #turn off all but quit and help
-      self.tools1.set_sensitive(FALSE)
-      self.new1.set_sensitive(FALSE)
-      self.open1.set_sensitive(FALSE)
-      self.save1.set_sensitive(FALSE)
-      self.save_as1.set_sensitive(FALSE)
+      self.tools1.set_sensitive(False)
+      self.new1.set_sensitive(False)
+      self.open1.set_sensitive(False)
+      self.save1.set_sensitive(False)
+      self.save_as1.set_sensitive(False)
 
   def lock_method_dlg_delete(self, *args):
-    return gtk.TRUE
+    return True
 
   def mcast_ip_dlg_delete(self, *args):
     self.mcast_ip_dlg.hide()
-    return gtk.TRUE
+    return True
 
 #############################################################
 def initGlade():

@@ -1,4 +1,3 @@
-from gtk import TRUE, FALSE
 import string
 import gobject
 import sys
@@ -61,7 +60,7 @@ class ConfigTab:
                                     gobject.TYPE_INT,
                                     gobject.TYPE_PYOBJECT)
     self.treeview.set_model(self.treemodel)
-    self.treeview.set_headers_visible(FALSE)
+    self.treeview.set_headers_visible(False)
 
     #placeholder iters for easy selection
     self.cluster_iter = None
@@ -269,19 +268,19 @@ class ConfigTab:
     self.prop_renderer.clear_layout_area()
 
     newmodel = self.treeview.get_model()
-    if cluster_exp == TRUE:
+    if cluster_exp == True:
       self.treeview.expand_to_path(newmodel.get_path(self.cluster_iter))
-    if clusternodes_exp == TRUE:
+    if clusternodes_exp == True:
       self.treeview.expand_to_path(newmodel.get_path(self.clusternodes_iter))
-    if managedrcs_exp == TRUE:
+    if managedrcs_exp == True:
       self.treeview.expand_to_path(newmodel.get_path(self.managedrcs_iter))
-    if failoverdomains_exp == TRUE:
+    if failoverdomains_exp == True:
       self.treeview.expand_to_path(newmodel.get_path(self.failoverdomains_iter))
-    if fencedevices_exp == TRUE:
+    if fencedevices_exp == True:
       self.treeview.expand_to_path(newmodel.get_path(self.fencedevices_iter))
-    if resources_exp == TRUE:
+    if resources_exp == True:
       self.treeview.expand_to_path(newmodel.get_path(self.resources_iter))
-    if services_exp == TRUE:
+    if services_exp == True:
       self.treeview.expand_to_path(newmodel.get_path(self.services_iter))
 
 
@@ -441,7 +440,7 @@ class ConfigTab:
     if (fname == "") or (fname == None):
       self.filename_entry.set_text(NEW_CONFIG)
     else:  
-      if self.model_builder.isFileModified() == TRUE:
+      if self.model_builder.isFileModified() == True:
         self.filename_entry.set_text(fname + " " + MODIFIED_FILE)
       else:
         self.filename_entry.set_text(fname)
@@ -449,15 +448,15 @@ class ConfigTab:
     #Set appropriate labels for Tools menu dropdown
     if self.model_builder.getLockType() == DLM_TYPE:
       self.change_lockserver.get_children()[0].set_text(SWITCH_TO_GULM)
-      self.use_multicast_mode.set_sensitive(TRUE)
-      if self.model_builder.isMulticast() == TRUE:
+      self.use_multicast_mode.set_sensitive(True)
+      if self.model_builder.isMulticast() == True:
         self.use_multicast_mode.get_children()[0].set_text(SWITCH_TO_BROADCAST)
       else:
         self.use_multicast_mode.get_children()[0].set_text(SWITCH_TO_MULTICAST)
     else:
       self.change_lockserver.get_children()[0].set_text(SWITCH_TO_DLM)
       self.use_multicast_mode.get_children()[0].set_text(SWITCH_TO_MULTICAST)
-      self.use_multicast_mode.set_sensitive(FALSE)
+      self.use_multicast_mode.set_sensitive(False)
 
     
 

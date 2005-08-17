@@ -1,6 +1,5 @@
 import gtk
 
-from gtk import TRUE, FALSE
 
 class IP (gtk.HBox):
   def __init__ (self):

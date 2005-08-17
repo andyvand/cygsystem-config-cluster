@@ -1,6 +1,5 @@
 import os
 import string
-from gtk import TRUE, FALSE
 from CommandError import CommandError
 from NodeData import NodeData
 from ServiceData import ServiceData
@@ -46,7 +45,7 @@ class CommandHandler:
 
   def __init__(self):
     path_exists = os.path.exists(PATH_TO_RELAXNG_FILE)
-    if path_exists == TRUE:
+    if path_exists == True:
       self.relaxng_file = PATH_TO_RELAXNG_FILE
     else:
       self.relaxng_file = ALT_PATH_TO_RELAXNG_FILE
@@ -60,19 +59,19 @@ class CommandHandler:
     try:
       out, err, res = executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
     except RuntimeError, e:
-      return FALSE
+      return False
 
     if res != 0:
-      return FALSE
+      return False
 
     #look for 'Connect Failure' substring
     lines = out.splitlines()
     for line in lines:
       val = line.find("Connect Failure")
       if val != (-1):
-        return FALSE
+        return False
 
-    return TRUE
+    return True
 
   def getClusterName(self):
     #Use  [root@link-08 ~]# ccs_test connect
@@ -205,10 +204,10 @@ class CommandHandler:
     try:
       out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
     except RuntimeError, e:
-      return FALSE
+      return False
 
     if res != 0:
-      return FALSE
+      return False
 
     #look for Node Name string
     lines = out.splitlines()
@@ -228,19 +227,19 @@ class CommandHandler:
     try:
       out,err,res =  executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
     except RuntimeError, e:
-      return FALSE
+      return False
 
     if res != 0:
-      return FALSE
+      return False
 
     #look for Quorate string
     lines = out.splitlines()
     for line in lines:
       val = line.find("Quorate")
       if val != (-1):  #Found it
-        return TRUE
+        return True
 
-    return FALSE
+    return False
 
   def getNodesInfo(self, locking_type ):
     dataobjs = list()
@@ -336,15 +335,15 @@ class CommandHandler:
     lines = out.splitlines()
    
     y = 0 
-    found_groups_tag = FALSE
+    found_groups_tag = False
     #First, run through lines and look for "<groups>" tag
     for line in lines:
       if line.find("<groups>") != (-1):
-        found_groups_tag = TRUE
+        found_groups_tag = True
         break
       y = y + 1
 
-    if found_groups_tag == FALSE:
+    if found_groups_tag == False:
       return dataobjs  #no services visible
 
 

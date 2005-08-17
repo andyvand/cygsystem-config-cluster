@@ -4,7 +4,6 @@
 __author__ = 'Jim Parsons (jparsons@redhat.com)'
                                                                                 
                                                                                 
-from gtk import TRUE, FALSE
 import string
 import os
 import gobject
@@ -303,7 +302,7 @@ class ConfigTabController:
                                               gobject.TYPE_STRING)
 
     self.fd_delete_treeview.set_model(self.fd_delete_treemodel)
-    self.fd_delete_treeview.set_headers_visible(TRUE)
+    self.fd_delete_treeview.set_headers_visible(True)
     self.fd_delete_treeview.get_selection().set_mode(gtk.SELECTION_NONE)
     self.fd_delete_treeview.get_selection().unselect_all()
 
@@ -326,7 +325,7 @@ class ConfigTabController:
                                           gobject.TYPE_INT,
                                           gobject.TYPE_PYOBJECT)
     self.fence_treeview.set_model(self.fence_treemodel)
-    self.fence_treeview.set_headers_visible(FALSE)
+    self.fence_treeview.set_headers_visible(False)
 
     selection = self.fence_treeview.get_selection()
     selection.connect('changed',self.on_fence_tree_changed)
@@ -377,9 +376,9 @@ class ConfigTabController:
     self.post_join.set_text(fptr.getPostJoinDelay())
     self.post_fail.set_text(fptr.getPostFailDelay())
     if fptr.getCleanStart() == "0":
-      self.clean_start.set_active(FALSE)
+      self.clean_start.set_active(False)
     else:
-      self.clean_start.set_active(TRUE)
+      self.clean_start.set_active(True)
     self.cluster_props_dlg.show()
 
   def on_cluster_props_edit_ok(self, button):
@@ -401,7 +400,7 @@ class ConfigTabController:
       self.config_version.select_region(0, -1)
       return
 
-    if version.isdigit() == FALSE: 
+    if version.isdigit() == False: 
       self.errorMessage(CONFIG_VERSION_DIGITS)
       self.config_version.set_text(cptr.getConfigVersion())
       self.config_version.select_region(0, -1)
@@ -415,21 +414,21 @@ class ConfigTabController:
       return
 
 
-    if postjoin.startswith("-") == TRUE:
+    if postjoin.startswith("-") == True:
       postjoinstr = postjoin[1:]
     else:
       postjoinstr = postjoin
-    if postjoinstr.isdigit() == FALSE:
+    if postjoinstr.isdigit() == False:
       if postjoin.strip() != "":
         self.errorMessage(NEED_VALID_POSTJOIN)
         self.post_join.select_region(0, -1)
         return
 
-    if postfail.startswith("-") == TRUE:
+    if postfail.startswith("-") == True:
       postfailstr = postfail[1:]
     else:
       postfailstr = postfail
-    if postfailstr.isdigit() == FALSE:
+    if postfailstr.isdigit() == False:
       if postfail.strip() != "":
         self.errorMessage(NEED_VALID_POSTFAIL)
         self.post_fail.select_region(0, -1)
@@ -452,7 +451,7 @@ class ConfigTabController:
     else:
       fdptr.addAttribute("post_fail_delay",POST_FAIL_DEFAULT)
 
-    if cleanstart == FALSE:
+    if cleanstart == False:
       fdptr.addAttribute("clean_start","0")
     else:
       fdptr.addAttribute("clean_start","1")
@@ -503,7 +502,7 @@ class ConfigTabController:
                              FENCE_TYPE_COL, F_NODE_TYPE,
                              FENCE_OBJ_COL, nd)
 
-    self.fence_panel_label.set_use_markup(TRUE)
+    self.fence_panel_label.set_use_markup(True)
     self.fence_panel_label.set_markup(FENCE_PANEL_LABEL % nd.getName())
     for fence_level in nd.getFenceLevels():
       flevel_iter = treemodel.append(node_iter)
@@ -735,7 +734,7 @@ class ConfigTabController:
 
     self.fi_options.set_menu(menu) 
 
-  def refresh_fi_panel(self, editmode=TRUE):
+  def refresh_fi_panel(self, editmode=True):
     #1) Load option menu by getting list of current fence devices and
     #   building menu's by setting menu labels to 
     #   <Generic Fence Name> + (name used in fence device table)
@@ -810,15 +809,15 @@ class ConfigTabController:
     self.node_props_flag = NODE_NEW
     self.node_props_name.set_text("")
     self.node_props_name.grab_focus()
-    self.node_props_name.set_activates_default(gtk.TRUE)
+    self.node_props_name.set_activates_default(True)
     self.node_props_votes.set_text("")
     if self.model_builder.getLockType() == GULM_TYPE:
       self.gulm_lockserver.show()
-      self.gulm_lockserver.set_active(FALSE)
+      self.gulm_lockserver.set_active(False)
       self.mcast_interface.hide()
     else:
       self.gulm_lockserver.hide()
-      if self.model_builder.isMulticast() == TRUE:
+      if self.model_builder.isMulticast() == True:
         self.mcast_interface.show()
       else:
         self.mcast_interface.hide()
@@ -833,7 +832,7 @@ class ConfigTabController:
     if votesattr == "":
       votesattr = "1"
 
-    if votesattr.isdigit() == FALSE:
+    if votesattr.isdigit() == False:
       self.errorMessage(VOTES_ONLY_DIGITS)
       self.node_props_votes.set_text("")
       return
@@ -885,12 +884,12 @@ class ConfigTabController:
       self.model_builder.addNode(cn)
 
       if self.model_builder.getLockType() == GULM_TYPE:
-        if self.gulm_lockserver.get_active() == TRUE:
+        if self.gulm_lockserver.get_active() == True:
           ls = Lockserver()
           ls.addAttribute(NAME_ATTR,nameattr)
           self.model_builder.getGULMPtr().addChild(ls)
       else:  #DLM Type locking...
-        if self.model_builder.isMulticast() == TRUE:
+        if self.model_builder.isMulticast() == True:
           mcast = cn.getMulticastNode()
           if mcast != None:
             mcast.addAttribute("addr",self.model_builder.getMcastAddr())
@@ -923,7 +922,7 @@ class ConfigTabController:
             self.errorMessage(NODE_NAME_EQUAL_TO_FD_NAME % nameattr)
             return
         if self.model_builder.getLockType() == GULM_TYPE:
-          if islockserver and (self.gulm_lockserver.get_active() == TRUE):
+          if islockserver and (self.gulm_lockserver.get_active() == True):
             lsn = self.model_builder.getLockServer(ndname)
             lsn.addAttribute(NAME_ATTR,nameattr)
         nd.addAttribute(NAME_ATTR,nameattr)
@@ -933,17 +932,17 @@ class ConfigTabController:
       nd.addAttribute(VOTES_ATTR,votesattr) 
 
       if self.model_builder.getLockType() == GULM_TYPE:
-        if islockserver and (self.gulm_lockserver.get_active() == FALSE):
+        if islockserver and (self.gulm_lockserver.get_active() == False):
           gptr = self.model_builder.getGULMPtr()
           gptr.removeChild(self.model_builder.getLockServer(nd.getName()))
-        elif (islockserver == FALSE) and (self.gulm_lockserver.get_active() == TRUE):
+        elif (islockserver == False) and (self.gulm_lockserver.get_active() == True):
           ls = Lockserver()
           ls.addAttribute(NAME_ATTR,nameattr)
           gptr = self.model_builder.getGULMPtr()
           gptr.addChild(ls)
 
       else:
-        if self.model_builder.isMulticast() == TRUE:
+        if self.model_builder.isMulticast() == True:
           ifc = self.mcast_interface_entry.get_text().strip()
           if ifc == "":
             nd.setInterface("eth0") #set the default
@@ -965,7 +964,7 @@ class ConfigTabController:
 
   def on_clusternode_edit_b(self, button):
     self.node_props_flag = NODE_EXISTING
-    self.node_props_votes.set_activates_default(gtk.TRUE)
+    self.node_props_votes.set_activates_default(True)
     self.prep_clusternode_edit_dialog(NODE_EXISTING)
     self.node_props.set_default_response(gtk.RESPONSE_OK)
     self.node_props.run()
@@ -992,11 +991,11 @@ class ConfigTabController:
       self.node_props_votes.set_text("1")
       if self.model_builder.getLockType() == GULM_TYPE:
         self.gulm_lockserver.show()
-        self.gulm_lockserver.set_active(FALSE)
+        self.gulm_lockserver.set_active(False)
         self.mcast_interface.hide()  #Insurance...
       else:  #Uses DLM Type locking then...
         self.gulm_lockserver.hide()
-        if self.model_builder.isMulticast() == TRUE:
+        if self.model_builder.isMulticast() == True:
           self.mcast_interface.show()
         else: 
           self.mcast_interface.hide()
@@ -1021,12 +1020,12 @@ class ConfigTabController:
         self.gulm_lockserver.show()
         self.mcast_interface.hide()
         if self.model_builder.isNodeLockserver(attrs[NAME_ATTR]):
-          self.gulm_lockserver.set_active(TRUE)
+          self.gulm_lockserver.set_active(True)
         else:
-          self.gulm_lockserver.set_active(FALSE)
+          self.gulm_lockserver.set_active(False)
       else:  #DLM type then...
         self.gulm_lockserver.hide()
-        if self.model_builder.isMulticast() == TRUE:
+        if self.model_builder.isMulticast() == True:
           self.mcast_interface.show()
           ifc = nd.getInterface()
           if ifc != None:
@@ -1560,40 +1559,40 @@ class ConfigTabController:
                                                                                 
   def node_props_delete(self, *args):
     self.node_props.hide()
-    return gtk.TRUE
+    return True
 
   def cluster_props_dlg_delete(self, *args):
     self.cluster_props_dlg.hide()
-    return gtk.TRUE
+    return True
 
   def fence_panel_delete(self, *args):
     self.fence_panel.hide()
-    return gtk.TRUE
+    return True
 
   def fd_panel_delete(self, *args):
     self.fd_panel.hide()
-    return gtk.TRUE
+    return True
 
   def fi_panel_delete(self, *args):
     self.fi_panel.hide()
-    return gtk.TRUE
+    return True
 
   def faildom_panel_delete(self, *args):
     self.faildom_panel.hide()
-    return gtk.TRUE
+    return True
 
   def add_faildom_dlg_delete(self, *args):
     self.add_faildom_dlg.hide()
-    return gtk.TRUE
+    return True
 
   def rc_panel_delete(self, *args):
     self.rc_panel.hide()
-    return gtk.TRUE
+    return True
 
   def on_svc_mgmt_delete(self, *args):
     self.service_controller_close()
-    return gtk.TRUE
+    return True
 
   def on_svc_add_delete(self, *args):
     self.svc_add_dlg.hide()
-    return gtk.TRUE
+    return True

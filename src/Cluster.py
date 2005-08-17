@@ -1,6 +1,5 @@
 import string
 from TagObject import TagObject
-from gtk import TRUE, FALSE
 
 TAG_NAME = "cluster"
 import gettext
@@ -18,16 +17,16 @@ class Cluster(TagObject):
   def __init__(self):
     TagObject.__init__(self)
     self.TAG_NAME = TAG_NAME
-    self.is_cfg_version_dirty = FALSE
+    self.is_cfg_version_dirty = False
 
   def getProperties(self):
     stringbuf = ""
     special_kid = None
     kidname = ""
     numkids = 0
-    dlm_locking = TRUE
+    dlm_locking = True
     gulm_ptr = None
-    isMulticast = FALSE
+    isMulticast = False
     mcast_address = ""
 
     stringbuf = CLUSTER_NAME % self.getAttribute("name") + "\n"
@@ -57,17 +56,17 @@ class Cluster(TagObject):
       try:
         kidname = kid.getTagName()
         if kidname.strip() == "cman":
-          dlm_locking = TRUE
+          dlm_locking = True
           gulm_ptr = None 
           cman_kids = kid.getChildren()
           for cman_kid in cman_kids:
             if cman_kid.getTagName() == "multicast":
-              isMulticast = TRUE
+              isMulticast = True
               mcast_address = cman_kid.getAttribute("addr")
               break
           break
         if kidname.strip() == "gulm":
-          dlm_locking = FALSE
+          dlm_locking = False
           gulm_ptr = kid          
           break
       except KeyError, e:
@@ -76,9 +75,9 @@ class Cluster(TagObject):
 
     stringbuf = stringbuf + CLUSTER_POPULATION % numkids + "\n\n"
 
-    if dlm_locking == TRUE:
+    if dlm_locking == True:
       stringbuf = stringbuf + DLM_TYPE + "\n"
-      if isMulticast == TRUE:
+      if isMulticast == True:
         stringbuf = stringbuf + (MCAST_MODE % mcast_address)
     else:
       stringbuf = stringbuf + GULM_TYPE + "\n"
@@ -98,30 +97,30 @@ class Cluster(TagObject):
       return
 
     self.addAttribute("config_version", version)
-    self.is_cfg_version_dirty = TRUE
+    self.is_cfg_version_dirty = True
 
   def incrementConfigVersion(self):
     version = self.getAttribute("config_version")
     intversion = int(version)
     intversion = intversion + 1
     self.addAttribute("config_version", str(intversion))
-    #self.is_cfg_version_dirty = TRUE
+    #self.is_cfg_version_dirty = True
 
   #def addAttribute(self, name, value):
   #  if name == "config_version":
   #    cfg = self.getAttribute("config_version")
   #    if cfg != None:
   #      if int(value) != int(cfg):
-  #        self.is_cfg_version_dirty = TRUE
+  #        self.is_cfg_version_dirty = True
   # 
   #  self.attr_hash[name] = value
 
 
   def generateXML(self, doc, parent=None):
-    if self.is_cfg_version_dirty == FALSE:
+    if self.is_cfg_version_dirty == False:
       self.incrementConfigVersion()
     else:
-      self.is_cfg_version_dirty = FALSE
+      self.is_cfg_version_dirty = False
     tag = doc.createElement(self.TAG_NAME)
     if parent != None:
       parent.appendChild(tag)

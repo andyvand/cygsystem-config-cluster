@@ -1,5 +1,4 @@
 import string
-from gtk import TRUE, FALSE
 from TagObject import TagObject
 
 TAG_NAME = "ref"
@@ -21,7 +20,7 @@ class RefObject(TagObject):
     self.addAttribute("ref", attr)
 
   def isRefObject(self):
-    return TRUE
+    return True
 
   def getName(self):
     try:

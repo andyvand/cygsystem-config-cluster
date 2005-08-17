@@ -1,5 +1,4 @@
 import string
-from gtk import TRUE, FALSE
 
 TAG_NAME = "document"
 
@@ -23,9 +22,9 @@ class TagObject:
     try:
       del(self.attr_hash[key])
     except KeyError, e:
-      return FALSE
+      return False
 
-    return TRUE
+    return True
 
   def generateXML(self, doc, parent=None):
     #tag = parent.createNode(TAG_NAME)
@@ -75,4 +74,4 @@ class TagObject:
     return ""
 
   def isRefObject(self):
-    return FALSE
+    return False

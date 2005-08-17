@@ -85,12 +85,12 @@ class ForkedCommand:
  
     self.be_patient_dialog = gtk.Dialog()
     label = gtk.Label(message)
-    self.be_patient_dialog.vbox.pack_start(label, gtk.TRUE, gtk.TRUE, 0)
-    self.be_patient_dialog.set_modal(gtk.TRUE)
+    self.be_patient_dialog.vbox.pack_start(label, True, True, 0)
+    self.be_patient_dialog.set_modal(True)
                                                                             
     #Create an alignment object that will center the pbar
     align = gtk.Alignment(0.5, 0.5, 0, 0)
-    self.be_patient_dialog.vbox.pack_start(align, gtk.FALSE, gtk.FALSE, 5)
+    self.be_patient_dialog.vbox.pack_start(align, False, False, 5)
     align.show()
                                                                             
     self.pbar = gtk.ProgressBar()
@@ -102,14 +102,14 @@ class ForkedCommand:
 
     self.be_patient_dialog.show_all()
     self.timeout_id = 0
-    return gtk.FALSE
+    return False
                                                                             
   def progress_bar_timeout(self):
     global SIGCHLD_RECIEVED
 
     self.pbar.pulse()
     if (SIGCHLD_RECIEVED == 0):
-      return gtk.TRUE
+      return True
     else:
       return self.cleanup()
 

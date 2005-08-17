@@ -5,7 +5,6 @@ _ = gettext.gettext
 
 import gtk
 import gtk.glade
-from gtk import TRUE, FALSE
 import MessageLibrary
 import ModelBuilder
 from ValidationError import ValidationError
@@ -88,10 +87,10 @@ class ResourceHandler:
     addr = attrs["address"]
     self.ip.setAddrFromString(addr)
     monitor = attrs["monitor_link"]
-    if (monitor == None) or (monitor == FALSE) or (monitor == "no"):
-      self.monitor_link.set_active(FALSE)
+    if (monitor == None) or (monitor == False) or (monitor == "no"):
+      self.monitor_link.set_active(False)
     else:
-      self.monitor_link.set_active(TRUE)
+      self.monitor_link.set_active(True)
 
   def pop_script(self, attrs):
     self.script_name.set_text(attrs["name"])
@@ -103,11 +102,11 @@ class ResourceHandler:
     
     options = attrs['options'].strip().split(',')
     if 'ro' in options:
-      self.nfsc_ro.set_active(TRUE)
-      self.nfsc_rw.set_active(FALSE)
+      self.nfsc_ro.set_active(True)
+      self.nfsc_rw.set_active(False)
     else:
-      self.nfsc_rw.set_active(TRUE)
-      self.nfsc_ro.set_active(FALSE)
+      self.nfsc_rw.set_active(True)
+      self.nfsc_ro.set_active(False)
     if 'rw' in options:
       options.remove('rw')
     if 'ro' in options:
@@ -147,20 +146,20 @@ class ResourceHandler:
     try:
       fstype = attrs["fstype"]
       if fstype == "nfs":
-        self.netfs_fstype.set_active(TRUE)
+        self.netfs_fstype.set_active(True)
       else:
-        self.netfs_fstype.set_active(FALSE)
+        self.netfs_fstype.set_active(False)
     except KeyError, e:
-      self.netfs_fstype.set_active(TRUE)
+      self.netfs_fstype.set_active(True)
 
     try:
       force = attrs["force_unmount"]
       if force == "1" or force == "yes":
-        self.netfs_force_unmount.set_active(TRUE)
+        self.netfs_force_unmount.set_active(True)
       else:
-        self.netfs_force_unmount.set_active(FALSE)
+        self.netfs_force_unmount.set_active(False)
     except KeyError, e:
-        self.netfs_force_unmount.set_active(FALSE)
+        self.netfs_force_unmount.set_active(False)
  
     try:
       self.netfs_options.set_text(attrs["options"])
@@ -209,7 +208,7 @@ class ResourceHandler:
   def clear_rc_forms(self):
 
     self.ip.clear()
-    self.monitor_link.set_active(TRUE)
+    self.monitor_link.set_active(True)
 
     self.script_name.set_text("")
     self.script_filepath.set_text("")
@@ -219,7 +218,7 @@ class ResourceHandler:
     self.nfsc_name.set_text("")
     self.nfsc_target.set_text("")
     self.nfsc_options.set_text("")
-    self.nfsc_rw.set_active(TRUE)
+    self.nfsc_rw.set_active(True)
 
     self.fs_name.set_text("")
     self.fs_mnt.set_text("")
@@ -230,8 +229,8 @@ class ResourceHandler:
     self.netfs_host.set_text("")
     self.netfs_export.set_text("")
     self.netfs_options.set_text("")
-    self.netfs_force_unmount.set_active(FALSE)
-    self.netfs_fstype.set_active(TRUE)
+    self.netfs_force_unmount.set_active(False)
+    self.netfs_fstype.set_active(True)
 
     self.gfs_name.set_text("")
     self.gfs_mnt.set_text("")
@@ -260,13 +259,13 @@ class ResourceHandler:
     addr = self.ip.getAddrAsString()
     if inaddr == None: #New resource...
       res = self.check_unique_ip(addr)
-      if res == FALSE:  #adress already used
+      if res == False:  #adress already used
         raise ValidationError('FATAL',PROVIDE_UNIQUE_IP)
       
     else:
       if inaddr != addr:
         res = self.check_unique_ip(addr)
-        if res == FALSE:  #address already used
+        if res == False:  #address already used
           raise ValidationError('FATAL',PROVIDE_UNIQUE_IP)
 
     monitor = self.monitor_link.get_active()
@@ -296,13 +295,13 @@ class ResourceHandler:
 
     if name == None: #New resource...
       res = self.check_unique_script_name(script_name)
-      if res == FALSE:  #name already used for a script
+      if res == False:  #name already used for a script
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
       
     else:
       if name != script_name:
         res = self.check_unique_script_name(script_name)
-        if res == FALSE:  #name already used for a script
+        if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     filepath = self.script_filepath.get_text()
@@ -323,13 +322,13 @@ class ResourceHandler:
 
     if name == None: #New resource...
       res = self.check_unique_nfsclient_name(nfs_name)
-      if res == FALSE:  #name already used for a script
+      if res == False:  #name already used for a script
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
       
     else:
       if name != nfs_name:
         res = self.check_unique_nfsclient_name(nfs_name)
-        if res == FALSE:  #name already used for a script
+        if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     
@@ -374,13 +373,13 @@ class ResourceHandler:
 
     if name == None: #New resource...
       res = self.check_unique_nfsexport_name(nfse_name)
-      if res == FALSE:  #name already used for a script
+      if res == False:  #name already used for a script
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
       
     else:
       if name != nfse_name:
         res = self.check_unique_nfsexport_name(nfse_name)
-        if res == FALSE:  #name already used for a script
+        if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
@@ -396,13 +395,13 @@ class ResourceHandler:
 
     if name == None: #New resource...
       res = self.check_unique_netfs_name(netfs_name)
-      if res == FALSE:  #name already used for a script
+      if res == False:  #name already used for a script
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
       
     else:
       if name != netfs_name:
         res = self.check_unique_netfs_name(netfs_name)
-        if res == FALSE:  #name already used for a script
+        if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
@@ -413,7 +412,7 @@ class ResourceHandler:
     fields["host"] = host
     export = self.netfs_export.get_text()
     fields["export"] = export 
-    if self.netfs_fstype.get_active() == TRUE:
+    if self.netfs_fstype.get_active() == True:
       fstype = "nfs"
     else:
       fstype = "nfs4"
@@ -421,7 +420,7 @@ class ResourceHandler:
     options = self.netfs_options.get_text()
     fields["options"] = options
     unmount = self.netfs_force_unmount.get_active()
-    if unmount == FALSE:
+    if unmount == False:
       umount = "0"
     else:
       umount = "1"
@@ -437,13 +436,13 @@ class ResourceHandler:
 
     if name == None: #New resource...
       res = self.check_unique_gfs_name(gfs_name)
-      if res == FALSE:  #name already used for a script
+      if res == False:  #name already used for a script
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
       
     else:
       if name != gfs_name:
         res = self.check_unique_gfs_name(gfs_name)
-        if res == FALSE:  #name already used for a script
+        if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
@@ -466,13 +465,13 @@ class ResourceHandler:
 
     if name == None: #New resource...
       res = self.check_unique_fs_name(fs_name)
-      if res == FALSE:  #name already used for a script
+      if res == False:  #name already used for a script
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
       
     else:
       if name != gfs_name:
         res = self.check_unique_fs_name(fs_name)
-        if res == FALSE:  #name already used for a script
+        if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
     fields = {}
@@ -532,55 +531,55 @@ class ResourceHandler:
     rcs = self.model_builder.getResources()
     for rc in rcs:
       if rc.getName() == fs_name:
-        return FALSE
+        return False
 
-    return TRUE
+    return True
 
   def check_unique_netfs_name(self,netfs_name):
     rcs = self.model_builder.getResources()
     for rc in rcs:
       if rc.getName() == netfs_name:
-        return FALSE
+        return False
 
-    return TRUE
+    return True
 
   def check_unique_gfs_name(self,gfs_name):
     rcs = self.model_builder.getResources()
     for rc in rcs:
       if rc.getName() == gfs_name:
-        return FALSE
+        return False
 
-    return TRUE
+    return True
 
   def check_unique_script_name(self,name):
     rcs = self.model_builder.getResources()
     for rc in rcs:
       if rc.getName() == name:
-        return FALSE
+        return False
 
-    return TRUE
+    return True
 
   def check_unique_ip(self,addr):
     rcs = self.model_builder.getResources()
     for rc in rcs:
       if rc.getName() == addr:
-        return FALSE
+        return False
 
-    return TRUE
+    return True
 
   def check_unique_nfsexport_name(self,name):
     rcs = self.model_builder.getResources()
     for rc in rcs:
       if rc.getName() == name:
-        return FALSE
+        return False
 
-    return TRUE
+    return True
 
   def check_unique_nfsclient_name(self,name):
     rcs = self.model_builder.getResources()
     for rc in rcs:
       if rc.getName() == name:
-        return FALSE
+        return False
 
-    return TRUE
+    return True
 
