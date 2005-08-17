@@ -237,7 +237,7 @@ class MgmtTab:
       self.servicetree.get_model().clear()
 
     if self.timer_id == 0:
-        self.timer_id = gtk.timeout_add(10000, self.onTimer)
+        self.timer_id = gobject.timeout_add(10000, self.onTimer)
     
     return True
     

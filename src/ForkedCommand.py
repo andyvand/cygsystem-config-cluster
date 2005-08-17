@@ -14,6 +14,7 @@
 ###     has completed, it can be passed in here. 
 
 import time
+import gobject
 import gtk
 import os
 import signal
@@ -63,7 +64,7 @@ class ForkedCommand:
 
       #spawn dialog
       signal.signal(signal.SIGCHLD, self.serviceSignalHandler)
-      self.timeout_id = gtk.timeout_add(100, self.showDialog, self.message)
+      self.timeout_id = gobject.timeout_add(100, self.showDialog, self.message)
                                                                           
     else:
       #child process
@@ -79,7 +80,7 @@ class ForkedCommand:
 
   def showDialog(self,message):
     global SIGCHLD_RECIEVED
-
+    
     if(SIGCHLD_RECIEVED == 1):
         return self.cleanup()
  
@@ -98,7 +99,7 @@ class ForkedCommand:
     self.pbar.show()
 
     #Start bouncing progress bar
-    self.pbar_timer = gtk.timeout_add(100, self.progress_bar_timeout)
+    self.pbar_timer = gobject.timeout_add(100, self.progress_bar_timeout)
 
     self.be_patient_dialog.show_all()
     self.timeout_id = 0
@@ -149,9 +150,9 @@ class ForkedCommand:
 
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)
     if(self.timeout_id != 0):
-      gtk.timeout_remove(self.timeout_id)
+      gobject.source_remove(self.timeout_id)
     if(self.pbar_timer != 0):
-      gtk.timeout_remove(self.pbar_timer)
+      gobject.source_remove(self.pbar_timer)
     if(self.be_patient_dialog):
       self.be_patient_dialog.destroy()
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)
