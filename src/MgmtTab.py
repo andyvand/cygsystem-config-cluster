@@ -251,7 +251,7 @@ class MgmtTab:
     if svc_title == "" or svc_title == None:
       return
     self.grayOutMainWindow()
-    commandstring = "clusvcadm -e \"" + svc_name + "\""
+    commandstring = "clusvcadm -q -e \"" + svc_name + "\""
     errorstring = (_("Error: Service Enable failed - please check the logs for error messages.\n\nOnce the problem has been corrected, the 'Failed' service must first be Disabled before it can be Enabled."))
     fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring, self.ungrayOutAndResetMainWindow)
 
@@ -264,7 +264,7 @@ class MgmtTab:
     svc_title = model.get_value(iter,S_TITLE_COL)
     if svc_title == "" or svc_title == None:
       return
-    commandstring = "clusvcadm -d \"" + svc_name + "\""
+    commandstring = "clusvcadm -q -d \"" + svc_name + "\""
     errorstring = _(" An error has occurred while disabling this service. Please check logs for details.")
     self.grayOutMainWindow()
     fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring, self.ungrayOutAndResetMainWindow)
@@ -278,7 +278,7 @@ class MgmtTab:
     svc_title = model.get_value(iter,S_TITLE_COL)
     if svc_title == "" or svc_title == None:
       return
-    commandstring = "clusvcadm -R \"" + svc_name + "\""
+    commandstring = "clusvcadm -q -R \"" + svc_name + "\""
     errorstring = ""
     self.grayOutMainWindow()
     fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring,self.ungrayOutAndResetMainWindow)
@@ -311,6 +311,7 @@ class MgmtTab:
     for i in range(row):
         iter=model.iter_next(iter)
     m_name = model.get_value (iter, NAME_COL)
+    
     #if s.getStateString() == 'Disabled':
     ###XXX Fix - find out how to get state info on service here
     s_name, s_state = selection_data.data.split(' -- ')
@@ -318,12 +319,12 @@ class MgmtTab:
         return
     if s_state.strip().lower() == 'disabled':
       ### Service is 'Disabled' - just 'enable' on new member
-      commandstring = "clusvcadm -e \"" + s_name + "\" -m " + m_name
+      commandstring = "clusvcadm -q -e \"" + s_name + "\" -m " + m_name
       self.grayOutMainWindow()
       fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring1, self.ungrayOutAndResetMainWindow)
     else:
       ### Service is not 'Disabled' - restart it on new member
-      commandstring = "clusvcadm -r \"" + s_name + "\" -m " + m_name
+      commandstring = "clusvcadm -q -r \"" + s_name + "\" -m " + m_name
       self.grayOutMainWindow()
       fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring2, self.ungrayOutAndResetMainWindow)
                                                                             
