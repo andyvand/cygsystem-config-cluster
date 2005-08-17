@@ -92,7 +92,7 @@ def __execWithCaptureErrorStatus(command, argv, searchPath = 0, root = '/', stdi
     except OSError, (errno, msg):
         print __name__, "waitpid:", msg
     
-    if os.WIFEXITED(status) and (os.WEXITSTATUS(status) == 0):
+    if os.WIFEXITED(status):
         status = os.WEXITSTATUS(status)
     else:
         status = -1

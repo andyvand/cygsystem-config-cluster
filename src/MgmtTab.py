@@ -296,7 +296,7 @@ class MgmtTab:
   def ungrayOutAndResetMainWindow(self):
     self.winMain.window.set_cursor(None)
     self.winMain.set_sensitive(True)
-    self.prep_service_tree()
+    self.onTimer()
 
   def dest_drag_data_received(self,w, context, x, y, selection_data, info, time):
     errorstring1 = ""
