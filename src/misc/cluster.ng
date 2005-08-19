@@ -514,9 +514,16 @@
         <group>
          <attribute name="blade"/>
         </group>
-        <!-- xCAT, GNBD, manual -->
+        <!-- xCAT, manual -->
         <group>
          <attribute name="nodename"/>
+        </group>
+	<!-- GNBD -->
+        <group>
+         <attribute name="nodename"/>
+	 <optional>
+	  <attribute name="ipaddr"/>
+	 </optional>
         </group>
         <!-- bullpap -->
         <group>
