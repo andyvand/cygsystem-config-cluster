@@ -52,6 +52,7 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_mcdata":_("McDATA SAN Switch"),
               "fence_egenera":_("Egenera SAN Controller"),
               "fence_bullpap":_("Bull PAP"),
+              "fence_drac":_("DRAC"),
               "fence_ipmilan":_("IPMI Lan"),
               "fence_manual":_("Manual Fencing") }
 
@@ -67,6 +68,7 @@ FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_egenera":["name","cserver"],
               "fence_ipmilan":["name","ipaddr","login","passwd"],
               "fence_bullpap":["name","ipaddr","login","passwd"],
+              "fence_drac":["name","ipaddr","login","passwd"],
               "fence_manual":["name"] }
 
 FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
@@ -81,6 +83,7 @@ FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
               "fence_egenera":["lpan","pserver"],
               "fence_ipmilan":[],
               "fence_bullpap":["domain"],
+              "fence_drac":[],
               "fence_manual":[] }
 
 PRETTY_NAME_ATTRS = {"port":_("Port"),
@@ -155,6 +158,7 @@ class FenceHandler:
               "fence_vixel":self.pop_vixel,
               "fence_gnbd":self.pop_gnbd,
               "fence_ilo":self.pop_ilo,
+              "fence_drac":self.pop_drac,
               "fence_sanbox2":self.pop_sanbox2,
               "fence_bladecenter":self.pop_bladecenter,
               "fence_mcdata":self.pop_mcdata,
@@ -169,6 +173,7 @@ class FenceHandler:
               "fence_vixel":self.pop_vixel_fd,
               "fence_gnbd":self.pop_gnbd_fd,
               "fence_ilo":self.pop_ilo_fd,
+              "fence_drac":self.pop_drac_fd,
               "fence_sanbox2":self.pop_sanbox2_fd,
               "fence_bladecenter":self.pop_bladecenter_fd,
               "fence_mcdata":self.pop_mcdata_fd,
@@ -183,6 +188,7 @@ class FenceHandler:
               "fence_vixel":self.val_vixel,
               "fence_gnbd":self.val_gnbd,
               "fence_ilo":self.val_ilo,
+              "fence_drac":self.val_drac,
               "fence_sanbox2":self.val_sanbox2,
               "fence_bladecenter":self.val_bladecenter,
               "fence_mcdata":self.val_mcdata,
@@ -197,6 +203,7 @@ class FenceHandler:
               "fence_vixel":self.val_vixel_fd,
               "fence_gnbd":self.val_gnbd_fd,
               "fence_ilo":self.val_ilo_fd,
+              "fence_drac":self.val_drac_fd,
               "fence_sanbox2":self.val_sanbox2_fd,
               "fence_bladecenter":self.val_bladecenter_fd,
               "fence_mcdata":self.val_mcdata_fd,
@@ -230,6 +237,9 @@ class FenceHandler:
     self.brocade_port.set_text(attrs["port"])
  
   def pop_ilo(self, attrs):
+    pass
+ 
+  def pop_drac(self, attrs):
     pass
  
   def pop_vixel(self, attrs):
@@ -290,6 +300,10 @@ class FenceHandler:
     self.ilo_fd_login.set_text("")
     self.ilo_fd_passwd.set_text("")
     self.ilo_fd_hostname.set_text("")
+    self.drac_fd_name.set_text("")
+    self.drac_fd_login.set_text("")
+    self.drac_fd_passwd.set_text("")
+    self.drac_fd_ip.set_text("")
     self.vixel_fd_name.set_text("")
     self.vixel_fd_ip.set_text("")
     self.vixel_fd_passwd.set_text("")
@@ -344,6 +358,12 @@ class FenceHandler:
     self.ilo_fd_login.set_text(attrs["login"])
     self.ilo_fd_passwd.set_text(attrs["passwd"])
     self.ilo_fd_hostname.set_text(attrs["hostname"])
+
+  def pop_drac_fd(self, attrs):
+    self.drac_fd_name.set_text(attrs["name"])
+    self.drac_fd_login.set_text(attrs["login"])
+    self.drac_fd_passwd.set_text(attrs["passwd"])
+    self.drac_fd_ip.set_text(attrs["ipaddr"])
 
  
   def pop_vixel_fd(self, attrs):
@@ -438,6 +458,11 @@ class FenceHandler:
     self.ilo_fd_login = self.fence_xml.get_widget('entry29')
     self.ilo_fd_passwd = self.fence_xml.get_widget('entry30')
     self.ilo_fd_hostname = self.fence_xml.get_widget('entry31')
+
+    self.drac_fd_name = self.fence_xml.get_widget('entry57')
+    self.drac_fd_login = self.fence_xml.get_widget('entry59')
+    self.drac_fd_passwd = self.fence_xml.get_widget('entry60')
+    self.drac_fd_ip = self.fence_xml.get_widget('entry58')
 
     self.sanbox2_fd_name = self.fence_xml.get_widget('entry32')
     self.sanbox2_fd_ip = self.fence_xml.get_widget('entry33')
@@ -595,6 +620,36 @@ class FenceHandler:
     fields["hostname"] = self.ilo_fd_hostname.get_text()
     fields["login"] = self.ilo_fd_login.get_text()
     fields["passwd"] = self.ilo_fd_passwd.get_text()
+
+    return fields
+ 
+ 
+  def val_drac_fd(self, name):
+    rectify_fence_name = FALSE
+    if self.drac_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.drac_fd_name)
+    if name != self.drac_fd_name.get_text():
+      res = self.check_unique_fd_name(self.drac_fd_name.get_text())
+      if res == FALSE:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = TRUE
+
+    if self.drac_fd_login.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+    if self.drac_fd_passwd.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+    if self.drac_fd_ip.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_IP)
+
+    if rectify_fence_name == TRUE:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.drac_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.drac_fd_name.get_text()
+    fields["ipaddr"] = self.drac_fd_ip.get_text()
+    fields["login"] = self.drac_fd_login.get_text()
+    fields["passwd"] = self.drac_fd_passwd.get_text()
 
     return fields
  
