@@ -625,15 +625,15 @@ class FenceHandler:
  
  
   def val_drac_fd(self, name):
-    rectify_fence_name = FALSE
+    rectify_fence_name = False
     if self.drac_fd_name.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_NAME)
     self.validateNCName(self.drac_fd_name)
     if name != self.drac_fd_name.get_text():
       res = self.check_unique_fd_name(self.drac_fd_name.get_text())
-      if res == FALSE:  #name is already used
+      if res == False:  #name is already used
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
-      rectify_fence_name = TRUE
+      rectify_fence_name = True
 
     if self.drac_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
@@ -642,7 +642,7 @@ class FenceHandler:
     if self.drac_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
 
-    if rectify_fence_name == TRUE:
+    if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.drac_fd_name.get_text())
 
     fields = {}
@@ -958,6 +958,12 @@ class FenceHandler:
     return fields
 
   def val_ilo(self):
+
+    fields = {}
+
+    return fields
+
+  def val_drac(self):
 
     fields = {}
 
