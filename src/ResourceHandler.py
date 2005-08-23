@@ -459,7 +459,7 @@ class ResourceHandler:
 
   def val_fs(self, *argname):
     name = argname[0]
-    fs_name = self.fs_name.get_text()
+    fs_name = self.fs_name.get_text().strip()
     if fs_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
 
@@ -469,7 +469,7 @@ class ResourceHandler:
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
       
     else:
-      if name != gfs_name:
+      if name != fs_name:
         res = self.check_unique_fs_name(fs_name)
         if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
