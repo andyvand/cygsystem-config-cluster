@@ -469,7 +469,7 @@ class ResourceHandler:
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
       
     else:
-      if name != fs_name:
+       if name != fs_name:
         res = self.check_unique_fs_name(fs_name)
         if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
