@@ -182,8 +182,16 @@ class ResourceHandler:
       self.gfs_device.set_text(attrs["device"])
     except KeyError, e:
       self.gfs_host.set_text("")
-
-
+    
+    try:
+      force = attrs["force_unmount"]
+      if force == "1" or force == "yes":
+        self.gfs_force_unmount.set_active(True)
+      else:
+        self.gfs_force_unmount.set_active(False)
+    except KeyError, e:
+      self.gfs_force_unmount.set_active(False)
+    
     try:
       self.gfs_options.set_text(attrs["options"])
     except KeyError, e:
@@ -193,18 +201,31 @@ class ResourceHandler:
     self.fs_name.set_text(attrs["name"])
     self.fs_mnt.set_text(attrs["mountpoint"])
     self.fs_device.set_text(attrs["device"])
-   
+    
     type = attrs["fstype"] 
-    y = (-1)
-    menu = self.fs_optionmenu.get_menu()
-    for item in menu.get_children():
-      y = y + 1
-      children = item.get_children()
-      if children:
-        if item.get_children()[0].get_text() == type:
-          break
-    self.fs_optionmenu.set_history(y) 
-
+    model = self.fs_combo.get_model()
+    iter = model.get_iter_first()
+    while iter != None:
+      if model.get_value(iter, 0) == type:
+        self.fs_combo.set_active_iter(iter)
+        break
+      iter = model.iter_next(iter)
+    
+    try:
+      force = attrs["force_unmount"]
+      if force == "1" or force == "yes":
+        self.fs_force_unmount.set_active(True)
+      else:
+        self.fs_force_unmount.set_active(False)
+    except KeyError, e:
+      self.fs_force_unmount.set_active(False)
+    
+    try:
+      self.fs_options.set_text(attrs["options"])
+    except KeyError, e:
+      self.fs_options.set_text("")
+    
+  
   def clear_rc_forms(self):
 
     self.ip.clear()
@@ -223,7 +244,10 @@ class ResourceHandler:
     self.fs_name.set_text("")
     self.fs_mnt.set_text("")
     self.fs_device.set_text("")
-
+    self.fs_combo.set_active_iter(self.fs_combo.get_model().get_iter_first())
+    self.fs_force_unmount.set_active(False)
+    self.fs_options.set_text('')
+    
     self.netfs_name.set_text("")
     self.netfs_mnt.set_text("")
     self.netfs_host.set_text("")
@@ -235,6 +259,7 @@ class ResourceHandler:
     self.gfs_name.set_text("")
     self.gfs_mnt.set_text("")
     self.gfs_device.set_text("")
+    self.gfs_force_unmount.set_active(False)
     self.gfs_options.set_text("")
 
 
@@ -453,7 +478,12 @@ class ResourceHandler:
     fields["device"] = device
     options = self.gfs_options.get_text()
     fields["options"] = options
-
+    if self.gfs_force_unmount.get_active():
+      force = '1'
+    else:
+      force = '0'
+    fields['force_unmount'] = force
+    
     return fields
 
 
@@ -476,14 +506,26 @@ class ResourceHandler:
 
     fields = {}
     fields["name"] = fs_name
+    
     mntp = self.fs_mnt.get_text()
     fields["mountpoint"] = mntp
+    
     device = self.fs_device.get_text()
     fields["device"] = device
-    fstypelabel = self.fs_optionmenu.get_children()[0]
-    fstype = fstypelabel.get_text()
+    
+    iter = self.fs_combo.get_active_iter()
+    fstype = self.fs_combo.get_model().get_value(iter, 0)
     fields["fstype"] = fstype
-
+    
+    if self.fs_force_unmount.get_active():
+      force = '1'
+    else:
+      force = '0'
+    fields['force_unmount'] = force
+    
+    options = self.fs_options.get_text().strip()
+    fields['options'] = options
+    
     return fields
 
   def process_widgets(self):
@@ -517,13 +559,16 @@ class ResourceHandler:
     self.gfs_name = self.rc_xml.get_widget('gfs_name')
     self.gfs_mnt = self.rc_xml.get_widget('entry14')
     self.gfs_device = self.rc_xml.get_widget('entry15')
-    self.gfs_options = self.rc_xml.get_widget('entry21')
-
+    self.gfs_options = self.rc_xml.get_widget('gfs_options')
+    self.gfs_force_unmount = self.rc_xml.get_widget('gfs_force_unmount')
+    
     self.fs_name = self.rc_xml.get_widget('entry11')
-    self.fs_optionmenu = self.rc_xml.get_widget('optionmenu2')
     self.fs_mnt = self.rc_xml.get_widget('entry12')
     self.fs_device = self.rc_xml.get_widget('fs_dev')
-
+    self.fs_combo = self.rc_xml.get_widget('combobox1')
+    self.fs_force_unmount = self.rc_xml.get_widget('fs_force_unmount')
+    self.fs_options = self.rc_xml.get_widget('fs_options')
+  
   def set_model(self, model_builder):
     self.model_builder = model_builder
 
