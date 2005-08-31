@@ -50,6 +50,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Aug 31 2005 Jim Parsons <jparsons@redhat.com> 1.0.14-1
+  -  Version Bump.
 * Wed Aug 17 2005 Stanko Kupcevic <kupcevic@redhat.com> 1.0.13-1
   -  Fixes for bz161344, 160264, 160127, 163673, 163237, 160240, 164407, 159965, 165130, 165140, 161974, 165169, 164936, 165184, 164857, 166663, 166140, and validation of IP addresses.
 * Tue Jun 07 2005 Jim Parsons <jparsons@redhat.com> 1.0.12-1
