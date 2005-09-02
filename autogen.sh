@@ -48,8 +48,6 @@ esac
 glib-gettextize --copy --force
 intltoolize --copy -f --automake
 
-patch -p0 < intltool.patch
-
 autoconf
 aclocal-1.7 -I . $ACLOCAL_FLAGS
 aclocal-1.7
