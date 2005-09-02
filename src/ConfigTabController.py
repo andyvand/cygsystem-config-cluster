@@ -1461,7 +1461,8 @@ class ConfigTabController:
 
     #Made it past unique name check -- ready to add service
     service = Service()
-    service.addAttribute("name",svc_name)
+    service.addAttribute("name", svc_name)
+    service.addAttribute("autostart", "1") #Have autostart set by default
     rm_ptr = self.model_builder.getResourceManagerPtr()
     rm_ptr.addChild(service)
     self.svc_add_dlg.hide()
