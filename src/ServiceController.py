@@ -148,19 +148,17 @@ class ServiceController:
         m = gtk.MenuItem(fdom.getName())
         m.show()
         menu.append(m)
-    self.prepset = True
     self.svc_fdom_optionmenu.set_menu(menu)
 
   def on_fdom_option_changed(self, *args):
     if self.prepset == True:
-      self.prepset = False
       return
     else:
       if self.svc_fdom_optionmenu.get_history() == 0:
         retval = self.current_service.removeAttribute("domain")
-        return
-      lbl = self.svc_fdom_optionmenu.get_children()[0]
-      self.current_service.addAttribute("domain",lbl.get_text())
+      else:
+        lbl = self.svc_fdom_optionmenu.get_children()[0]
+        self.current_service.addAttribute("domain",lbl.get_text())
       self.model_builder.setModified()
 
     
@@ -290,6 +288,8 @@ class ServiceController:
 
 
   def prep_service_panel(self, svc):
+    self.prepset = True
+    
     self.current_service = svc
     if self.current_service != None:  
       self.service_name_label.set_markup("<span><b>" + svc.getName() + "</b></span>")
@@ -310,7 +310,9 @@ class ServiceController:
 
       self.populate_fdom_optionmenu()
       self.prep_service_tree()
-
+      
+      self.prepset = False
+  
   def prep_service_tree(self):
     resources = self.current_service.getChildren()
     treemodel = self.svc_treeview.get_model()
@@ -327,7 +329,6 @@ class ServiceController:
     self.del_rc_button.set_sensitive(False)
     self.edit_rc_button.set_sensitive(False)
 
-    #self.prepset = True
     domain = self.current_service.getAttribute("domain")
     if domain == None:
       self.svc_fdom_optionmenu.set_history(0)
@@ -341,7 +342,7 @@ class ServiceController:
           if item.get_children()[0].get_text() == domain:
             break
       self.svc_fdom_optionmenu.set_history(y)
-
+    
   def add_tree_children(self, obj, iter):
     treemodel = self.svc_treeview.get_model()
     if obj.isRefObject() == True:
@@ -455,6 +456,9 @@ class ServiceController:
     self.shared_rc_panel.hide()
 
   def on_exclusive_cbox_changed(self, *args):
+    if self.prepset == True:
+      return
+    self.model_builder.setModified()
     if self.exclusive_cbox.get_active() == True:
       self.current_service.addAttribute(EXCLUSIVE_STR,"1")
     else:
@@ -463,6 +467,9 @@ class ServiceController:
         self.current_service.removeAttribute(EXCLUSIVE_STR)
                                                                                 
   def on_autostart_cbox_changed(self, *args):
+    if self.prepset == True:
+      return
+    self.model_builder.setModified()
     if self.autostart_cbox.get_active() == True:
       self.current_service.addAttribute(AUTOSTART_STR,"1")
     else:
