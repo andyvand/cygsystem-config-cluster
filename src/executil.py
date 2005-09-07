@@ -60,8 +60,7 @@ def __execWithCaptureErrorStatus(command, argv, searchPath = 0, root = '/', stdi
             os.execvp(command, argv)
         else:
             os.execv(command, argv)
-        
-        sys.exit(1)
+        # will never get here :)
     
     os.close(write)
     os.close(write_err)

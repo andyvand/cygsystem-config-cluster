@@ -35,8 +35,6 @@ class ForkedCommand:
     self.pbar_timer = 0
     self.be_patient_dialog = 0
     self.system_command_retval = 0
-    self.fd_read = 0
-    self.fd_write = 0
     EXT_PID = 0
     SIGCHLD_RECIEVED = 0
 
@@ -48,12 +46,7 @@ class ForkedCommand:
       self.errorstring = errorstring
 
     self.post_fork_command = post_fork_command
-
-    #This pipe is for the parent process to receive
-    #the result of the system call in the child process,
-    #and take appropriate action if an error has occurred.
-    self.fd_read, self.fd_write = os.pipe()
-
+    
     try:
       EXT_PID = os.fork()
     except OSError:
@@ -68,15 +61,13 @@ class ForkedCommand:
                                                                           
     else:
       #child process
-      self.system_command_retval = os.system(self.commandstring)
-
-      #let parent process know result of system call through IPC
-      if(self.system_command_retval):
-        os.write(self.fd_write, "failure")
+      ret = os.system(self.commandstring)
+      if os.WIFEXITED(ret):
+        # child exited normaly
+        status = os.WEXITSTATUS(ret)
       else:
-        os.write(self.fd_write, "success")
-
-      os._exit(self.system_command_retval)
+        status = -1
+      os._exit(status)
 
   def showDialog(self,message):
     global SIGCHLD_RECIEVED
@@ -107,9 +98,9 @@ class ForkedCommand:
                                                                             
   def progress_bar_timeout(self):
     global SIGCHLD_RECIEVED
-
-    self.pbar.pulse()
+    
     if (SIGCHLD_RECIEVED == 0):
+      self.pbar.pulse()
       return True
     else:
       return self.cleanup()
@@ -119,36 +110,41 @@ class ForkedCommand:
     global EXT_PID
 
     my_pid = os.getpid()
-
-    #Stop caring about SIGCHLD...
-    #signal.signal(signal.SIGCHLD, signal.SIG_DFL)
-
+    
+    reaped, status = -1, -1
     try:
-      (reaped, status) = os.waitpid((-1),0)
+      (reaped, status) = os.waitpid(EXT_PID, os.WNOHANG)
     except IOError:
         print "Spurious IO signal error in waitpid attempt"
     except OSError:
         print "Spurious OS signal error in waitpid attempt"
 
     if(reaped == EXT_PID):
-      SIGCHLD_RECIEVED = 1
-
-      #Check how things went with the system call
-      first_char = os.read(self.fd_read, 1)
-      if(first_char == 's'):
-        self.system_command_retval = 0
+      if os.WIFEXITED(status):
+        # child exited normaly
+        SIGCHLD_RECIEVED = 1
+        self.system_command_retval = os.WEXITSTATUS(status)
+        
+      elif WIFSIGNALED(status):
+        # child terminated due to being signaled
+        SIGCHLD_RECIEVED = 1
+        self.system_command_retval = -1
+        
       else:
-        self.system_command_retval = 1
-   
+        # child stopped, continue waiting for its death
+        print "Child stopped, waiting for it; it might take long time"
+    
+  
   def post_fork(self):
     if(self.post_fork_command):
       apply(self.post_fork_command)
 
   def cleanup(self):
     global SIGCHLD_RECIEVED
-    SIGCHLD_RECIEVED = 0
-
+    
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+    SIGCHLD_RECIEVED = 0
+    
     if(self.timeout_id != 0):
       gobject.source_remove(self.timeout_id)
     if(self.pbar_timer != 0):
