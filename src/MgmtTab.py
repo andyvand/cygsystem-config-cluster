@@ -276,9 +276,16 @@ class MgmtTab:
       return
     svc_name = model.get_value(iter, S_NAME_COL)
     svc_title = model.get_value(iter,S_TITLE_COL)
-    if svc_title == "" or svc_title == None:
-      return
-    commandstring = "clusvcadm -q -R \"" + svc_name + "\""
+    svc_state = model.get_value(iter, S_STATE_COL)
+    if '<span' in svc_state:
+        svc_state = svc_state.replace('</span>', '')
+        svc_state = svc_state.replace(svc_state[svc_state.find('<span'):svc_state.find('>')+1], '').strip()
+    if svc_title == "" or svc_title == None or svc_name == '' or svc_name == None or svc_state == '' or svc_state == None:
+        return
+    if svc_state.strip().lower() == 'disabled':
+        commandstring = "clusvcadm -q -e \"" + svc_name + "\""
+    else:
+        commandstring = "clusvcadm -q -R \"" + svc_name + "\""
     errorstring = ""
     self.grayOutMainWindow()
     fm = ForkedCommand(commandstring, PATIENCE_MESSAGE, errorstring,self.ungrayOutAndResetMainWindow)
