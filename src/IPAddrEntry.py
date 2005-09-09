@@ -11,28 +11,53 @@ class IP (gtk.HBox):
     self.e1.set_property ("width-chars", 3)
     self.e1.set_property ("max_length", 3)
     self.pack_start (self.e1, False, False, 0)
-    self.pack_start (gtk.Label ('-'), False, False, 0)
+    self.pack_start (gtk.Label ('.'), False, False, 0)
 
     self.e2 = gtk.Entry ()
     self.e2.set_property ("xalign", 1.0)
     self.e2.set_property ("width-chars", 3)
     self.e2.set_property ("max_length", 3)
     self.pack_start (self.e2, False, False, 0)
-    self.pack_start (gtk.Label ('-'), False, False, 0)
+    self.pack_start (gtk.Label ('.'), False, False, 0)
 
     self.e3 = gtk.Entry ()
     self.e3.set_property ("xalign", 1.0)
     self.e3.set_property ("width-chars", 3)
     self.e3.set_property ("max_length", 3)
     self.pack_start (self.e3, False, False, 0)
-    self.pack_start (gtk.Label ('-'), False, False, 0)
+    self.pack_start (gtk.Label ('.'), False, False, 0)
 
     self.e4 = gtk.Entry ()
     self.e4.set_property ("xalign", 1.0)
     self.e4.set_property ("width-chars", 3)
     self.e4.set_property ("max_length", 3)
     self.pack_start (self.e4, False, False, 0)
+    
+    self.e1.connect('key-press-event', self.key_press)
+    self.e2.connect('key-press-event', self.key_press)
+    self.e3.connect('key-press-event', self.key_press)
+    self.e4.connect('key-press-event', self.key_press)
 
+  def key_press(self, obj, event, *args):
+    change_focus = False
+    stop_event = True
+    
+    ch = event.string
+    if ch in '0123456789':
+      stop_event = False
+    elif ch == '.':
+      change_focus = True
+    
+    if change_focus:
+      if obj == self.e1:
+        self.e2.grab_focus()
+      elif obj == self.e2:
+        self.e3.grab_focus()
+      elif obj == self.e3:
+        self.e4.grab_focus()
+    return stop_event
+      
+    
   def clear(self):
     self.e1.set_text("")
     self.e2.set_text("")
