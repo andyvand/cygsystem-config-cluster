@@ -67,7 +67,7 @@ S_NAME_COL = 5
 
 #python_code_targets = [('execable_python', 0, 0),
 #                       ('pickled_python', 0, 1)];
-python_code_targets = [('system-config-cluster_service_string', 0, 0)]
+python_code_targets = [('system-config-cluster/service_string', 0, 0)]
 
 ############################################
 class MgmtTab:
