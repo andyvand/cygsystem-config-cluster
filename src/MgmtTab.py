@@ -65,8 +65,9 @@ S_LASTOWNER_COL = 3
 S_RESTARTS_COL = 4
 S_NAME_COL = 5
 
-python_code_targets = [('execable_python', 0, 0),
-                       ('pickled_python', 0, 1)];
+#python_code_targets = [('execable_python', 0, 0),
+#                       ('pickled_python', 0, 1)];
+python_code_targets = [('system-config-cluster_service_string', 0, 0)]
 
 ############################################
 class MgmtTab:
@@ -353,5 +354,5 @@ class MgmtTab:
             s_state = s_state.replace(s_state[s_state.find('<span'):s_state.find('>')+1], '').strip()
       except:
         pass
-    selection_data.set(selection_data.target, 0, s_name + ' -- ' + s_state)
+    selection_data.set(selection_data.target, 8, s_name + ' -- ' + s_state)
     return
