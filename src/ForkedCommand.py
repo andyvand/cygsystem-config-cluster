@@ -76,10 +76,16 @@ class ForkedCommand:
         return self.cleanup()
  
     self.be_patient_dialog = gtk.Dialog()
+    self.be_patient_dialog.set_modal(True)
+    self.be_patient_dialog.connect("response", self.__on_delete_event)
+    self.be_patient_dialog.connect("close", self.__on_delete_event)
+    self.be_patient_dialog.connect("delete_event", self.__on_delete_event)
+    
+    self.be_patient_dialog.set_has_separator(False)
+    
     label = gtk.Label(message)
     self.be_patient_dialog.vbox.pack_start(label, True, True, 0)
-    self.be_patient_dialog.set_modal(True)
-                                                                            
+    
     #Create an alignment object that will center the pbar
     align = gtk.Alignment(0.5, 0.5, 0, 0)
     self.be_patient_dialog.vbox.pack_start(align, False, False, 5)
@@ -157,7 +163,10 @@ class ForkedCommand:
       self.errorMessage(self.errorstring)
     self.post_fork()
     return 0
-
+  
+  def __on_delete_event(self, *args):
+    return True
+  
   def errorMessage(self, message):
     dlg = gtk.MessageDialog(None, 0, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
                             message)
