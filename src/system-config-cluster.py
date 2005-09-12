@@ -404,6 +404,7 @@ class basecluster:
     self.lock_method_dlg.connect("delete_event", self.lock_method_dlg_delete)
     self.glade_xml.get_widget('okbutton17').connect('clicked', self.lock_ok)
     self.no_conf_dlg = self.glade_xml.get_widget('no_conf')
+    self.no_conf_dlg.connect("delete_event",self.on_no_conf_dlg_delete)
     self.no_conf_label = self.glade_xml.get_widget('no_conf_label')
     self.glade_xml.get_widget('no_conf_create').connect('clicked',self.on_no_conf_create)
     self.glade_xml.get_widget('no_conf_open').connect('clicked',self.on_no_conf_open)
@@ -511,6 +512,9 @@ class basecluster:
   def mcast_ip_dlg_delete(self, *args):
     self.mcast_ip_dlg.hide()
     return True
+
+  def on_no_conf_dlg_delete(self, *args):
+    sys.exit(0)
 
 #############################################################
 def initGlade():

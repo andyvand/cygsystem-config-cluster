@@ -145,7 +145,10 @@ class ServiceController:
       m.show()
       menu.append(m)
       for fdom in faildoms:
-        m = gtk.MenuItem(fdom.getName())
+        namestr = fdom.getName()
+        namestr = namestr.replace("_","__")
+
+        m = gtk.MenuItem(namestr)
         m.show()
         menu.append(m)
     self.svc_fdom_optionmenu.set_menu(menu)
