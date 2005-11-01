@@ -4600,11 +4600,12 @@ Failover Domain: </property>
 		  <property name="can_focus">True</property>
 		  <property name="editable">True</property>
 		  <property name="visibility">True</property>
-		  <property name="max_length">0</property>
-		  <property name="text" translatable="yes">alpha</property>
+		  <property name="max_length">15</property>
+		  <property name="text" translatable="yes">a</property>
 		  <property name="has_frame">True</property>
 		  <property name="invisible_char" translatable="yes">*</property>
 		  <property name="activates_default">False</property>
+		  <property name="width_chars">15</property>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
