@@ -4765,29 +4765,6 @@ Failover Domain: </property>
 	      </child>
 
 	      <child>
-		<widget class="GtkCheckButton" id="clean_start">
-		  <property name="visible">True</property>
-		  <property name="tooltip" translatable="yes">Used to prevent any start up fencing the daemon might do. When set, the daemon assumes all nodes are in a clean state to start.</property>
-		  <property name="can_focus">True</property>
-		  <property name="label" translatable="yes">Clean Start</property>
-		  <property name="use_underline">True</property>
-		  <property name="relief">GTK_RELIEF_NORMAL</property>
-		  <property name="focus_on_click">True</property>
-		  <property name="active">False</property>
-		  <property name="inconsistent">False</property>
-		  <property name="draw_indicator">True</property>
-		</widget>
-		<packing>
-		  <property name="left_attach">0</property>
-		  <property name="right_attach">1</property>
-		  <property name="top_attach">2</property>
-		  <property name="bottom_attach">3</property>
-		  <property name="x_options">fill</property>
-		  <property name="y_options"></property>
-		</packing>
-	      </child>
-
-	      <child>
 		<widget class="GtkEntry" id="post_join">
 		  <property name="visible">True</property>
 		  <property name="tooltip" translatable="yes">The number of seconds to wait before fencing any victims after a node joins the domain.</property>

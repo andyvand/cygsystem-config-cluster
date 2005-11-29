@@ -241,7 +241,6 @@ class ConfigTabController:
     self.config_version = self.glade_xml.get_widget('config_version')
     self.post_join = self.glade_xml.get_widget('post_join')
     self.post_fail = self.glade_xml.get_widget('post_fail')
-    self.clean_start = self.glade_xml.get_widget('clean_start')
     self.mcast_interface = self.glade_xml.get_widget('mcast_interface')
     self.mcast_interface_entry = self.glade_xml.get_widget('mcast_interface_entry')
 
@@ -375,10 +374,6 @@ class ConfigTabController:
     #set fence daemon fields
     self.post_join.set_text(fptr.getPostJoinDelay())
     self.post_fail.set_text(fptr.getPostFailDelay())
-    if fptr.getCleanStart() == "0":
-      self.clean_start.set_active(False)
-    else:
-      self.clean_start.set_active(True)
     self.cluster_props_dlg.show()
 
   def on_cluster_props_edit_ok(self, button):
@@ -388,7 +383,6 @@ class ConfigTabController:
     version = self.config_version.get_text()
     postjoin = self.post_join.get_text()
     postfail = self.post_fail.get_text()
-    cleanstart = self.clean_start.get_active()
 
     if name == "":
       self.errorMessage(NEED_CLUSTER_NAME)
@@ -451,10 +445,6 @@ class ConfigTabController:
     else:
       fdptr.addAttribute("post_fail_delay",POST_FAIL_DEFAULT)
 
-    if cleanstart == False:
-      fdptr.addAttribute("clean_start","0")
-    else:
-      fdptr.addAttribute("clean_start","1")
 
     self.model_builder.setModified()
     args = list()
@@ -727,7 +717,10 @@ class ConfigTabController:
       self.fi_optionmenu_hash[counter] = fd.getName()
       self.fi_agent_hash[fd.getName()] = fd.getAgentType()
       self.fi_prettyname_hash[counter] = pretty_name_hash[fd.getAgentType()]
-      m = gtk.MenuItem(fd.getName())
+      normalized_name = fd.getName()
+      normalized_name = normalized_name.replace('_','__')
+      m = gtk.MenuItem(normalized_name)
+      # m = gtk.MenuItem(fd.getName())
       counter = counter + 1
       m.show()
       menu.append(m)
