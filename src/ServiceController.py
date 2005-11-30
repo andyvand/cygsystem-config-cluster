@@ -306,7 +306,7 @@ class ServiceController:
 
       #and if necessary, set autostart checkbox
       autostart_state = svc.getAttribute(AUTOSTART_STR)
-      if (autostart_state == None) or (autostart_state == "0"):
+      if (autostart_state == "0"):
         self.autostart_cbox.set_active(False)
       else:
         self.autostart_cbox.set_active(True)
@@ -473,8 +473,8 @@ class ServiceController:
     if self.prepset == True:
       return
     self.model_builder.setModified()
-    if self.autostart_cbox.get_active() == True:
-      self.current_service.addAttribute(AUTOSTART_STR,"1")
+    if self.autostart_cbox.get_active() == False:
+      self.current_service.addAttribute(AUTOSTART_STR,"0")
     else:
       retval = self.current_service.getAttribute(AUTOSTART_STR)
       if retval != None:
