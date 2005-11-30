@@ -16,6 +16,7 @@ FD_PROVIDE_CSERVER = _("A cserver address must be provided for this Egenera Fenc
 FD_PROVIDE_IP = _("An IP address must be provided for this Fence Device")
 FD_PROVIDE_LOGIN = _("A login name must be provided for this Fence Device")
 FD_PROVIDE_PASSWD = _("A password must be provided for this Fence Device")
+FD_PROVIDE_DEVICE = _("A device path must be provided for this Fence Device")
 FI_PROVIDE_XCATNODENAME = _("An xCAT Nodename must be provided for this Fence")
 FI_PROVIDE_SWITCH = _("A switch address must be provided for this Fence")
 FI_PROVIDE_PORT = _("A port value must be provided for this Fence")
@@ -43,6 +44,7 @@ ILLEGAL_CHARS = [':', ' ']
 
 FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_wti":_("WTI Power Device"),
+              "fence_rps10":("RPS10 Serial Switch"),
               "fence_brocade":_("Brocade Switch"),
               "fence_vixel":_("Vixel SAN Switch"),
               "fence_gnbd":_("Global Network Block Device"),
@@ -58,6 +60,7 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
 
 FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_wti":["name","ipaddr","passwd"],
+              "fence_rps10":["name","device","port","owner"],
               "fence_brocade":["name","ipaddr","login","passwd"],
               "fence_vixel":["name","ipaddr","passwd"],
               "fence_gnbd":["name","servers"],
@@ -73,6 +76,7 @@ FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
 
 FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
               "fence_wti":["port"],
+              "fence_rps10":[],
               "fence_brocade":["port"],
               "fence_vixel":["port"],
               "fence_gnbd":[],
@@ -96,6 +100,8 @@ PRETTY_NAME_ATTRS = {"port":_("Port"),
                      "login":_("Login"),
                      "passwd":_("Password"),
                      "name":_("Name"),
+                     "device":_("Device"),
+                     "owner":_("Owner"),
                      "server":_("Server"),
                      "servers":_("Servers"),
                      "domain":_("Domain"),
@@ -154,6 +160,7 @@ class FenceHandler:
 
     self.fi_populate = {"fence_apc":self.pop_apc,
               "fence_wti":self.pop_wti,
+              "fence_rps10":self.pop_rps10,
               "fence_brocade":self.pop_brocade,
               "fence_vixel":self.pop_vixel,
               "fence_gnbd":self.pop_gnbd,
@@ -169,6 +176,7 @@ class FenceHandler:
 
     self.fd_populate = {"fence_apc":self.pop_apc_fd,
               "fence_wti":self.pop_wti_fd,
+              "fence_rps10":self.pop_rps10_fd,
               "fence_brocade":self.pop_brocade_fd,
               "fence_vixel":self.pop_vixel_fd,
               "fence_gnbd":self.pop_gnbd_fd,
@@ -184,6 +192,7 @@ class FenceHandler:
 
     self.fi_validate = {"fence_apc":self.val_apc,
               "fence_wti":self.val_wti,
+              "fence_rps10":self.val_rps10,
               "fence_brocade":self.val_brocade,
               "fence_vixel":self.val_vixel,
               "fence_gnbd":self.val_gnbd,
@@ -199,6 +208,7 @@ class FenceHandler:
 
     self.fd_validate = {"fence_apc":self.val_apc_fd,
               "fence_wti":self.val_wti_fd,
+              "fence_rps10":self.val_rps10_fd,
               "fence_brocade":self.val_brocade_fd,
               "fence_vixel":self.val_vixel_fd,
               "fence_gnbd":self.val_gnbd_fd,
@@ -233,6 +243,9 @@ class FenceHandler:
   def pop_wti(self, attrs):
     self.wti_port.set_text(attrs["port"])
  
+  def pop_rps10(self, attrs):
+    pass
+
   def pop_brocade(self, attrs):
     self.brocade_port.set_text(attrs["port"])
  
@@ -292,6 +305,10 @@ class FenceHandler:
     self.wti_fd_ip.set_text("")
     self.wti_fd_name.set_text("")
     self.wti_fd_passwd.set_text("")
+    self.rps10_fd_name.set_text("")
+    self.rps10_fd_device.set_text("")
+    self.rps10_fd_port.set_text("")
+    self.rps10_fd_owner.set_text("")
     self.brocade_fd_name.set_text("")
     self.brocade_fd_ip.set_text("")
     self.brocade_fd_login.set_text("")
@@ -346,6 +363,13 @@ class FenceHandler:
     self.wti_fd_name.set_text(attrs["name"])
     self.wti_fd_passwd.set_text(attrs["passwd"])
  
+  def pop_rps10_fd(self, attrs):
+    self.rps10_fd_name.set_text(attrs["name"])
+    self.rps10_fd_device.set_text(attrs["device"])
+    self.rps10_fd_port.set_text(attrs["port"])
+    ###FIXXX - populate owner field with other node name###
+
+
   def pop_brocade_fd(self, attrs):
     self.brocade_fd_name.set_text(attrs["name"])
     self.brocade_fd_ip.set_text(attrs["ipaddr"])
@@ -441,6 +465,11 @@ class FenceHandler:
     self.wti_fd_ip = self.fence_xml.get_widget('entry17')
     self.wti_fd_name = self.fence_xml.get_widget('entry16')
     self.wti_fd_passwd = self.fence_xml.get_widget('entry18')
+
+    self.rps10_fd_name = self.fence_xml.get_widget('entry61')
+    self.rps10_fd_device = self.fence_xml.get_widget('entry62')
+    self.rps10_fd_port = self.fence_xml.get_widget('entry63')
+    self.rps10_fd_owner = self.fence_xml.get_widget('entry64')
 
     self.brocade_fd_name = self.fence_xml.get_widget('entry19')
     self.brocade_fd_ip = self.fence_xml.get_widget('entry20')
@@ -560,6 +589,32 @@ class FenceHandler:
     fields["name"] = self.wti_fd_name.get_text()
     fields["ipaddr"] = self.wti_fd_ip.get_text()
     fields["passwd"] = self.wti_fd_passwd.get_text()
+
+    return fields
+ 
+  def val_rps10_fd(self, name):
+    rectify_fence_name = False
+    if self.rps10_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.rps10_fd_name)
+    if name != self.rps10_fd_name.get_text():
+      res = self.check_unique_fd_name(self.rps10_fd_name.get_text())
+      if res == False:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = True
+
+    if self.rps10_fd_device.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_DEVICE)
+    if self.rps10_fd_port.get_text() == "":
+        raise ValidationError('FATAL', FI_PROVIDE_PORT)
+
+    if rectify_fence_name == True:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.rps10_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.rps10_fd_name.get_text()
+    fields["device"] = self.rps10_fd_device.get_text()
+    fields["port"] = self.rps10_fd_port.get_text()
 
     return fields
  
@@ -931,6 +986,12 @@ class FenceHandler:
 
     fields = {}
     fields["port"] = self.wti_port.get_text()
+
+    return fields
+
+  def val_rps10(self):
+
+    fields = {}
 
     return fields
 
