@@ -50,6 +50,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Dec 1 2005 Jim Parsons <jparsons@redhat.com> 1.0.20-1
+  -  minor cleanup and version bump 
+* Mon Dec 1 2005 Jim Parsons <jparsons@redhat.com> 1.0.19-1
+  -  Version Bump
 * Mon Dec 1 2005 Jim Parsons <jparsons@redhat.com> 1.0.18-1
   -  Fix for Fix for bz159965 and added samba support for bz173527
 * Mon Nov 14 2005 Jim Parsons <jparsons@redhat.com> 1.0.17-1

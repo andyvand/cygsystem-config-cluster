@@ -207,7 +207,7 @@ class ResourceHandler:
 
   def pop_samba(self, attrs):
     self.samba_name.set_text(attrs["name"])
-    self.samba_sharename.set_text(attrs["sharename"])
+    self.samba_workgroup.set_text(attrs["workgroup"])
 
   def pop_fs(self, attrs):
     self.fs_name.set_text(attrs["name"])
@@ -261,7 +261,7 @@ class ResourceHandler:
     self.fs_options.set_text('')
 
     self.samba_name.set_text("")
-    self.samba_sharename.set_text("")
+    self.samba_workgroup.set_text("")
     
     self.netfs_name.set_text("")
     self.netfs_mnt.set_text("")
@@ -446,12 +446,12 @@ class ResourceHandler:
         if res == False:  #name already used for a samba
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
 
-    sharename = self.samba_sharename.get_text()
+    workgroup = self.samba_workgroup.get_text()
     
     fields = {}
     
     fields["name"] = samba_name
-    fields["sharename"] = sharename
+    fields["workgroup"] = workgroup
 
     return fields
 
@@ -586,7 +586,7 @@ class ResourceHandler:
     self.nfse_name = self.rc_xml.get_widget('entry7')
 
     self.samba_name = self.rc_xml.get_widget('entry24')
-    self.samba_sharename = self.rc_xml.get_widget('entry25')
+    self.samba_workgroup = self.rc_xml.get_widget('entry25')
 
     self.nfsc_name = self.rc_xml.get_widget('entry8')
     self.nfsc_target = self.rc_xml.get_widget('entry9')

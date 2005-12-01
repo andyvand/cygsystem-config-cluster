@@ -199,14 +199,14 @@ class MgmtTab:
 
   def prep_service_tree(self):
     treemodel = self.servicetree.get_model()
-    treemodel.clear()
-
     try:
-      services = self.command_handler.getServicesInfo()
+        services = self.command_handler.getServicesInfo()
     except CommandError, e:
-      retval = MessageLibrary.errorMessage(e.getMessage())
-      return
-
+        retval = MessageLibrary.errorMessage(e.getMessage())
+        treemodel.clear()
+        return
+    treemodel.clear()
+    
     if len(services) == 0:
       iter = treemodel.append(None)
       treemodel.set(iter, S_NAME_COL, "<span foreground=\"red\"><b>" + NO_SERVICES + "</b></span>")

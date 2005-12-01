@@ -36,6 +36,7 @@ NFSClient.py \
 NFSExport.py \
 NodeData.py	\
 PropertiesRenderer.py \
+Samba.py \
 Service.py	\
 ServiceController.py	\
 ServiceData.py	\
@@ -108,6 +109,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/NFSClient.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NFSExport.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NodeData.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Samba.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Service.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ServiceController.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ServiceData.py  $(DESTDIR)$(pkgdatadir)/
