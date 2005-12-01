@@ -42,6 +42,7 @@ ServiceData.py	\
 RefObject.py	\
 ResourceHandler.py \
 Resources.py \
+RHPL_execWithCaptureErrorStatus.py \
 Rm.py \
 Script.py \
 TagObject.py \
@@ -113,6 +114,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/RefObject.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ResourceHandler.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Resources.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/RHPL_execWithCaptureErrorStatus.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Rm.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Script.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/TagObject.py  $(DESTDIR)$(pkgdatadir)/

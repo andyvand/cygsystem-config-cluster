@@ -1,6 +1,9 @@
 
-import os, sys
-import select
+import gtk
+import time
+import threading
+
+import RHPL_execWithCaptureErrorStatus
 
 
 BASH_PATH='/bin/bash'
@@ -17,83 +20,29 @@ def execWithCaptureErrorStatus(bin, args):
     if len(args) > 0:
         for arg in args[1:]:
             command = command + ' ' + arg
-    return __execWithCaptureErrorStatus(BASH_PATH, [BASH_PATH, '-c', command])
+    ex = ExecutionThread(BASH_PATH, [BASH_PATH, '-c', command])
+    ex.start()
+    return ex.get_result()
 
 
-
-# to be moved back into rhpl when time arrives
-def __execWithCaptureErrorStatus(command, argv, searchPath = 0, root = '/', stdin = 0, catchfd = 1, catcherrfd = 2, closefd = -1):
-    if not os.access (root + command, os.X_OK):
-        raise RuntimeError, command + " can not be run"
+class ExecutionThread(threading.Thread):
     
-    (read, write) = os.pipe()
-    (read_err,write_err) = os.pipe()
-    
-    childpid = os.fork()
-    if (not childpid):
-        # child
-        if (root and root != '/'): os.chroot (root)
-        if isinstance(catchfd, tuple):
-            for fd in catchfd:
-                os.dup2(write, fd)
-        else:
-            os.dup2(write, catchfd)
-        os.close(write)
-        os.close(read)
+    def __init__(self, bin, args):
+        threading.Thread.__init__(self)
         
-        if isinstance(catcherrfd, tuple):
-            for fd in catcherrfd:
-                os.dup2(write_err, fd)
-        else:
-            os.dup2(write_err, catcherrfd)
-        os.close(write_err)
-        os.close(read_err)
-        
-        if closefd != -1:
-            os.close(closefd)
-        
-        if stdin:
-            os.dup2(stdin, 0)
-            os.close(stdin)
-        
-        if (searchPath):
-            os.execvp(command, argv)
-        else:
-            os.execv(command, argv)
-        # will never get here :)
+        self.__bin = bin
+        self.__args = args
+        self.__ret = ['', '', -1]
     
-    os.close(write)
-    os.close(write_err)
+    def run(self):
+        # call RHPL.execWithCaptureErrorStatus when moved into RHPL
+        self.__ret = RHPL_execWithCaptureErrorStatus.execWithCaptureErrorStatus(self.__bin, self.__args)
     
-    rc = ""
-    rc_err = ""
-    in_list = [read, read_err]
-    while len(in_list) != 0:
-        i,o,e = select.select(in_list, [], [])
-        for fd in i:
-            if fd == read:
-                s = os.read(read, 1000)
-                if s == '':
-                    in_list.remove(read)
-                rc = rc + s
-            if fd == read_err:
-                s = os.read(read_err, 1000)
-                if s == '':
-                    in_list.remove(read_err)
-                rc_err = rc_err + s
+    def get_result(self):
+        while self.isAlive():
+            time.sleep(0.1)
+            while gtk.events_pending():
+                gtk.main_iteration()
+        self.join()
+        return self.__ret
     
-    os.close(read)
-    os.close(read_err)
-    
-    status = -1
-    try:
-        (pid, status) = os.waitpid(childpid, 0)
-    except OSError, (errno, msg):
-        print __name__, "waitpid:", msg
-    
-    if os.WIFEXITED(status):
-        status = os.WEXITSTATUS(status)
-    else:
-        status = -1
-    
-    return (rc, rc_err, status)

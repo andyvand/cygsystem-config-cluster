@@ -23,6 +23,7 @@ from Script import Script
 from NFSClient import NFSClient
 from NFSExport import NFSExport
 from Fs import Fs
+from Samba import Samba
 from Multicast import Multicast
 from FenceDaemon import FenceDaemon
 from Netfs import Netfs
@@ -57,6 +58,7 @@ TAGNAMES={ 'cluster':Cluster,
            'failoverdomainnode':FailoverDomainNode,
            'ip':Ip,
            'fs':Fs,
+           'samba':Samba,
            'fence_daemon':FenceDaemon,
            'multicast':Multicast,
            'clusterfs':Clusterfs,

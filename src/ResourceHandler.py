@@ -31,6 +31,7 @@ RC_OPTS = {"ip":_("IP Address"),
            "nfsexport":_("NFS Export"),
            "netfs":_("NFS Mount"),
            "clusterfs":_("GFS"),
+           "samba":_("Samba Service"),
            "fs":_("File System") }
 
 class ResourceHandler:
@@ -56,12 +57,18 @@ class ResourceHandler:
     for child in children:
       child.reparent(self.rc_proxy_widget)
 
+    self.rc_container2 = self.rc_xml.get_widget('rc_container2')
+    children2 = self.rc_container2.get_children()
+    for child in children2:
+      child.reparent(self.rc_proxy_widget)
+
     self.rc_populate_hash = {"ip":self.pop_ip,
                              "script":self.pop_script,
                              "nfsclient":self.pop_nfsclient,
                              "nfsexport":self.pop_nfsexport,
                              "netfs":self.pop_netfs,
                              "clusterfs":self.pop_clusterfs,
+                             "samba":self.pop_samba,
                              "fs":self.pop_fs }
 
     self.rc_validate_hash = {"ip":self.val_ip,
@@ -70,6 +77,7 @@ class ResourceHandler:
                              "nfsexport":self.val_nfsexport,
                              "netfs":self.val_netfs,
                              "clusterfs":self.val_clusterfs,
+                             "samba":self.val_samba,
                              "fs":self.val_fs }
 
     self.process_widgets()
@@ -197,6 +205,10 @@ class ResourceHandler:
     except KeyError, e:
       self.gfs_options.set_text("")
 
+  def pop_samba(self, attrs):
+    self.samba_name.set_text(attrs["name"])
+    self.samba_sharename.set_text(attrs["sharename"])
+
   def pop_fs(self, attrs):
     self.fs_name.set_text(attrs["name"])
     self.fs_mnt.set_text(attrs["mountpoint"])
@@ -247,6 +259,9 @@ class ResourceHandler:
     self.fs_combo.set_active_iter(self.fs_combo.get_model().get_iter_first())
     self.fs_force_unmount.set_active(False)
     self.fs_options.set_text('')
+
+    self.samba_name.set_text("")
+    self.samba_sharename.set_text("")
     
     self.netfs_name.set_text("")
     self.netfs_mnt.set_text("")
@@ -412,6 +427,34 @@ class ResourceHandler:
 
     return fields
 
+  def val_samba(self, *argname):
+    name = argname[0]
+    samba_name = self.samba_name.get_text()
+    if samba_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    #Please see comments about name uniqueness in the val_script method
+
+    if name == None: #New resource...
+      res = self.check_unique_script_name(samba_name)
+      if res == False:  #name already used for a samba resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+      
+    else:
+      if name != samba_name:
+        res = self.check_unique_script_name(samba_name)
+        if res == False:  #name already used for a samba
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    sharename = self.samba_sharename.get_text()
+    
+    fields = {}
+    
+    fields["name"] = samba_name
+    fields["sharename"] = sharename
+
+    return fields
+
   def val_netfs(self, *argname):
     name = argname[0]
     netfs_name = self.netfs_name.get_text()
@@ -541,6 +584,9 @@ class ResourceHandler:
     #self.script_browse_button = self.rc_xml.get_widget('button1')
 
     self.nfse_name = self.rc_xml.get_widget('entry7')
+
+    self.samba_name = self.rc_xml.get_widget('entry24')
+    self.samba_sharename = self.rc_xml.get_widget('entry25')
 
     self.nfsc_name = self.rc_xml.get_widget('entry8')
     self.nfsc_target = self.rc_xml.get_widget('entry9')
