@@ -5,7 +5,7 @@ from BaseResource import BaseResource
 import gettext
 _ = gettext.gettext
 
-TAG_NAME = "samba"
+TAG_NAME = "smb"
 RESOURCE_TYPE = _("Samba Service: ")
 
 class Samba(BaseResource):

@@ -25,6 +25,14 @@ EXCLUSIVE_STR = "exclusive"
 
 AUTOSTART_STR = "autostart"
 
+RECOVERY_STR = "recovery"
+
+RESTART_STR = "restart"
+
+RELOCATE_STR = "relocate"
+
+DISABLE_STR = "disable"
+
 ###YUK! XXX make access to this static in ResourceHandler
 ###This is an awful copy
 RC_OPTS = {"ip":_("IP Address"),
@@ -115,6 +123,13 @@ class ServiceController:
 
     self.autostart_cbox = self.glade_xml.get_widget('autostart_cbox')
     self.autostart_cbox.connect('toggled',self.on_autostart_cbox_changed)
+
+    self.svc_restart_rbutton = self.glade_xml.get_widget('svc_restart')
+    self.svc_restart_rbutton.connect("toggled",self.on_recovery_radio_changed)
+    self.svc_relocate_rbutton = self.glade_xml.get_widget('svc_relocate')
+    self.svc_relocate_rbutton.connect("toggled",self.on_recovery_radio_changed)
+    self.svc_disable_rbutton = self.glade_xml.get_widget('svc_disable')
+    self.svc_disable_rbutton.connect("toggled",self.on_recovery_radio_changed)
 
     self.exclusive_cbox = self.glade_xml.get_widget('exclusive_cbox')
     self.exclusive_cbox.connect('toggled',self.on_exclusive_cbox_changed)
@@ -311,6 +326,20 @@ class ServiceController:
       else:
         self.autostart_cbox.set_active(True)
 
+      #We can't forget the radiogroup
+      recovery_attr = svc.getAttribute(RECOVERY_STR)
+      if recovery_attr != None:
+        recovery_attr = recovery_attr.lower()
+      if (recovery_attr == None) or (recovery_attr == RESTART_STR):
+        self.svc_restart_rbutton.set_active(True)
+      elif (recovery_attr == RELOCATE_STR):
+        self.svc_relocate_rbutton.set_active(True)
+      elif (recovery_attr == DISABLE_STR):
+        self.svc_disable_rbutton.set_active(True)
+      else:
+        self.svc_restart_rbutton.set_active(True)
+
+
       self.populate_fdom_optionmenu()
       self.prep_service_tree()
       
@@ -479,6 +508,16 @@ class ServiceController:
       retval = self.current_service.getAttribute(AUTOSTART_STR)
       if retval != None:
         self.current_service.removeAttribute(AUTOSTART_STR)
+
+  def on_recovery_radio_changed(self, *args):
+    if self.svc_restart_rbutton.get_active() == True:
+      self.current_service.addAttribute(RECOVERY_STR, RESTART_STR)
+    elif self.svc_relocate_rbutton.get_active() == True:
+      self.current_service.addAttribute(RECOVERY_STR, RELOCATE_STR)
+    elif self.svc_disable_rbutton.get_active() == True:
+      self.current_service.addAttribute(RECOVERY_STR, DISABLE_STR)
+
+    self.model_builder.setModified()
                                                                                 
   def on_shared_rc_cancel(self, button):
     self.shared_rc_panel.hide()

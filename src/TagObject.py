@@ -75,3 +75,12 @@ class TagObject:
 
   def isRefObject(self):
     return False
+
+  def searchTree(self, objlist, tagtype):
+    if self.TAG_NAME == tagtype:
+      objlist.append(self)
+    if len(self.children) > 0:
+      for child in self.children:
+        if child == None:
+          continue
+        child.searchTree(objlist, tagtype)

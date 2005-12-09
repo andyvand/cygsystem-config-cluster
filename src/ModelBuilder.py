@@ -58,7 +58,7 @@ TAGNAMES={ 'cluster':Cluster,
            'failoverdomainnode':FailoverDomainNode,
            'ip':Ip,
            'fs':Fs,
-           'samba':Samba,
+           'smb':Samba,
            'fence_daemon':FenceDaemon,
            'multicast':Multicast,
            'clusterfs':Clusterfs,
@@ -865,7 +865,11 @@ class ModelBuilder:
           break
           
     
- 
+  def searchObjectTree(self, tagtype):
+    objlist = list()
+    self.object_tree.searchTree(objlist, tagtype)
+
+    return objlist 
    
 if __name__ == "__main__":
   print "Starting main program"

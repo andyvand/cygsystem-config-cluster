@@ -7,14 +7,21 @@ import gtk
 import gtk.glade
 import MessageLibrary
 import ModelBuilder
+import binascii
 from ValidationError import ValidationError
 from IPAddrEntry import IP
+
+CRC32_MASK = 0xFFFF
 
 INSTALLDIR="/usr/share/system-config-cluster"
 
 NONE_PLACEHOLDER=_("None")
 
 RESOURCE_PROVIDE_NAME=_("Please provide a name for this resource.")
+
+FSID_PROVIDE_INT_VALUE=_("Please Provide an integer value only for File System ID")
+
+FSID_PROVIDE_UNIQUE_VALUE=_("Please Provide a unique value for File System ID; Another File System resource is already using this ID")
 
 RESOURCE_PROVIDE_UNIQUE_NAME=_("Please provide a unique name for this resource.")
 
@@ -31,7 +38,7 @@ RC_OPTS = {"ip":_("IP Address"),
            "nfsexport":_("NFS Export"),
            "netfs":_("NFS Mount"),
            "clusterfs":_("GFS"),
-           "samba":_("Samba Service"),
+           "smb":_("Samba Service"),
            "fs":_("File System") }
 
 class ResourceHandler:
@@ -68,7 +75,7 @@ class ResourceHandler:
                              "nfsexport":self.pop_nfsexport,
                              "netfs":self.pop_netfs,
                              "clusterfs":self.pop_clusterfs,
-                             "samba":self.pop_samba,
+                             "smb":self.pop_smb,
                              "fs":self.pop_fs }
 
     self.rc_validate_hash = {"ip":self.val_ip,
@@ -77,7 +84,7 @@ class ResourceHandler:
                              "nfsexport":self.val_nfsexport,
                              "netfs":self.val_netfs,
                              "clusterfs":self.val_clusterfs,
-                             "samba":self.val_samba,
+                             "smb":self.val_smb,
                              "fs":self.val_fs }
 
     self.process_widgets()
@@ -176,10 +183,12 @@ class ResourceHandler:
 
 
   def pop_clusterfs(self, attrs):
+    nameval = True
     try:
       self.gfs_name.set_text(attrs["name"])
     except KeyError, e:
       self.gfs_name.set_text("")
+      nameval = False
 
     try:
       self.gfs_mnt.set_text(attrs["mountpoint"])
@@ -189,7 +198,12 @@ class ResourceHandler:
     try:
       self.gfs_device.set_text(attrs["device"])
     except KeyError, e:
-      self.gfs_host.set_text("")
+      self.gfs_device.set_text("")
+    
+    try:
+      self.gfs_id.set_text(attrs["fsid"])
+    except KeyError, e:
+      self.gfs_id.set_text("")
     
     try:
       force = attrs["force_unmount"]
@@ -205,7 +219,7 @@ class ResourceHandler:
     except KeyError, e:
       self.gfs_options.set_text("")
 
-  def pop_samba(self, attrs):
+  def pop_smb(self, attrs):
     self.samba_name.set_text(attrs["name"])
     self.samba_workgroup.set_text(attrs["workgroup"])
 
@@ -231,6 +245,29 @@ class ResourceHandler:
         self.fs_force_unmount.set_active(False)
     except KeyError, e:
       self.fs_force_unmount.set_active(False)
+
+    try:
+      self.fs_id.set_text(attrs["fsid"])
+    except KeyError, e:
+      self.fs_id.set_text("")
+    
+    try:
+      fence = attrs["self_fence"]
+      if fence == "1" or fence == "yes":
+        self.fs_self_fence.set_active(True)
+      else:
+        self.fs_self_fence.set_active(False)
+    except KeyError, e:
+      self.fs_self_fence.set_active(False)
+    
+    try:
+      fsck = attrs["force_fsck"]
+      if fsck == "1" or fsck == "yes":
+        self.fs_force_fsck.set_active(True)
+      else:
+        self.fs_force_fsck.set_active(False)
+    except KeyError, e:
+      self.fs_force_fsck.set_active(False)
     
     try:
       self.fs_options.set_text(attrs["options"])
@@ -258,7 +295,10 @@ class ResourceHandler:
     self.fs_device.set_text("")
     self.fs_combo.set_active_iter(self.fs_combo.get_model().get_iter_first())
     self.fs_force_unmount.set_active(False)
+    self.fs_self_fence.set_active(False)
+    self.fs_force_fsck.set_active(False)
     self.fs_options.set_text('')
+    self.fs_id.set_text("")
 
     self.samba_name.set_text("")
     self.samba_workgroup.set_text("")
@@ -276,6 +316,7 @@ class ResourceHandler:
     self.gfs_device.set_text("")
     self.gfs_force_unmount.set_active(False)
     self.gfs_options.set_text("")
+    self.gfs_id.set_text("")
 
 
   #### Validation Methods
@@ -427,7 +468,7 @@ class ResourceHandler:
 
     return fields
 
-  def val_samba(self, *argname):
+  def val_smb(self, *argname):
     name = argname[0]
     samba_name = self.samba_name.get_text()
     if samba_name == "":
@@ -498,20 +539,28 @@ class ResourceHandler:
 
   def val_clusterfs(self, *argname):
     name = argname[0]
+    crc = None
     gfs_name = self.gfs_name.get_text()
     if gfs_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    self.check_unique_fsid(16)
 
     if name == None: #New resource...
       res = self.check_unique_gfs_name(gfs_name)
       if res == False:  #name already used for a script
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+      #need to generate fs_id for new clusterfs's
+      bits = binascii.crc32(gfs_name)
+      crc = abs(bits & CRC32_MASK) #puts val in 16 bit space
       
     else:
       if name != gfs_name:
         res = self.check_unique_gfs_name(gfs_name)
         if res == False:  #name already used for a script
           raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+        
 
     fields = {}
     fields["name"] = gfs_name
@@ -526,12 +575,40 @@ class ResourceHandler:
     else:
       force = '0'
     fields['force_unmount'] = force
+
+    if crc != None: #New resource
+      gfs_id = self.gfs_id.get_text()
+      if gfs_id != "": #If the user wants to set an initial value for fsid 
+        if gfs_id.isdigit():
+          if self.check_unique_fsid(gfs_id):
+            fields['fsid'] = self.gfs_id.get_text()
+          else:
+            raise ValidationError('FATAL',FSID_PROVIDE_UNIQUE_VALUE)
+        else:
+          raise ValidationError('FATAL',FSID_PROVIDE_INT_VALUE)
+      else: #This code searches fsid's and increments crc by 1 if found
+        while self.check_unique_fsid(str(crc)) == False:
+          crc = crc + 1
+ 
+        fields['fsid'] = str(crc)
+
+    else: #Not a new resource
+      gfs_id = self.gfs_id.get_text()
+      if gfs_id != "": #If the user wants to set an fsid 
+        if gfs_id.isdigit():
+          if self.check_unique_fsid(gfs_id):
+            fields['fsid'] = self.gfs_id.get_text()
+          else:
+            raise ValidationError('FATAL',FSID_PROVIDE_UNIQUE_VALUE)
+        else:
+          raise ValidationError('FATAL',FSID_PROVIDE_INT_VALUE)
     
     return fields
 
 
   def val_fs(self, *argname):
     name = argname[0]
+    crc = None
     fs_name = self.fs_name.get_text().strip()
     if fs_name == "":
       raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
@@ -540,7 +617,11 @@ class ResourceHandler:
       res = self.check_unique_fs_name(fs_name)
       if res == False:  #name already used for a script
         raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
-      
+     
+     #need to generate fs_id for new clusterfs's
+      bits = binascii.crc32(fs_name)
+      crc = abs(bits & CRC32_MASK) #puts val in 16 bit space
+ 
     else:
        if name != fs_name:
         res = self.check_unique_fs_name(fs_name)
@@ -565,6 +646,42 @@ class ResourceHandler:
     else:
       force = '0'
     fields['force_unmount'] = force
+    
+    if self.fs_self_fence.get_active():
+      fence = '1'
+    else:
+      fence = '0'
+    fields['self_fence'] = fence
+    
+    if self.fs_force_fsck.get_active():
+      force_fsck = '1'
+    else:
+      force_fsck = '0'
+    fields['force_fsck'] = force_fsck
+
+    if crc != None: #New resource
+      fs_id = self.fs_id.get_text()
+      if fs_id != "": #If the user wants to set an initial value for fsid
+        if fs_id.isdigit():
+          if self.check_unique_fsid(fs_id):
+            fields['fsid'] = self.fs_id.get_text()
+          else:
+            raise ValidationError('FATAL',FSID_PROVIDE_UNIQUE_VALUE)
+        else:
+            raise ValidationError('FATAL',FSID_PROVIDE_INT_VALUE)
+      else: #This code searches fsid's and increments crc by 1 if found
+        while self.check_unique_fsid(str(crc)) == False:
+          crc = crc + 1
+
+        fields['fsid'] = str(crc)
+
+    else:
+      fs_id = self.fs_id.get_text()
+      if fs_id != "": #If the user wants to set an fsid
+        if fs_id.isdigit():
+          fields['fsid'] = self.fs_id.get_text()
+        else:
+          raise ValidationError('FATAL',FSID_PROVIDE_INT_VALUE)
     
     options = self.fs_options.get_text().strip()
     fields['options'] = options
@@ -607,13 +724,19 @@ class ResourceHandler:
     self.gfs_device = self.rc_xml.get_widget('entry15')
     self.gfs_options = self.rc_xml.get_widget('gfs_options')
     self.gfs_force_unmount = self.rc_xml.get_widget('gfs_force_unmount')
+    self.gfs_id_container = self.rc_xml.get_widget('gfs_id_container')
+    self.gfs_id = self.rc_xml.get_widget('gfs_id')
     
     self.fs_name = self.rc_xml.get_widget('entry11')
     self.fs_mnt = self.rc_xml.get_widget('entry12')
     self.fs_device = self.rc_xml.get_widget('fs_dev')
     self.fs_combo = self.rc_xml.get_widget('combobox1')
     self.fs_force_unmount = self.rc_xml.get_widget('fs_force_unmount')
+    self.fs_self_fence = self.rc_xml.get_widget('fs_self_fence')
+    self.fs_force_fsck = self.rc_xml.get_widget('fs_force_fsck')
     self.fs_options = self.rc_xml.get_widget('fs_options')
+    self.fs_id_container = self.rc_xml.get_widget('fs_id_container')
+    self.fs_id = self.rc_xml.get_widget('fs_id')
   
   def set_model(self, model_builder):
     self.model_builder = model_builder
@@ -641,6 +764,23 @@ class ResourceHandler:
         return False
 
     return True
+
+  def check_unique_fsid(self, in_fsid):
+    fs_objs = self.model_builder.searchObjectTree("fs")
+    gfs_objs = self.model_builder.searchObjectTree("clusterfs")
+
+    for obj in fs_objs:
+        at = obj.getAttribute("fsid")
+        if at == in_fsid:
+          return False
+
+    for obj in gfs_objs:
+        at = obj.getAttribute("fsid")
+        if at == in_fsid:
+          return False
+
+    return True
+
 
   def check_unique_script_name(self,name):
     rcs = self.model_builder.getResources()
