@@ -50,6 +50,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Fri Dec 9 2005 Jim Parsons <jparsons@redhat.com> 1.0.21-1
+  -  Some gui fixups, support for file system IDs, and some exposure of a few additional rgmanager params 
 * Mon Dec 1 2005 Jim Parsons <jparsons@redhat.com> 1.0.20-1
   -  minor cleanup and version bump 
 * Mon Dec 1 2005 Jim Parsons <jparsons@redhat.com> 1.0.19-1
