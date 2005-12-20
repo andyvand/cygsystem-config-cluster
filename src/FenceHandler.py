@@ -60,7 +60,7 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
 
 FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_wti":["name","ipaddr","passwd"],
-              "fence_rps10":["name","device","port","owner"],
+              "fence_rps10":["name","device","port"],
               "fence_brocade":["name","ipaddr","login","passwd"],
               "fence_vixel":["name","ipaddr","passwd"],
               "fence_gnbd":["name","servers"],
@@ -101,7 +101,6 @@ PRETTY_NAME_ATTRS = {"port":_("Port"),
                      "passwd":_("Password"),
                      "name":_("Name"),
                      "device":_("Device"),
-                     "owner":_("Owner"),
                      "server":_("Server"),
                      "servers":_("Servers"),
                      "domain":_("Domain"),
@@ -308,7 +307,6 @@ class FenceHandler:
     self.rps10_fd_name.set_text("")
     self.rps10_fd_device.set_text("")
     self.rps10_fd_port.set_text("")
-    self.rps10_fd_owner.set_text("")
     self.brocade_fd_name.set_text("")
     self.brocade_fd_ip.set_text("")
     self.brocade_fd_login.set_text("")
@@ -367,7 +365,6 @@ class FenceHandler:
     self.rps10_fd_name.set_text(attrs["name"])
     self.rps10_fd_device.set_text(attrs["device"])
     self.rps10_fd_port.set_text(attrs["port"])
-    ###FIXXX - populate owner field with other node name###
 
 
   def pop_brocade_fd(self, attrs):
@@ -469,7 +466,6 @@ class FenceHandler:
     self.rps10_fd_name = self.fence_xml.get_widget('entry61')
     self.rps10_fd_device = self.fence_xml.get_widget('entry62')
     self.rps10_fd_port = self.fence_xml.get_widget('entry63')
-    self.rps10_fd_owner = self.fence_xml.get_widget('entry64')
 
     self.brocade_fd_name = self.fence_xml.get_widget('entry19')
     self.brocade_fd_ip = self.fence_xml.get_widget('entry20')
