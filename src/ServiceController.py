@@ -325,6 +325,8 @@ class ServiceController:
         self.autostart_cbox.set_active(False)
       else:
         self.autostart_cbox.set_active(True)
+        if autostart_state == None:
+          self.current_service.addAttribute(AUTOSTART_STR,"1")
 
       #We can't forget the radiogroup
       recovery_attr = svc.getAttribute(RECOVERY_STR)
