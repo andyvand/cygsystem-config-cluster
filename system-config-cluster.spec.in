@@ -50,6 +50,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue Dec 20 2005 Jim Parsons <jparsons@redhat.com> 1.0.23-1
+  -  Removed unnecessary fence device field 
 * Tue Dec 20 2005 Jim Parsons <jparsons@redhat.com> 1.0.22-1
   -  Version bump 
 * Fri Dec 9 2005 Jim Parsons <jparsons@redhat.com> 1.0.21-1
