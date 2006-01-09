@@ -50,6 +50,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Jan 09 2006 Jim Parsons <jparsons@redhat.com> 1.0.24-1
+  -  Build for fedora 
 * Tue Dec 20 2005 Jim Parsons <jparsons@redhat.com> 1.0.23-1
   -  Removed unnecessary fence device field 
 * Tue Dec 20 2005 Jim Parsons <jparsons@redhat.com> 1.0.22-1
