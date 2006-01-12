@@ -3,6 +3,9 @@
 <element name="cluster">
  <attribute name="name"/>
  <attribute name="config_version"/>
+ <optional>
+  <attribute name="alias"/>
+ </optional>
  <!-- The choice section below brackets two very large group blocks. -->
  <!-- The first group specifies schema for a cman/dlm cluster, and -->
  <!-- the second for a gulm cluster -->
