@@ -2515,7 +2515,7 @@ Cluster</property>
 	    <widget class="GtkCheckButton" id="gulm_lockserver">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
-	      <property name="label" translatable="yes">GuLM Lockserver</property>
+	      <property name="label" translatable="yes">GULM Lockserver</property>
 	      <property name="use_underline">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -4938,7 +4938,7 @@ Failover Domain: </property>
 		<widget class="GtkRadioButton" id="radiobutton2">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
-		  <property name="label" translatable="yes">Grand Unified Lock Manager (GuLM)</property>
+		  <property name="label" translatable="yes">Grand Unified Lock Manager (GULM)</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>

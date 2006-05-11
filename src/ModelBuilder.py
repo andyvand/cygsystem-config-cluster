@@ -84,7 +84,7 @@ CMAN_PTR_STR="cman"
 ###-----------------------------------
 
 
-INVALID_GULM_COUNT=_("GuLM locking mechanism may consist of 1, 3, 4 or 5 locking servers. You have configured %d. Fix the error and try saving again.")
+INVALID_GULM_COUNT=_("GULM locking mechanism may consist of 1, 3, 4 or 5 locking servers. You have configured %d. Fix the error and try saving again.")
 
 
 class ModelBuilder:
@@ -424,7 +424,7 @@ class ModelBuilder:
   def deleteNode(self, clusternode):
     #1) delete node
     #2) delete failoverdomainnodes with same name
-    #3) delete lockserver nodes if GuLM
+    #3) delete lockserver nodes if GULM
 
     name = clusternode.getName()
 
@@ -562,7 +562,7 @@ class ModelBuilder:
 
   def isNodeLockserver(self,name):
     gptr = self.getGULMPtr()
-    if gptr == None:  #Obviously not GuLM
+    if gptr == None:  #Obviously not GULM
       return False
     children = gptr.getChildren()
     for child in children:
@@ -573,7 +573,7 @@ class ModelBuilder:
 
   def removeLockserver(self, clusternode):
     gptr = self.getGULMPtr()
-    if gptr == None:  #Obviously not GuLM
+    if gptr == None:  #Obviously not GULM
       return
     children = gptr.getChildren()
     for child in children:
