@@ -352,6 +352,7 @@
       <attribute name="mountpoint"/>
       <attribute name="device"/>
       <optional>
+       <attribute name="fsid"/>
        <attribute name="fstype"/>
       </optional>
       <optional>
@@ -388,6 +389,7 @@
       <attribute name="mountpoint"/>
       <attribute name="device"/>
       <optional>
+       <attribute name="fsid"/>
        <attribute name="fstype"/>
       </optional>
       <optional>

@@ -424,7 +424,6 @@ class CommandHandler:
 
 
   def check_xml(self, file):
-    return
     err = ""
     args = list()
     args.append("/usr/bin/xmllint")
