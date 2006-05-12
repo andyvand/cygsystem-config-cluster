@@ -158,7 +158,7 @@ class basecluster:
         dialog = gnome.ui.About(
             ABOUT_VERSION,
             '', ### Don't specify version - already in ABOUT_VERSION
-            _("Copyright (c) 2004 Red Hat, Inc. All rights reserved."),
+            _("Copyright (c) 2006 Red Hat, Inc. All rights reserved."),
             _("This software is licensed under the terms of the GPL."),
             [ 'Jim Parsons (system-config-cluster) <jparsons at redhat.com>',
               '',

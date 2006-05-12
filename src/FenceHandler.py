@@ -43,12 +43,14 @@ ILLEGAL_CHARS = [':', ' ']
 #forms to set_text and to check.
 
 FENCE_OPTS = {"fence_apc":_("APC Power Device"),
+              "fence_apc_snmp":_("APC Power Device (SNMP)"),
               "fence_wti":_("WTI Power Device"),
               "fence_rps10":("RPS10 Serial Switch"),
               "fence_brocade":_("Brocade Switch"),
               "fence_vixel":_("Vixel SAN Switch"),
               "fence_gnbd":_("Global Network Block Device"),
               "fence_ilo":_("HP ILO Device"),
+              "fence_rsa":_("IBM RSA II Device"),
               "fence_sanbox2":_("QLogic SANBox2"),
               "fence_bladecenter":_("IBM Blade Center"),
               "fence_mcdata":_("McDATA SAN Switch"),
@@ -59,12 +61,14 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_manual":_("Manual Fencing") }
 
 FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
+              "fence_apc_snmp":["name","ipaddr","login","passwd"],
               "fence_wti":["name","ipaddr","passwd"],
               "fence_rps10":["name","device","port"],
               "fence_brocade":["name","ipaddr","login","passwd"],
               "fence_vixel":["name","ipaddr","passwd"],
               "fence_gnbd":["name","servers"],
               "fence_ilo":["name","hostname","login","passwd"],
+              "fence_rsa":["name","hostname","login","passwd"],
               "fence_sanbox2":["name","ipaddr","login","passwd"],
               "fence_bladecenter":["name","ipaddr","login","passwd"],
               "fence_mcdata":["name","ipaddr","login","passwd"],
@@ -75,12 +79,14 @@ FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_manual":["name"] }
 
 FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
+              "fence_apc_snmp":["port","switch"],
               "fence_wti":["port"],
               "fence_rps10":[],
               "fence_brocade":["port"],
               "fence_vixel":["port"],
               "fence_gnbd":[],
               "fence_ilo":[],
+              "fence_rsa":[],
               "fence_sanbox2":["port"],
               "fence_bladecenter":["blade"],
               "fence_mcdata":["port"],
@@ -158,12 +164,14 @@ class FenceHandler:
     #self.fence_xml.get_widget('fi_wti').show()
 
     self.fi_populate = {"fence_apc":self.pop_apc,
+              "fence_apc_snmp":self.pop_apc_snmp,
               "fence_wti":self.pop_wti,
               "fence_rps10":self.pop_rps10,
               "fence_brocade":self.pop_brocade,
               "fence_vixel":self.pop_vixel,
               "fence_gnbd":self.pop_gnbd,
               "fence_ilo":self.pop_ilo,
+              "fence_rsa":self.pop_rsa,
               "fence_drac":self.pop_drac,
               "fence_sanbox2":self.pop_sanbox2,
               "fence_bladecenter":self.pop_bladecenter,
@@ -174,12 +182,14 @@ class FenceHandler:
               "fence_manual":self.pop_manual }
 
     self.fd_populate = {"fence_apc":self.pop_apc_fd,
+              "fence_apc_snmp":self.pop_apc_snmp_fd,
               "fence_wti":self.pop_wti_fd,
               "fence_rps10":self.pop_rps10_fd,
               "fence_brocade":self.pop_brocade_fd,
               "fence_vixel":self.pop_vixel_fd,
               "fence_gnbd":self.pop_gnbd_fd,
               "fence_ilo":self.pop_ilo_fd,
+              "fence_rsa":self.pop_rsa_fd,
               "fence_drac":self.pop_drac_fd,
               "fence_sanbox2":self.pop_sanbox2_fd,
               "fence_bladecenter":self.pop_bladecenter_fd,
@@ -190,12 +200,14 @@ class FenceHandler:
               "fence_manual":self.pop_manual_fd }
 
     self.fi_validate = {"fence_apc":self.val_apc,
+              "fence_apc_snmp":self.val_apc_snmp,
               "fence_wti":self.val_wti,
               "fence_rps10":self.val_rps10,
               "fence_brocade":self.val_brocade,
               "fence_vixel":self.val_vixel,
               "fence_gnbd":self.val_gnbd,
               "fence_ilo":self.val_ilo,
+              "fence_rsa":self.val_rsa,
               "fence_drac":self.val_drac,
               "fence_sanbox2":self.val_sanbox2,
               "fence_bladecenter":self.val_bladecenter,
@@ -206,12 +218,14 @@ class FenceHandler:
               "fence_manual":self.val_manual }
 
     self.fd_validate = {"fence_apc":self.val_apc_fd,
+              "fence_apc_snmp":self.val_apc_snmp_fd,
               "fence_wti":self.val_wti_fd,
               "fence_rps10":self.val_rps10_fd,
               "fence_brocade":self.val_brocade_fd,
               "fence_vixel":self.val_vixel_fd,
               "fence_gnbd":self.val_gnbd_fd,
               "fence_ilo":self.val_ilo_fd,
+              "fence_rsa":self.val_rsa_fd,
               "fence_drac":self.val_drac_fd,
               "fence_sanbox2":self.val_sanbox2_fd,
               "fence_bladecenter":self.val_bladecenter_fd,
@@ -238,6 +252,10 @@ class FenceHandler:
   def pop_apc(self, attrs):
     self.apc_port.set_text(attrs["port"]) 
     self.apc_switch.set_text(attrs["switch"]) 
+
+  def pop_apc_snmp(self, attrs):
+    self.apc_snmp_port.set_text(attrs["port"])
+    self.apc_snmp_switch.set_text(attrs["switch"]) 
  
   def pop_wti(self, attrs):
     self.wti_port.set_text(attrs["port"])
@@ -251,6 +269,9 @@ class FenceHandler:
   def pop_ilo(self, attrs):
     pass
  
+  def pop_rsa(self, attrs):
+    pass
+
   def pop_drac(self, attrs):
     pass
  
@@ -285,6 +306,8 @@ class FenceHandler:
   def clear_fi_forms(self):
     self.apc_port.set_text("") 
     self.apc_switch.set_text("") 
+    self.apc_snmp_port.set_text("") 
+    self.apc_snmp_switch.set_text("") 
     self.wti_port.set_text("") 
     self.brocade_port.set_text("")
     self.vixel_port.set_text("")
@@ -301,6 +324,10 @@ class FenceHandler:
     self.apc_fd_ip.set_text("")
     self.apc_fd_login.set_text("")
     self.apc_fd_passwd.set_text("")
+    self.apc_snmp_fd_name.set_text("") 
+    self.apc_snmp_fd_ip.set_text("")
+    self.apc_snmp_fd_login.set_text("")
+    self.apc_snmp_fd_passwd.set_text("")
     self.wti_fd_ip.set_text("")
     self.wti_fd_name.set_text("")
     self.wti_fd_passwd.set_text("")
@@ -315,6 +342,10 @@ class FenceHandler:
     self.ilo_fd_login.set_text("")
     self.ilo_fd_passwd.set_text("")
     self.ilo_fd_hostname.set_text("")
+    self.rsa_fd_name.set_text("")
+    self.rsa_fd_login.set_text("")
+    self.rsa_fd_passwd.set_text("")
+    self.rsa_fd_hostname.set_text("")
     self.drac_fd_name.set_text("")
     self.drac_fd_login.set_text("")
     self.drac_fd_passwd.set_text("")
@@ -355,7 +386,12 @@ class FenceHandler:
     self.apc_fd_login.set_text(attrs["login"])
     self.apc_fd_passwd.set_text(attrs["passwd"])
 
- 
+  def pop_apc_snmp_fd(self, attrs):
+    self.apc_snmp_fd_name.set_text(attrs["name"]) 
+    self.apc_snmp_fd_ip.set_text(attrs["ipaddr"])
+    self.apc_snmp_fd_login.set_text(attrs["login"])
+    self.apc_snmp_fd_passwd.set_text(attrs["passwd"])
+
   def pop_wti_fd(self, attrs):
     self.wti_fd_ip.set_text(attrs["ipaddr"])
     self.wti_fd_name.set_text(attrs["name"])
@@ -379,6 +415,12 @@ class FenceHandler:
     self.ilo_fd_login.set_text(attrs["login"])
     self.ilo_fd_passwd.set_text(attrs["passwd"])
     self.ilo_fd_hostname.set_text(attrs["hostname"])
+
+  def pop_rsa_fd(self, attrs):
+    self.rsa_fd_name.set_text(attrs["name"])
+    self.rsa_fd_login.set_text(attrs["login"])
+    self.rsa_fd_passwd.set_text(attrs["passwd"])
+    self.rsa_fd_hostname.set_text(attrs["hostname"])
 
   def pop_drac_fd(self, attrs):
     self.drac_fd_name.set_text(attrs["name"])
@@ -442,10 +484,13 @@ class FenceHandler:
     ##Fence Instance Form Fields
     self.apc_port = self.fence_xml.get_widget('entry1') 
     self.apc_switch = self.fence_xml.get_widget('entry2') 
+    self.apc_snmp_port = self.fence_xml.get_widget('apc_snmp_entry1') 
+    self.apc_snmp_switch = self.fence_xml.get_widget('apc_snmp_entry2') 
     self.wti_port = self.fence_xml.get_widget('entry3') 
     self.brocade_port = self.fence_xml.get_widget('entry4') 
     self.vixel_port = self.fence_xml.get_widget('entry5') 
     self.ilo_port = self.fence_xml.get_widget('entry7') 
+    self.rsa_port = self.fence_xml.get_widget('rsa_entry1') 
     self.sanbox2_port = self.fence_xml.get_widget('entry8') 
     self.bladecenter_blade = self.fence_xml.get_widget('entry41') 
     self.mcdata_port = self.fence_xml.get_widget('entry9') 
@@ -458,6 +503,11 @@ class FenceHandler:
     self.apc_fd_ip = self.fence_xml.get_widget('entry13')
     self.apc_fd_login = self.fence_xml.get_widget('entry14')
     self.apc_fd_passwd = self.fence_xml.get_widget('entry15')
+
+    self.apc_snmp_fd_name = self.fence_xml.get_widget('apc_snmp_entry3')
+    self.apc_snmp_fd_ip = self.fence_xml.get_widget('apc_snmp_entry4')
+    self.apc_snmp_fd_login = self.fence_xml.get_widget('apc_snmp_entry5')
+    self.apc_snmp_fd_passwd = self.fence_xml.get_widget('apc_snmp_entry6')
 
     self.wti_fd_ip = self.fence_xml.get_widget('entry17')
     self.wti_fd_name = self.fence_xml.get_widget('entry16')
@@ -483,6 +533,11 @@ class FenceHandler:
     self.ilo_fd_login = self.fence_xml.get_widget('entry29')
     self.ilo_fd_passwd = self.fence_xml.get_widget('entry30')
     self.ilo_fd_hostname = self.fence_xml.get_widget('entry31')
+
+    self.rsa_fd_name = self.fence_xml.get_widget('rsa_entry2')
+    self.rsa_fd_login = self.fence_xml.get_widget('rsa_entry3')
+    self.rsa_fd_passwd = self.fence_xml.get_widget('rsa_entry4')
+    self.rsa_fd_hostname = self.fence_xml.get_widget('rsa_entry5')
 
     self.drac_fd_name = self.fence_xml.get_widget('entry57')
     self.drac_fd_login = self.fence_xml.get_widget('entry59')
@@ -561,6 +616,34 @@ class FenceHandler:
 
     return fields
  
+  def val_apc_snmp_fd(self, name):
+    rectify_fence_name = False
+    if self.apc_snmp_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.apc_snmp_fd_name)
+    if name != self.apc_snmp_fd_name.get_text():
+      res = self.check_unique_fd_name(self.apc_snmp_fd_name.get_text())
+      if res == False:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = True
+    
+    if self.apc_snmp_fd_ip.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_IP)
+    if self.apc_snmp_fd_login.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+    if self.apc_snmp_fd_passwd.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    if rectify_fence_name == True:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.apc_snmp_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.apc_snmp_fd_name.get_text()
+    fields["ipaddr"] = self.apc_snmp_fd_ip.get_text()
+    fields["login"] = self.apc_snmp_fd_login.get_text()
+    fields["passwd"] = self.apc_snmp_fd_passwd.get_text()
+
+    return fields
  
   def val_wti_fd(self, name):
     rectify_fence_name = False
@@ -671,6 +754,35 @@ class FenceHandler:
     fields["hostname"] = self.ilo_fd_hostname.get_text()
     fields["login"] = self.ilo_fd_login.get_text()
     fields["passwd"] = self.ilo_fd_passwd.get_text()
+
+    return fields
+ 
+  def val_rsa_fd(self, name):
+    rectify_fence_name = False
+    if self.rsa_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.rsa_fd_name)
+    if name != self.rsa_fd_name.get_text():
+      res = self.check_unique_fd_name(self.rsa_fd_name.get_text())
+      if res == False:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = True
+
+    if self.rsa_fd_login.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+    if self.rsa_fd_passwd.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+    if self.rsa_fd_hostname.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_HOSTNAME)
+
+    if rectify_fence_name == True:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.rsa_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.rsa_fd_name.get_text()
+    fields["hostname"] = self.rsa_fd_hostname.get_text()
+    fields["login"] = self.rsa_fd_login.get_text()
+    fields["passwd"] = self.rsa_fd_passwd.get_text()
 
     return fields
  
@@ -976,6 +1088,18 @@ class FenceHandler:
 
     return fields
 
+  def val_apc_snmp(self):
+    if self.apc_snmp_port.get_text() == "": 
+      raise ValidationError('FATAL', FI_PROVIDE_PORT)
+    if self.apc_snmp_switch.get_text() == "": 
+      raise ValidationError('FATAL', FI_PROVIDE_SWITCH)
+
+    fields = {}
+    fields["port"] = self.apc_snmp_port.get_text()
+    fields["switch"] = self.apc_snmp_switch.get_text()
+
+    return fields
+
   def val_wti(self):
     if self.wti_port.get_text() == "":
       raise ValidationError('FATAL', FI_PROVIDE_PORT)
@@ -1015,6 +1139,12 @@ class FenceHandler:
     return fields
 
   def val_ilo(self):
+
+    fields = {}
+
+    return fields
+
+  def val_rsa(self):
 
     fields = {}
 

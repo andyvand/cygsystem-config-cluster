@@ -11,7 +11,7 @@ TYPE=_("Type")
 
 #New Power Controller Fence Agent names should be added to
 #the list below
-power_controller_list=["fence_wti","fence_apc"]
+power_controller_list=["fence_wti","fence_apc","fence_apc_snmp"]
 
 class Device(TagObject):
   def __init__(self):
