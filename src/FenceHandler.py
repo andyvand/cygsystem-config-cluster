@@ -135,7 +135,6 @@ class FenceHandler:
 
     if not enable_apc_snmp:
         del FENCE_OPTS['fence_apc_snmp']
-        del PRETTY_NAME_ATTRS['fence_apc_snmp']
         del FENCE_FD_ATTRS['fence_apc_snmp']
         del FENCE_FI_ATTRS['fence_apc_snmp']
 
