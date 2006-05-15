@@ -1180,7 +1180,6 @@ class ConfigTabController:
     self.model_builder.setModified()
 
   def prep_fd_options(self):
-   
     menu = gtk.Menu() 
     #make two hashes here - one for idx -> agent and one for 
     pretty_name_hash = self.fence_handler.getFENCE_OPTS()
