@@ -10,6 +10,7 @@ import select
 import signal
 import gobject
 import pango
+import cgi
 import string
 import os
 from clui_constants import *
@@ -96,7 +97,7 @@ class PropertiesRenderer:
     pc.set_font_description(desc)
     header_layout = pango.Layout(pc)
     layout_string = ""
-    name = inname.replace('_','__')
+    name = cgi.escape(inname.replace('_','__'))
 
 
     if type == CLUSTER_TYPE:
@@ -154,7 +155,7 @@ class PropertiesRenderer:
     
     
 
-  def prepare_prop_layout(self, prop_list,type):
+  def prepare_prop_layout(self, prop_list, type):
     amended_prop_list = ""
     if prop_list == None:
       return

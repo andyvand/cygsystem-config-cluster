@@ -7,6 +7,7 @@ __author__ = 'Jim Parsons (jparsons@redhat.com)'
 import string
 import os
 import gobject
+import cgi
 
 import gettext
 _ = gettext.gettext
@@ -486,14 +487,14 @@ class ConfigTabController:
     treemodel.clear()
 
     node_iter = treemodel.append(None)
-    node_str = "<span size=\"11000\"><b>" + nd.getName() + "</b></span>"
+    node_str = "<span size=\"11000\"><b>" + cgi.escape(nd.getName()) + "</b></span>"
     treemodel.set(node_iter, FENCE_PIX_COL, self.node_pixbuf,
                              FENCE_NAME_COL, node_str,
                              FENCE_TYPE_COL, F_NODE_TYPE,
                              FENCE_OBJ_COL, nd)
 
     self.fence_panel_label.set_use_markup(True)
-    self.fence_panel_label.set_markup(FENCE_PANEL_LABEL % nd.getName())
+    self.fence_panel_label.set_markup(FENCE_PANEL_LABEL % (cgi.escape(nd.getName())))
     for fence_level in nd.getFenceLevels():
       flevel_iter = treemodel.append(node_iter)
       flevel_substr = FENCE_LEVEL % level_index
@@ -501,7 +502,7 @@ class ConfigTabController:
       ##level names
       fence_level.addAttribute("name",str(level_index))
       level_index = level_index + 1
-      flevel_str = "<span size=\"11000\"><b>" + flevel_substr + "</b></span>"
+      flevel_str = "<span size=\"11000\"><b>" + cgi.escape(flevel_substr) + "</b></span>"
       treemodel.set(flevel_iter, FENCE_NAME_COL, flevel_str,
                                  FENCE_TYPE_COL, F_LEVEL_TYPE,
                                  FENCE_OBJ_COL, fence_level )
@@ -509,7 +510,7 @@ class ConfigTabController:
       fences = fence_level.getChildren()
       for fence in fences:
         fence_iter = treemodel.append(flevel_iter)
-        fence_str = "<span size=\"11000\"><b>" + fence.getName() + "</b></span>"
+        fence_str = "<span size=\"11000\"><b>" + cgi.escape(fence.getName()) + "</b></span>"
         treemodel.set(fence_iter, FENCE_PIX_COL, self.fence_pixbuf,
                                   FENCE_NAME_COL, fence_str,
                                   FENCE_TYPE_COL, F_FENCE_TYPE,

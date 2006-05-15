@@ -4,6 +4,7 @@ import gobject
 from clui_constants import *
 from RefObject import RefObject
 
+import cgi
 import gettext
 _ = gettext.gettext
 ### gettext first, then import gtk (exception prints gettext "_") ###
@@ -310,7 +311,7 @@ class ServiceController:
     
     self.current_service = svc
     if self.current_service != None:  
-      self.service_name_label.set_markup("<span><b>" + svc.getName() + "</b></span>")
+      self.service_name_label.set_markup("<span><b>" + cgi.escape(svc.getName()) + "</b></span>")
 
       #if necessary, set exclusive checkbox
       exclusive_state = svc.getAttribute(EXCLUSIVE_STR)

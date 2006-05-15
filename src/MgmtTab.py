@@ -2,6 +2,7 @@ import string
 import gobject
 import sys
 import MessageLibrary
+import cgi
 from CommandError import CommandError
 from clui_constants import *
 from CommandHandler import CommandHandler
@@ -191,7 +192,7 @@ class MgmtTab:
     for node in nodes:
       iter = treemodel.append(None)
       name, votes, status = node.getNodeProps()
-      name_str = "<span size=\"10000\"><b>" + name + "</b></span>"
+      name_str = "<span size=\"10000\"><b>" + cgi.escape(name) + "</b></span>"
       treemodel.set(iter, TITLE_COL, name_str,
                           VOTES_COL, votes,
                           STATUS_COL, status,
@@ -214,12 +215,12 @@ class MgmtTab:
       for service in services:
         iter = treemodel.append(None)
         name, state, owner, lastowner, restarts = service.getServiceProps()
-        name_str = "<span size=\"10000\"><b>" + name + "</b></span>"
+        name_str = "<span size=\"10000\"><b>" + cgi.escape(name) + "</b></span>"
         if state == "started":
           color = "green"
         else:
           color = "red"
-        state_str = "<span foreground=\"" + color + "\">" + state + "</span>"
+        state_str = "<span foreground=\"" + color + "\">" + cgi.escape(state) + "</span>"
         treemodel.set(iter, S_TITLE_COL, name_str,
                             S_STATE_COL, state_str,
                             S_OWNER_COL, owner,

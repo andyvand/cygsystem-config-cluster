@@ -1,6 +1,7 @@
 from FailoverDomainNode import FailoverDomainNode
 from FailoverDomain import FailoverDomain
 import gobject
+import cgi
 from clui_constants import *
 
 import gettext
@@ -204,7 +205,7 @@ class FaildomController:
   def prep_faildom_panel(self, faildom):
     self.current_faildom = faildom
     if self.current_faildom != None:  
-      self.faildom_name_label.set_markup("<span><b>" + faildom.getName() + "</b></span>")
+      self.faildom_name_label.set_markup("<span><b>" + cgi.escape(faildom.getName()) + "</b></span>")
 
       #Set checkboxes for restricted and prioritized
       val = self.current_faildom.getAttribute("restricted")

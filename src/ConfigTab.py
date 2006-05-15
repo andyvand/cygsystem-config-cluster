@@ -1,6 +1,7 @@
 import string
 import gobject
 import sys
+import cgi
 from clui_constants import *
 from PropertiesRenderer import PropertiesRenderer
 
@@ -199,7 +200,7 @@ class ConfigTab:
         nm = IPADDRESS
       else:
         nm = obj.getName()
-      self.prop_renderer.render_to_layout_area(None, nm,type) 
+      self.prop_renderer.render_to_layout_area(None, nm, type) 
       self.clear_all_buttonpanels()
       self.resource_p.show()
     else:
@@ -339,7 +340,7 @@ class ConfigTab:
     nodelist = self.model_builder.getNodes()
     for node in nodelist:
       n_iter = treemodel.append(cn_iter)
-      n_str = "<span>" + node.getName() + "</span>"
+      n_str = "<span>" + cgi.escape(node.getName()) + "</span>"
       treemodel.set(n_iter, NAME_COL, n_str,
                             TYPE_COL, CLUSTER_NODE_TYPE,
                             OBJ_COL, node)
@@ -361,7 +362,7 @@ class ConfigTab:
                             OBJ_COL, fencedev_ptr) 
     for fd in fencedevs:
       fd_iter = treemodel.append(fds_iter) 
-      fd_str = "<span>" + fd.getName() + "</span>"
+      fd_str = "<span>" + cgi.escape(fd.getName()) + "</span>"
       treemodel.set(fd_iter, NAME_COL, fd_str,
                              TYPE_COL, FENCE_DEVICE_TYPE,
                              OBJ_COL,  fd)
@@ -391,7 +392,7 @@ class ConfigTab:
 
     for faildom in faildoms:
       fdom_iter = treemodel.append(fdoms_iter)
-      fdom_str = "<span>" + faildom.getName() + "</span>"
+      fdom_str = "<span>" + cgi.escape(faildom.getName()) + "</span>"
       treemodel.set(fdom_iter, NAME_COL, fdom_str,
                                TYPE_COL,FAILOVER_DOMAIN_TYPE,
                                OBJ_COL, faildom)
@@ -408,9 +409,9 @@ class ConfigTab:
     for resource in resources:
       resource_iter = treemodel.append(resources_iter)
       if resource.getTagName() == "ip":
-        resource_str = "<span>" + resource.getResourceType() + " " + resource.getAttribute("address") + "</span>"
+        resource_str = "<span>" + cgi.escape(resource.getResourceType()) + " " + cgi.escape(resource.getAttribute("address")) + "</span>"
       else:
-        resource_str = "<span>" + resource.getResourceType() + " " + resource.getName() + "</span>"
+        resource_str = "<span>" + cgi.escape(resource.getResourceType()) + " " + cgi.escape(resource.getName()) + "</span>"
       treemodel.set(resource_iter, NAME_COL, resource_str,
                                TYPE_COL,RESOURCE_TYPE,
                                OBJ_COL, resource)
@@ -424,7 +425,7 @@ class ConfigTab:
 
     for rgroup in rgroups:
       try:
-        rgroup_str = "<span>" + SERVICE + " " + rgroup.getName() + "</span>"
+        rgroup_str = "<span>" + SERVICE + " " + cgi.escape(rgroup.getName()) + "</span>"
       except KeyError, e:
         continue
       rgroup_iter = treemodel.append(rgrps_iter)

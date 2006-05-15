@@ -1,5 +1,6 @@
 import string
 import FenceHandler
+import cgi
 from TagObject import TagObject
 
 TAG_NAME = "device"
@@ -44,7 +45,7 @@ class Device(TagObject):
 
     for attr in attrlist:
       NAME = self.pretty_name_attrs[attr]
-      VALUE = self.getAttribute(attr)
+      VALUE = cgi.escape(self.getAttribute(attr))
       stringbuf = stringbuf + "<span><b>" + NAME + ": " + "</b>" + VALUE + "\n</span>"
 
     return stringbuf

@@ -1,5 +1,6 @@
 import string
 import FenceHandler
+import cgi
 from TagObject import TagObject
 
 TAG_NAME = "fencedevice"
@@ -36,7 +37,7 @@ class FenceDevice(TagObject):
         VALUE = None
 
       if (NAME != None) and (VALUE != None):
-        stringbuf = stringbuf + "<span><b>" + NAME + ": " + "</b>" + VALUE + "\n</span>"
+        stringbuf = stringbuf + "<span><b>" + cgi.escape(NAME) + ": " + "</b>" + cgi.escape(VALUE) + "\n</span>"
                                                                                 
     return stringbuf
 
