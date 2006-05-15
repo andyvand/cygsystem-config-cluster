@@ -128,11 +128,10 @@ class FenceHandler:
     self.fence_xml = gtk.glade.XML (gladepath, domain="NULL")
 
 	# hack!
-    enable_apc_snmp = 0
-    for i in glob('/usr/share/snmp/mibs/powernet*.mib'):
-        if os.path.exists(i):
-            enable_apc_snmp = 1
-            break
+    if glob('/usr/share/snmp/mibs/powernet*.mib'):
+        enable_apc_snmp = 1
+    else:
+        enable_apc_snmp = 0
 
     if not enable_apc_snmp:
         del FENCE_OPTS['fence_apc_snmp']
