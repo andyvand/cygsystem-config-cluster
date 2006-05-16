@@ -102,7 +102,7 @@ class ResourceHandler:
     addr = attrs["address"]
     self.ip.setAddrFromString(addr)
     monitor = attrs["monitor_link"]
-    if (monitor == None) or (monitor == False) or (monitor == "no"):
+    if (monitor == None) or (monitor == False) or (monitor == "no") or (monitor == "0"):
       self.monitor_link.set_active(False)
     else:
       self.monitor_link.set_active(True)
