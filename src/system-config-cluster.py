@@ -347,6 +347,7 @@ class basecluster:
       self.configtab.set_model(self.model_builder)
 
   def lock_backout(self, button):
+    self.lock_method_dlg.response(gtk.RESPONSE_OK)
     self.lock_method_dlg.hide()
     self.no_conf_dlg.run()
 
