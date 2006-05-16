@@ -346,6 +346,10 @@ class basecluster:
     if self.configtab != None:
       self.configtab.set_model(self.model_builder)
 
+  def lock_backout(self, button):
+    self.lock_method_dlg.hide()
+    self.no_conf_dlg.run()
+
   def on_no_conf_create(self, button):
     self.no_conf_dlg.hide()
     self.radio_dlm.set_active(True)
@@ -403,10 +407,11 @@ class basecluster:
     self.lock_method_dlg = self.glade_xml.get_widget('lock_method')
     self.lock_method_dlg.connect("delete_event", self.lock_method_dlg_delete)
     self.glade_xml.get_widget('okbutton17').connect('clicked', self.lock_ok)
+    self.glade_xml.get_widget('uselesscancel').connect('clicked', self.lock_backout)
     self.no_conf_dlg = self.glade_xml.get_widget('no_conf')
     self.no_conf_dlg.connect("delete_event",self.on_no_conf_dlg_delete)
     self.no_conf_label = self.glade_xml.get_widget('no_conf_label')
-    self.glade_xml.get_widget('no_conf_create').connect('clicked',self.on_no_conf_create)
+    self.glade_xml.get_widget('no_conf_create').connect('clicked', self.on_no_conf_create)
     self.glade_xml.get_widget('no_conf_open').connect('clicked',self.on_no_conf_open)
     self.glade_xml.get_widget('no_conf_quit').connect('clicked',self.on_no_conf_quit)
     self.propagate_button = self.glade_xml.get_widget('propagate')
