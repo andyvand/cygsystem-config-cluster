@@ -29,7 +29,7 @@ class Cluster(TagObject):
     isMulticast = False
     mcast_address = ""
 
-    stringbuf = CLUSTER_NAME % self.getAttribute("name") + "\n"
+    stringbuf = CLUSTER_NAME % self.getNameAlias() + "\n"
 
     stringbuf = stringbuf + CONFIG_VERSION + ": " + self.getConfigVersion() + "\n"
 
@@ -105,6 +105,15 @@ class Cluster(TagObject):
     intversion = intversion + 1
     self.addAttribute("config_version", str(intversion))
     #self.is_cfg_version_dirty = True
+
+  def getNameAlias(self):
+    alias = self.getAttribute("alias")
+    if alias == None:
+      name = self.getAttribute("name")
+      self.addAttribute("alias", name)
+      return self.getAttribute("alias")
+    else:
+      return alias
 
   #def addAttribute(self, name, value):
   #  if name == "config_version":

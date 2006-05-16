@@ -368,7 +368,7 @@ class ConfigTabController:
     fptr = self.model_builder.getFenceDaemonPtr()
 
     #set fields for edit
-    name = cptr.getName()
+    name = cptr.getNameAlias()
     self.clustername.set_text(name)
     self.config_version.set_text(cptr.getConfigVersion())
 
@@ -429,7 +429,7 @@ class ConfigTabController:
         self.post_fail.select_region(0, -1)
         return
 
-    cptr.addAttribute("name",name)
+    cptr.addAttribute("alias",name)
     cptr.setConfigVersion(version)
 
     if postjoin.strip() != "":
