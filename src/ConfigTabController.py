@@ -642,6 +642,15 @@ class ConfigTabController:
           f_obj.addAttribute(k,attrlist[k])
         self.prep_fence_panel(nd)
         self.fi_panel.hide()
+
+        #special case for drac/mc...if modulename is removed, attr must be as well
+        if agent_type == "fence_drac":
+          try:
+            check_var = attrlist["modulename"]
+            if check_var == "":
+              f_obj.removeAttribute("modulename") #This rm's any old modulename
+          except KeyError, e:
+            pass    #no attr, no worries
  
 
     self.model_builder.setModified()
