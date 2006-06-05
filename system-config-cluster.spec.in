@@ -50,6 +50,12 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Jun 05 2006 Jim Parsons <jparsons@redhat.com> 1.0.27-1
+  - Fix for bz192134  
+* Tue May 16 2006 Jim Parsons <jparsons@redhat.com> 1.0.26-1
+  - Fixes for bz179559,180507,181725,182516,183217,185686,190361  
+* Wed Feb 08 2006 Jim Parsons <jparsons@redhat.com> 1.0.25-1
+  -  Added rsa and drac/mc support. Also auth type field for ipmi. 
 * Mon Jan 09 2006 Jim Parsons <jparsons@redhat.com> 1.0.24-1
   -  Build for fedora 
 * Tue Dec 20 2005 Jim Parsons <jparsons@redhat.com> 1.0.23-1
