@@ -13,6 +13,7 @@ Requires: /sbin/chkconfig
 Requires: gnome-python2, pygtk2, pygtk2-libglade, gnome-python2-canvas 
 Requires: rhpl >= 0.148.2
 Requires: python >= 2.3
+BuildRequires: perl(XML::Parser) gettext
 
 %description
 system-config-cluster is a utility which allows you to manage cluster configuuration in a graphical setting.
@@ -50,6 +51,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Jun 14 2006 Jim Parsons <jparsons@redhat.com> 1.0.29-1
+  -  spec file fix, version bump 
 * Wed Jun 14 2006 Jim Parsons <jparsons@redhat.com> 1.0.28-1
   -  Version bump for fedora 
 * Mon Jun 05 2006 Jim Parsons <jparsons@redhat.com> 1.0.27-1
