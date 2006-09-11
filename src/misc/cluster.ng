@@ -353,6 +353,8 @@
       <attribute name="device"/>
       <optional>
        <attribute name="fsid"/>
+      </optional>
+      <optional>
        <attribute name="fstype"/>
       </optional>
       <optional>
