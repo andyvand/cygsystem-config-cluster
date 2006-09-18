@@ -385,10 +385,6 @@ class FenceHandler:
     self.drac_fd_login.set_text("")
     self.drac_fd_passwd.set_text("")
     self.drac_fd_ip.set_text("")
-    self.rsa_fd_name.set_text("")
-    self.rsa_fd_login.set_text("")
-    self.rsa_fd_passwd.set_text("")
-    self.rsa_fd_ip.set_text("")
     self.vixel_fd_name.set_text("")
     self.vixel_fd_ip.set_text("")
     self.vixel_fd_passwd.set_text("")
@@ -468,13 +464,6 @@ class FenceHandler:
     self.drac_fd_passwd.set_text(attrs["passwd"])
     self.drac_fd_ip.set_text(attrs["ipaddr"])
 
-  def pop_rsa_fd(self, attrs):
-    self.rsa_fd_name.set_text(attrs["name"])
-    self.rsa_fd_login.set_text(attrs["login"])
-    self.rsa_fd_passwd.set_text(attrs["passwd"])
-    self.rsa_fd_ip.set_text(attrs["ipaddr"])
-
- 
   def pop_vixel_fd(self, attrs):
     self.vixel_fd_name.set_text(attrs["name"])
     self.vixel_fd_ip.set_text(attrs["ipaddr"])
@@ -597,11 +586,6 @@ class FenceHandler:
     self.drac_fd_login = self.fence_xml.get_widget('entry59')
     self.drac_fd_passwd = self.fence_xml.get_widget('entry60')
     self.drac_fd_ip = self.fence_xml.get_widget('entry58')
-
-    self.rsa_fd_name = self.fence_xml.get_widget('entry64')
-    self.rsa_fd_login = self.fence_xml.get_widget('entry66')
-    self.rsa_fd_passwd = self.fence_xml.get_widget('entry67')
-    self.rsa_fd_ip = self.fence_xml.get_widget('entry65')
 
     self.sanbox2_fd_name = self.fence_xml.get_widget('entry32')
     self.sanbox2_fd_ip = self.fence_xml.get_widget('entry33')
@@ -875,37 +859,6 @@ class FenceHandler:
     fields["passwd"] = self.drac_fd_passwd.get_text()
 
     return fields
- 
-  def val_rsa_fd(self, name):
-    rectify_fence_name = False
-    if self.rsa_fd_name.get_text() == "":
-      raise ValidationError('FATAL', FD_PROVIDE_NAME)
-    self.validateNCName(self.rsa_fd_name)
-    if name != self.rsa_fd_name.get_text():
-      res = self.check_unique_fd_name(self.rsa_fd_name.get_text())
-      if res == False:  #name is already used
-        raise ValidationError('FATAL', FD_PROVIDE_NAME)
-      rectify_fence_name = True
-
-    if self.rsa_fd_login.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.rsa_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
-    if self.rsa_fd_ip.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_IP)
-
-    if rectify_fence_name == True:
-      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.rsa_fd_name.get_text())
-
-    fields = {}
-    fields["name"] = self.rsa_fd_name.get_text()
-    fields["ipaddr"] = self.rsa_fd_ip.get_text()
-    fields["login"] = self.rsa_fd_login.get_text()
-    fields["passwd"] = self.rsa_fd_passwd.get_text()
-
-    return fields
- 
- 
  
   def val_vixel_fd(self, name):
     rectify_fence_name = False
