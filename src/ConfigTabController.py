@@ -239,6 +239,7 @@ class ConfigTabController:
     self.cluster_props_dlg = self.glade_xml.get_widget('cluster_props')
     self.cluster_props_dlg.connect("delete_event", self.cluster_props_dlg_delete)
     self.clustername = self.glade_xml.get_widget('clustername')
+    self.actualclustername = self.glade_xml.get_widget('actualclustername')
     self.config_version = self.glade_xml.get_widget('config_version')
     self.post_join = self.glade_xml.get_widget('post_join')
     self.post_fail = self.glade_xml.get_widget('post_fail')
@@ -369,7 +370,9 @@ class ConfigTabController:
 
     #set fields for edit
     name = cptr.getNameAlias()
+    actualname = cptr.getName()
     self.clustername.set_text(name)
+    self.actualclustername.set_text(actualname)
     self.config_version.set_text(cptr.getConfigVersion())
 
     #set fence daemon fields
