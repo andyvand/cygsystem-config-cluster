@@ -51,6 +51,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Sep 26 2006 Jim Parsons <jparsons@redhat.com> 1.0.30-1
+  -  Fixed RSA II fence form, bz207671 
 * Wed Jun 14 2006 Jim Parsons <jparsons@redhat.com> 1.0.29-1
   -  spec file fix, version bump 
 * Wed Jun 14 2006 Jim Parsons <jparsons@redhat.com> 1.0.28-1
