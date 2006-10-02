@@ -59,7 +59,6 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_egenera":_("Egenera SAN Controller"),
               "fence_bullpap":_("Bull PAP"),
               "fence_drac":_("DRAC"),
-              "fence_rsa":_("RSA II"),
               "fence_ipmilan":_("IPMI Lan"),
               "fence_manual":_("Manual Fencing") }
 
@@ -71,13 +70,12 @@ FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_vixel":["name","ipaddr","passwd"],
               "fence_gnbd":["name","servers"],
               "fence_ilo":["name","hostname","login","passwd"],
-              "fence_rsa":["name","hostname","login","passwd"],
+              "fence_rsa":["name","ipaddr","login","passwd"],
               "fence_sanbox2":["name","ipaddr","login","passwd"],
               "fence_bladecenter":["name","ipaddr","login","passwd"],
               "fence_mcdata":["name","ipaddr","login","passwd"],
               "fence_egenera":["name","cserver"],
               "fence_ipmilan":["name","ipaddr","login","passwd","auth"],
-              "fence_rsa":["name","ipaddr","login","passwd"],
               "fence_bullpap":["name","ipaddr","login","passwd"],
               "fence_drac":["name","ipaddr","login","passwd"],
               "fence_manual":["name"] }
@@ -98,7 +96,6 @@ FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
               "fence_ipmilan":[],
               "fence_bullpap":["domain"],
               "fence_drac":["modulename"],
-              "fence_rsa":[],
               "fence_manual":[] }
 
 PRETTY_NAME_ATTRS = {"port":_("Port"),
@@ -186,7 +183,6 @@ class FenceHandler:
               "fence_ilo":self.pop_ilo,
               "fence_rsa":self.pop_rsa,
               "fence_drac":self.pop_drac,
-              "fence_rsa":self.pop_rsa,
               "fence_sanbox2":self.pop_sanbox2,
               "fence_bladecenter":self.pop_bladecenter,
               "fence_mcdata":self.pop_mcdata,
@@ -205,7 +201,6 @@ class FenceHandler:
               "fence_ilo":self.pop_ilo_fd,
               "fence_rsa":self.pop_rsa_fd,
               "fence_drac":self.pop_drac_fd,
-              "fence_rsa":self.pop_rsa_fd,
               "fence_sanbox2":self.pop_sanbox2_fd,
               "fence_bladecenter":self.pop_bladecenter_fd,
               "fence_mcdata":self.pop_mcdata_fd,
@@ -224,7 +219,6 @@ class FenceHandler:
               "fence_ilo":self.val_ilo,
               "fence_rsa":self.val_rsa,
               "fence_drac":self.val_drac,
-              "fence_rsa":self.val_rsa,
               "fence_sanbox2":self.val_sanbox2,
               "fence_bladecenter":self.val_bladecenter,
               "fence_mcdata":self.val_mcdata,
@@ -243,7 +237,6 @@ class FenceHandler:
               "fence_ilo":self.val_ilo_fd,
               "fence_rsa":self.val_rsa_fd,
               "fence_drac":self.val_drac_fd,
-              "fence_rsa":self.val_rsa_fd,
               "fence_sanbox2":self.val_sanbox2_fd,
               "fence_bladecenter":self.val_bladecenter_fd,
               "fence_mcdata":self.val_mcdata_fd,
@@ -300,9 +293,6 @@ class FenceHandler:
       self.drac_modulename.set_text("")
       self.drac_modulename.set_sensitive(False)
       self.drac_modname_label.set_sensitive(False)
- 
-  def pop_rsa(self, attrs):
-    pass
  
   def pop_vixel(self, attrs):
     self.vixel_port_text(attrs["port"])
@@ -380,7 +370,7 @@ class FenceHandler:
     self.rsa_fd_name.set_text("")
     self.rsa_fd_login.set_text("")
     self.rsa_fd_passwd.set_text("")
-    self.rsa_fd_hostname.set_text("")
+    self.rsa_fd_ip.set_text("")
     self.drac_fd_name.set_text("")
     self.drac_fd_login.set_text("")
     self.drac_fd_passwd.set_text("")
@@ -456,7 +446,7 @@ class FenceHandler:
     self.rsa_fd_name.set_text(attrs["name"])
     self.rsa_fd_login.set_text(attrs["login"])
     self.rsa_fd_passwd.set_text(attrs["passwd"])
-    self.rsa_fd_hostname.set_text(attrs["hostname"])
+    self.rsa_fd_ip.set_text(attrs["ipaddr"])
 
   def pop_drac_fd(self, attrs):
     self.drac_fd_name.set_text(attrs["name"])
@@ -580,7 +570,7 @@ class FenceHandler:
     self.rsa_fd_name = self.fence_xml.get_widget('rsa_entry2')
     self.rsa_fd_login = self.fence_xml.get_widget('rsa_entry3')
     self.rsa_fd_passwd = self.fence_xml.get_widget('rsa_entry4')
-    self.rsa_fd_hostname = self.fence_xml.get_widget('rsa_entry5')
+    self.rsa_fd_ip = self.fence_xml.get_widget('rsa_entry5')
 
     self.drac_fd_name = self.fence_xml.get_widget('entry57')
     self.drac_fd_login = self.fence_xml.get_widget('entry59')
@@ -816,15 +806,15 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
     if self.rsa_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
-    if self.rsa_fd_hostname.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_HOSTNAME)
+    if self.rsa_fd_ip.get_text() == "":
+        raise ValidationError('FATAL', FD_PROVIDE_IP)
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.rsa_fd_name.get_text())
 
     fields = {}
     fields["name"] = self.rsa_fd_name.get_text()
-    fields["hostname"] = self.rsa_fd_hostname.get_text()
+    fields["ipaddr"] = self.rsa_fd_ip.get_text()
     fields["login"] = self.rsa_fd_login.get_text()
     fields["passwd"] = self.rsa_fd_passwd.get_text()
 
