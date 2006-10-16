@@ -521,6 +521,12 @@
       <optional>
        <attribute name="options"/>
       </optional>
+      <optional>
+       <attribute name="path"/>
+      </optional>
+      <optional>
+       <attribute name="fsid"/>
+      </optional>
      </group>
     </choice>
    </element>
