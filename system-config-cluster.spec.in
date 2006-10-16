@@ -51,8 +51,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Oct 16 2006 Jim Parsons <jparsons@redhat.com> 1.0.31-1
+  -  Beta 2 build. Fixes for bz210733, bz204497, bz202739
 * Wed Sep 26 2006 Jim Parsons <jparsons@redhat.com> 1.0.30-1
-  -  Fixed RSA II fence form, bz207671 
+  -  Fixed RSA II fence form, bz207671 and cluster name bz205662
 * Wed Jun 14 2006 Jim Parsons <jparsons@redhat.com> 1.0.29-1
   -  spec file fix, version bump 
 * Wed Jun 14 2006 Jim Parsons <jparsons@redhat.com> 1.0.28-1
