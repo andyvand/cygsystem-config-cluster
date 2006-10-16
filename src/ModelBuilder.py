@@ -30,6 +30,8 @@ from Netfs import Netfs
 from Clusterfs import Clusterfs
 from Resources import Resources
 from Service import Service
+from QuorumD import QuorumD
+from Xenvm import Xenvm
 from RefObject import RefObject
 from FailoverDomain import FailoverDomain
 from FailoverDomains import FailoverDomains
@@ -63,6 +65,8 @@ TAGNAMES={ 'cluster':Cluster,
            'multicast':Multicast,
            'clusterfs':Clusterfs,
            'netfs':Netfs,
+           'quorumd':QuorumD,
+           'xenvm':Xenvm,
            'script':Script,
            'nfsexport':NFSExport, 
            'nfsclient':NFSClient,
@@ -88,7 +92,7 @@ INVALID_GULM_COUNT=_("GULM locking mechanism may consist of 1, 3, 4 or 5 locking
 
 
 class ModelBuilder:
-  def __init__(self, lock_type, filename=None, mcast_addr=None):
+  def __init__(self, lock_type, filename=None, mcast_addr=None,new_clu_name=None,new_quorumdisk=None):
 
     if os.path.exists("/etc/cluster/") == False:
       try:
@@ -118,10 +122,10 @@ class ModelBuilder:
     if filename == None:
       if lock_type == DLM_TYPE:
         self.lock_type = DLM_TYPE
-        self.object_tree = self.buildDLMModelTemplate()
+        self.object_tree = self.buildDLMModelTemplate(new_clu_name,new_quorumdisk)
       else:
         self.lock_type = GULM_TYPE
-        self.object_tree = self.buildGULMModelTemplate()
+        self.object_tree = self.buildGULMModelTemplate(new_clu_name)
     else:
       try:
         self.parent = minidom.parse(self.filename)
@@ -190,11 +194,18 @@ class ModelBuilder:
 
     return (new_object)
 
-  def buildDLMModelTemplate(self):
+  def buildDLMModelTemplate(self, new_clu_name, new_qd):
     obj_tree = Cluster()
     self.cluster_ptr = obj_tree
+    if new_clu_name == None:
+      new_clu_name = "new_cluster"
+    else:
+      new_clu_name = new_clu_name.strip()
 
-    obj_tree.addAttribute("name","alpha_cluster")
+    if new_qd != None:
+      obj_tree.addChild(new_qd)
+
+    obj_tree.addAttribute("name",new_clu_name)
     obj_tree.addAttribute("config_version","1")
     fdp = FenceDaemon()
     obj_tree.addChild(fdp)
@@ -232,11 +243,16 @@ class ModelBuilder:
 
     return obj_tree
     
-  def buildGULMModelTemplate(self):
+  def buildGULMModelTemplate(self, new_clu_name):
     obj_tree = Cluster()
     self.cluster_ptr = obj_tree
 
-    obj_tree.addAttribute("name","alpha_cluster")
+    if new_clu_name == None:
+      new_clu_name = "new_cluster"
+    else:
+      new_clu_name = new_clu_name.strip()
+
+    obj_tree.addAttribute("name",new_clu_name)
     obj_tree.addAttribute("config_version","1")
     fdp = FenceDaemon()
     obj_tree.addChild(fdp)

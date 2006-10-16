@@ -284,15 +284,21 @@ class FenceHandler:
 
   def pop_drac(self, attrs):
     try:
-      self.drac_modulename.set_sensitive(True)
-      self.drac_modulename.set_text(attrs["modulename"])
-      self.drac_mc_cbox.set_active(True)
-      self.drac_modname_label.set_sensitive(True)
+      mod_name_attr = attrs["modulename"]
     except KeyError, e:
+      mod_name_attr = None
+
+    if(mod_name_attr == None or mod_name_attr == ""):
       self.drac_mc_cbox.set_active(False)
       self.drac_modulename.set_text("")
       self.drac_modulename.set_sensitive(False)
       self.drac_modname_label.set_sensitive(False)
+
+    else:
+      self.drac_modulename.set_sensitive(True)
+      self.drac_modulename.set_text(attrs["modulename"])
+      self.drac_mc_cbox.set_active(True)
+      self.drac_modname_label.set_sensitive(True)
  
   def pop_vixel(self, attrs):
     self.vixel_port_text(attrs["port"])

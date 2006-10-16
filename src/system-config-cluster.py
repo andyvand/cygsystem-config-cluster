@@ -17,6 +17,8 @@ import os
 import MessageLibrary
 from CommandHandler import CommandHandler
 from CommandError import CommandError
+from QuorumD import QuorumD
+from Heuristic import Heuristic
 
 PROGNAME = "system-config-cluster"
 VERSION = "@VERSION@"
@@ -65,6 +67,10 @@ NO_CONF_PRESENT=_("The cluster configuration file, '/etc/cluster/cluster.conf' d
 NO_CONF_PRESENT_INVALID=_("The cluster configuration file, '/etc/cluster/cluster.conf' is not valid. This application will help you build an initial configuration file, or you can open an existing configuration file in another location.")
 
 NOT_CLUSTER_MEMBER=_("Because this node is not currently part of a cluster, the management tab for this application is not available.")
+
+NO_QD_DEVICE=_("Either a device name that all nodes can see, or a label is needed for the quorum disk heuristic.")
+
+NO_QD_PROGRAM=_("A path to a program is needed for the quorum disk heuristic.")
 
 SAVED_FILE=_("The current configuration has been saved in \n %s")
 CONFIRM_PROPAGATE=_("This action will save the current configuration in /etc/cluster/cluster.conf, and will propagate this configuration to all active cluster members. Do you wish to proceed?")
@@ -317,6 +323,9 @@ class basecluster:
     self.mcast_address = None
     self.mcast_addr_label.set_sensitive(False)
     self.radio_dlm.set_active(True)
+    self.qd_cbox.set_sensitive(True)
+    self.qd_cbox.set_active(False)
+    self.gray_out_qd_frame()
     self.lock_method_dlg.show()
     #print "So now the mcast_addr == %s" % self.mcast_address
     #self.model_builder = ModelBuilder(self.lock_type, None, self.mcast_address)
@@ -325,6 +334,8 @@ class basecluster:
     #self.configtab.set_model(self.model_builder)
 
   def lock_ok(self, button):
+    new_qd = None
+    new_cluname = self.newcluname.get_text()
     if self.radio_dlm.get_active() == True:
       if self.mcast_cbox.get_active() == True: #User wishes to use multicast
         if self.ip.isValid() == False:
@@ -334,13 +345,24 @@ class basecluster:
           return True
         else:
           self.mcast_address = self.ip.getAddrAsString() 
+      if self.qd_cbox.get_active() == True:   #qdisk is desired
+        if (self.qd_device.get_text().strip() == "" and self.qd_label.get_text().strip() == ""):
+          retval = MessageLibrary.errorMessage(NO_QD_DEVICE)
+          self.lock_method_dlg.response(gtk.RESPONSE_NO)
+          return True
+        if self.qd_h_program.get_text().strip() == "":
+          retval = MessageLibrary.errorMessage(NO_QD_PROGRAM)
+          self.lock_method_dlg.response(gtk.RESPONSE_NO)
+          return True
+        new_qd = self.makeNewQuorumDisk()
+        
       self.lock_type = DLM_TYPE
     else:
       self.lock_type = GULM_TYPE
       self.mcast_address = None
 
     self.lock_method_dlg.hide()
-    self.model_builder = ModelBuilder(self.lock_type, None, self.mcast_address)
+    self.model_builder = ModelBuilder(self.lock_type, None, self.mcast_address, new_cluname, new_qd)
     #set file name field at top of tab to 'New Configuration'
     self.glade_xml.get_widget("filename_entry").set_text(NEW_CONFIG)
     if self.configtab != None:
@@ -351,6 +373,55 @@ class basecluster:
     self.lock_method_dlg.hide()
     self.no_conf_dlg.run()
 
+  def makeNewQuorumDisk(self):
+    qd = QuorumD()
+    interval = self.qd_interval.get_text().strip()
+    if interval == "":
+      interval = "1"
+    qd.addAttribute('interval',interval)
+
+    tko = self.qd_tko.get_text().strip()
+    if tko == "":
+      tko = "10"
+    qd.addAttribute('tko',tko)
+
+    votes = self.qd_votes.get_text().strip()
+    if votes == "":
+      votes = "3"
+    qd.addAttribute('votes',votes)
+
+    minscore = self.qd_minscore.get_text().strip()
+    if minscore == "":
+      minscore = "3"
+    qd.addAttribute('min_score',minscore)
+
+    device = self.qd_device.get_text().strip()
+    if device != "":
+      qd.addAttribute('device',device)
+
+    label = self.qd_label.get_text().strip()
+    if label != "":
+      qd.addAttribute('label',label)
+
+    #Add heuristic
+    heur = Heuristic()
+    score = self.qd_h_score.get_text().strip()
+    if score == "":
+      score = "1"
+    heur.addAttribute('score',score)
+
+    hinterval = self.qd_h_interval.get_text().strip()
+    if hinterval == "":
+      hinterval = "2"
+    heur.addAttribute('interval',hinterval)
+
+    program = self.qd_h_program.get_text().strip()
+    heur.addAttribute('program',program)
+
+    qd.addChild(heur)
+    return qd
+
+
   def on_no_conf_create(self, button):
     self.no_conf_dlg.hide()
     self.radio_dlm.set_active(True)
@@ -358,6 +429,10 @@ class basecluster:
     self.mcast_cbox.set_active(False)
     self.ip.clear()
     self.ip.set_sensitive(False)
+    self.qd_cbox.set_sensitive(True)
+    self.qd_cbox.set_active(False)
+    #self.qd_frame.hide_all()
+    self.gray_out_qd_frame()
     self.mcast_addr_label.set_sensitive(False)
     while self.lock_method_dlg.run() != gtk.RESPONSE_OK:
         # continue ONLY after self.model_builder has been set up
@@ -378,15 +453,27 @@ class basecluster:
       self.ip.set_sensitive(True)
       self.mcast_addr_label.set_sensitive(True)
 
+  def on_qd_cbox_changed(self, *args):
+    if self.qd_cbox.get_active() == False:
+      #self.qd_frame.hide_all()
+      self.gray_out_qd_frame()
+    else:
+      #self.qd_frame.show_all()
+      self.ungray_qd_frame()
+
   def on_radio_change(self, *args):
     if self.radio_dlm.get_active() == False:
       self.mcast_cbox.set_sensitive(False)
       self.ip.set_sensitive(False)
       self.mcast_addr_label.set_sensitive(False)
+      self.qd_cbox.set_sensitive(False)
+      self.gray_out_qd_frame()
     else:
       self.mcast_cbox.set_sensitive(True)
       self.ip.set_sensitive(True)
       self.mcast_addr_label.set_sensitive(True)
+      self.qd_cbox.set_sensitive(True)
+      self.ungray_qd_frame()
     
 
   def init_widgets(self):
@@ -420,6 +507,7 @@ class basecluster:
     self.bad_xml_dlg = self.glade_xml.get_widget('bad_xml_dlg')
     self.bad_xml_label = self.glade_xml.get_widget('bad_xml_label')
     self.bad_xml_text = self.glade_xml.get_widget('bad_xml_text')
+    self.newcluname = self.glade_xml.get_widget('new_cluname')
     self.mcast_cbox = self.glade_xml.get_widget('mcast_cbox')
     self.mcast_cbox.connect('toggled',self.on_mcast_cbox_changed)
     self.mcast_addr_label = self.glade_xml.get_widget('label121')
@@ -431,6 +519,72 @@ class basecluster:
     self.glade_xml.get_widget('mcast_addr_entry_proxy').add(self.mcast_addr_entry)
     self.mcast_ip_dlg = self.glade_xml.get_widget('mcast_ip_dlg')
     self.mcast_ip_dlg.connect("delete_event", self.mcast_ip_dlg_delete)
+    self.qd_cbox = self.glade_xml.get_widget('qd_cbox')
+    self.qd_cbox.connect('toggled',self.on_qd_cbox_changed)
+    self.qd_frame = self.glade_xml.get_widget('qd_frame')
+    self.qd_interval = self.glade_xml.get_widget('qd_interval')
+    self.qd_tko = self.glade_xml.get_widget('qd_tko')
+    self.qd_votes = self.glade_xml.get_widget('qd_votes')
+    self.qd_minscore = self.glade_xml.get_widget('qd_minscore')
+    self.qd_device = self.glade_xml.get_widget('qd_device')
+    self.qd_label = self.glade_xml.get_widget('qd_label')
+    self.qd_h_program = self.glade_xml.get_widget('qd_h_program')
+    self.qd_h_score = self.glade_xml.get_widget('qd_h_score')
+    self.qd_h_interval = self.glade_xml.get_widget('qd_h_interval')
+    self.qd_interval_l = self.glade_xml.get_widget('qd_interval_l')
+    self.qd_tko_l = self.glade_xml.get_widget('qd_tko_l')
+    self.qd_votes_l = self.glade_xml.get_widget('qd_votes_l')
+    self.qd_minscore_l = self.glade_xml.get_widget('qd_minscore_l')
+    self.qd_device_l = self.glade_xml.get_widget('qd_device_l')
+    self.qd_label_l = self.glade_xml.get_widget('qd_label_l')
+    self.qd_h_program_l = self.glade_xml.get_widget('qd_h_program_l')
+    self.qd_h_score_l = self.glade_xml.get_widget('qd_h_score_l')
+    self.qd_h_interval_l = self.glade_xml.get_widget('qd_h_interval_l')
+    self.qd_h_label_l = self.glade_xml.get_widget('qd_h_label_l')
+
+  def gray_out_qd_frame(self):
+    self.qd_interval.set_sensitive(False)
+    self.qd_tko.set_sensitive(False)
+    self.qd_votes.set_sensitive(False)
+    self.qd_minscore.set_sensitive(False)
+    self.qd_device.set_sensitive(False)
+    self.qd_label.set_sensitive(False)
+    self.qd_h_program.set_sensitive(False)
+    self.qd_h_score.set_sensitive(False)
+    self.qd_h_interval.set_sensitive(False)
+    self.qd_interval_l.set_sensitive(False)
+    self.qd_tko_l.set_sensitive(False)
+    self.qd_votes_l.set_sensitive(False)
+    self.qd_minscore_l.set_sensitive(False)
+    self.qd_device_l.set_sensitive(False)
+    self.qd_label_l.set_sensitive(False)
+    self.qd_h_program_l.set_sensitive(False)
+    self.qd_h_score_l.set_sensitive(False)
+    self.qd_h_interval_l.set_sensitive(False)
+    self.qd_h_label_l.set_sensitive(False)
+
+
+  def ungray_qd_frame(self):
+    self.qd_interval.set_sensitive(True)
+    self.qd_tko.set_sensitive(True)
+    self.qd_votes.set_sensitive(True)
+    self.qd_minscore.set_sensitive(True)
+    self.qd_device.set_sensitive(True)
+    self.qd_label.set_sensitive(True)
+    self.qd_h_program.set_sensitive(True)
+    self.qd_h_score.set_sensitive(True)
+    self.qd_h_interval.set_sensitive(True)
+    self.qd_interval_l.set_sensitive(True)
+    self.qd_tko_l.set_sensitive(True)
+    self.qd_votes_l.set_sensitive(True)
+    self.qd_minscore_l.set_sensitive(True)
+    self.qd_device_l.set_sensitive(True)
+    self.qd_label_l.set_sensitive(True)
+    self.qd_h_program_l.set_sensitive(True)
+    self.qd_h_score_l.set_sensitive(True)
+    self.qd_h_interval_l.set_sensitive(True)
+    self.qd_h_label_l.set_sensitive(True)
+
 
   def propagate(self, button):
     retval = MessageLibrary.warningMessage(CONFIRM_PROPAGATE)

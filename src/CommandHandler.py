@@ -52,26 +52,60 @@ class CommandHandler:
     pass
 
   def isClusterMember(self):
-    args = list()
-    args.append("/sbin/magma_tool")
-    args.append("quorum")
-    cmdstr = ' '.join(args)
-    try:
-      out, err, res = executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
-    except RuntimeError, e:
-      return False
-
-    if res != 0:
-      return False
-
-    #look for 'Connect Failure' substring
-    lines = out.splitlines()
-    for line in lines:
-      val = line.find("Connect Failure")
-      if val != (-1):
+    if self.isRHEL4() == True:
+      args = list()
+      args.append("/sbin/magma_tool")
+      args.append("quorum")
+      cmdstr = ' '.join(args)
+      try:
+        out, err, res = executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
+      except RuntimeError, e:
         return False
 
-    return True
+      if res != 0:
+        return False
+
+      #look for 'Connect Failure' substring
+      lines = out.splitlines()
+      for line in lines:
+        val = line.find("Connect Failure")
+        if val != (-1):
+          return False
+
+      return True
+    else:  #rhel5 or fc6
+      args = list()
+      args.append("/sbin/cman_tool")
+      args.append("status")
+      cmdstr = ' '.join(args)
+      try:
+        out, err, res = executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      except RuntimeError, e:
+        return False
+
+      if res != 0:
+        return False
+
+      #look for 'Connect Failure' substring
+      lines = out.splitlines()
+      for line in lines:
+        val = line.find("Connect Failure")
+        if val != (-1):
+          return False
+
+
+      #look for 'Cluster Member' substring
+      for line in lines:
+        val = line.find("Cluster Member")
+        if val != (-1):
+          dex = line.find("Yes")
+          if dex != (-1):
+            return True
+          else:
+            return False
+
+      return False
+
 
   def getClusterName(self):
     #Use  [root@link-08 ~]# ccs_test connect
@@ -220,26 +254,53 @@ class CommandHandler:
     return ""
 
   def isClusterQuorate(self):
-    args = list()
-    args.append("/sbin/magma_tool")
-    args.append("quorum")
-    cmdstr = ' '.join(args)
-    try:
-      out,err,res =  executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
-    except RuntimeError, e:
+    if self.isRHEL4():
+      args = list()
+      args.append("/sbin/magma_tool")
+      args.append("quorum")
+      cmdstr = ' '.join(args)
+      try:
+        out,err,res =  executil.execWithCaptureErrorStatus("/sbin/magma_tool",args)
+      except RuntimeError, e:
+        return False
+
+      if res != 0:
+        return False
+
+      #look for Quorate string
+      lines = out.splitlines()
+      for line in lines:
+        val = line.find("Quorate")
+        if val != (-1):  #Found it
+          return True
+
+      return False
+    else: #must be rhel5 or fc6
+      args = list()
+      args.append("/sbin/cman_tool")
+      args.append("status")
+      cmdstr = ' '.join(args)
+      try:
+        out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)    
+      except RuntimeError, e:
+        return False
+
+      if res != 0:
+        return False
+
+      #look for Quorum string
+      lines = out.splitlines()
+      for line in lines:
+        val = line.find("Quorum")
+        if val != (-1):  #Found it
+          dex = line.find("blocked")
+          if dex != (-1):  #Found the word blocked...uh oh
+            return False
+          else:
+            return True
+
       return False
 
-    if res != 0:
-      return False
-
-    #look for Quorate string
-    lines = out.splitlines()
-    for line in lines:
-      val = line.find("Quorate")
-      if val != (-1):  #Found it
-        return True
-
-    return False
 
   def getNodesInfo(self, locking_type ):
     dataobjs = list()
@@ -438,3 +499,17 @@ class CommandHandler:
     if res != 0:
       raise CommandError("FATAL", err)
 
+  def isRHEL4(self):
+    rh_release = open("/etc/redhat-release", 'r')
+    lines = rh_release.readlines()
+    for line in lines:  #This should only run once...
+      if line.find("Bordeaux") != (-1):  #FC 5
+        return True
+      if line.find("Nahant") != (-1):
+        return True
+      if line.find("Tikanga") != (-1):
+        return False
+      if line.find("FC6") != (-1):
+        return False
+
+    return False  #Guess it is rhel5

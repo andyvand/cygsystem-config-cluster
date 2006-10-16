@@ -1821,7 +1821,7 @@
 		  <child>
 		    <widget class="GtkEntry" id="entry27">
 		      <property name="visible">True</property>
-		      <property name="tooltip" translatable="yes">Whitespace seperated list of GNBD servers</property>
+		      <property name="tooltip" translatable="yes">Whitespace separated list of GNBD servers</property>
 		      <property name="can_focus">True</property>
 		      <property name="editable">True</property>
 		      <property name="visibility">True</property>

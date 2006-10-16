@@ -5,13 +5,23 @@ TAG_NAME = "cluster"
 import gettext
 _ = gettext.gettext
 
-CLUSTER_NAME=_("Cluster Name: %s")
+CLUSTER_NAME_ALIAS=_("Cluster Name Alias: %s")
+ACTUAL_CLUSTER_NAME=_("Actual Cluster Name: %s")
+ACTUAL_CLUSTER_NAME_DESC=_("The Actual Cluster Name should \n be used for storage configuration,\n such as making a clustered file system")
 CLUSTER_POPULATION=_("Number of Members: %d")
 DLM_TYPE=_("Locking Type: Distributed")
 GULM_TYPE=_("Locking Type: GULM")
 LOCKSERVER=_("Lock Server:")
 CONFIG_VERSION=_("Config Version")
 MCAST_MODE=_("Cluster Manager using Multicast Mode. \n   Multicast Address: %s")
+
+#Quorum disk attributes
+QD_INTERVAL=_("Interval: %s")
+QD_TKO=_("TKO Value: %s")
+QD_VOTES=_("Votes: %s")
+QD_MIN_SCORE=_("Minimum Score: %s")
+QD_DEVICE=_("Device: %s")
+QD_LABEL=_("Label: %s")
                                                                                 
 class Cluster(TagObject):
   def __init__(self):
@@ -29,7 +39,11 @@ class Cluster(TagObject):
     isMulticast = False
     mcast_address = ""
 
-    stringbuf = CLUSTER_NAME % self.getNameAlias() + "\n"
+    stringbuf = CLUSTER_NAME_ALIAS % self.getNameAlias() + "\n"
+
+    stringbuf = stringbuf + ACTUAL_CLUSTER_NAME % self.getName() + "\n"
+
+    stringbuf = stringbuf + ACTUAL_CLUSTER_NAME_DESC + "\n"
 
     stringbuf = stringbuf + CONFIG_VERSION + ": " + self.getConfigVersion() + "\n"
 
@@ -114,6 +128,23 @@ class Cluster(TagObject):
       return self.getAttribute("alias")
     else:
       return alias
+
+  def doesClusterUseQuorumDisk(self):
+    kids = self.getChildren()
+    for kid in kids:
+      if kid.getTagName().strip() == "quorumd":
+        return True
+
+    return False
+
+  def getQuorumdPtr(self):
+    kids = self.getChildren()
+    for kid in kids:
+      if kid.getTagName().strip() == "quorumd":
+        return kid
+
+    return None
+
 
   #def addAttribute(self, name, value):
   #  if name == "config_version":

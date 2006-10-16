@@ -65,6 +65,9 @@
         <attribute name="hostname"/>
         <attribute name="login"/>
         <attribute name="passwd"/>
+        <optional>
+         <attribute name="force"/>
+        </optional>
        </group>
        <!-- GNBD -->
        <group>
@@ -94,6 +97,12 @@
 
  <optional>
   <element name="rm">
+   <optional>
+    <attribute name="log_level"/>
+   </optional>
+   <optional>
+    <attribute name="log_facility"/>
+   </optional>
    <interleave>
    <optional>
     <element name="failoverdomains">
@@ -148,6 +157,15 @@
      </zeroOrMore>
     </element>
    </zeroOrMore>
+   <zeroOrMore>
+    <element name="xenvm">
+     <attribute name="name"/>
+     <attribute name="path"/>
+     <optional>
+      <attribute name="autostart"/>
+     </optional>
+    </element>
+   </zeroOrMore>
   </interleave>
   </element>
  </optional>
@@ -163,6 +181,40 @@
    <optional>
     <attribute name="clean_start"/>
    </optional>
+  </element>
+ </optional>
+
+ <optional>
+  <element name="quorumd">
+   <optional>
+    <attribute name="interval"/>
+   </optional>
+   <optional>
+    <attribute name="tko"/>
+   </optional>
+   <optional>
+    <attribute name="votes"/>
+   </optional>
+   <optional>
+    <attribute name="min_score"/>
+   </optional>
+   <optional>
+    <attribute name="device"/>
+   </optional>
+   <optional>
+    <attribute name="label"/>
+   </optional>
+   <oneOrMore>
+    <element name="heuristic">
+     <attribute name="program"/>
+     <optional>
+      <attribute name="score"/>
+     </optional>
+     <optional>
+      <attribute name="interval"/>
+     </optional>
+    </element>
+   </oneOrMore>
   </element>
  </optional>
 
@@ -191,6 +243,12 @@
      <element name="multicast">
       <attribute name="addr"/>
      </element>
+    </optional> 
+    <optional>
+     <attribute name="log_level"/>
+    </optional> 
+    <optional>
+     <attribute name="log_facility"/>
     </optional> 
    </element>
   </define>
