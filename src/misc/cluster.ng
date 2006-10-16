@@ -54,11 +54,19 @@
         <attribute name="ipaddr"/>
         <attribute name="login"/>
         <attribute name="passwd"/>
+        <optional>
+         <attribute name="lanplus"/>
+        </optional>
        </group>
        <!-- WTI, Vixel -->
        <group>
         <attribute name="ipaddr"/>
         <attribute name="passwd"/>
+       </group>
+       <!-- scsi reservations -->
+       <group>
+        <attribute name="nodename"/>
+        <attribute name="self"/>
        </group>
        <!-- ILO -->
        <group>
