@@ -21,6 +21,7 @@ FenceDevice.py \
 FenceDevices.py \
 FenceHandler.py \
 Fence.py \
+Heuristic.py \
 ForkedCommand.py	\
 executil.py \
 Fs.py \
@@ -47,6 +48,7 @@ RHPL_execWithCaptureErrorStatus.py \
 Rm.py \
 Script.py \
 TagObject.py \
+QuorumD.py \
 ValidationError.py \
 pixmaps/node.png	\
 pixmaps/fence.png	\
@@ -94,6 +96,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/FenceDevices.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FenceHandler.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fence.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Heuristic.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ForkedCommand.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/executil.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fs.py  $(DESTDIR)$(pkgdatadir)/
@@ -119,6 +122,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/RHPL_execWithCaptureErrorStatus.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Rm.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Script.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/QuorumD.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/TagObject.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ValidationError.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/pixmaps/fence.png  $(DESTDIR)$(pkgdatadir)/pixmaps/
