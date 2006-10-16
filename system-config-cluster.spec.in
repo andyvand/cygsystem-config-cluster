@@ -51,6 +51,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Mon Oct 16 2006 Jim Parsons <jparsons@redhat.com> 1.0.32-1
+  -  Fix oversight in Makefile
 * Mon Oct 16 2006 Jim Parsons <jparsons@redhat.com> 1.0.31-1
   -  Beta 2 build. Fixes for bz210733, bz204497, bz202739
 * Wed Sep 26 2006 Jim Parsons <jparsons@redhat.com> 1.0.30-1
