@@ -55,6 +55,9 @@
         <attribute name="login"/>
         <attribute name="passwd"/>
         <optional>
+         <attribute name="auth"/>
+        </optional>
+        <optional>
          <attribute name="lanplus"/>
         </optional>
        </group>
