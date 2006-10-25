@@ -38,6 +38,7 @@ from Service import Service
 from FailoverDomain import FailoverDomain
 from Device import Device
 from Method import Method
+from Vm import Vm
 from Fence import Fence
 from Lockserver import Lockserver
 from ResourceHandler import ResourceHandler
@@ -90,6 +91,8 @@ CONFIRM_FD_DELETE=_("Are you certain that you wish to delete Fence Device %s?")
 
 ADD_FENCE=_("Add a New Fence")
 
+UNABLE_LOCATE_VM=_("The Virtual Server to be edited, %s, can not be located")
+
 EDIT_FENCE=_("Edit Properties for Fence: %s")
 
 SELECT_LEVEL_FOR_FENCE=_("Please select a fence level for the new fence first.")
@@ -121,6 +124,12 @@ CONFIRM_FAILDOM_REMOVE=_("Are you certain that you wish to remove Failover Domai
 CONFIRM_RC_REMOVE=_("Are you certain that you wish to remove resource %s ?")
 
 CONFIRM_SVC_REMOVE=_("Are you certain that you wish to remove service %s ?")
+
+CONFIRM_VM_REMOVE=_("Are you certain that you wish to remove virtual service %s ?")
+
+VM_NAME_REQUIRED=_("Please provide a name for this virtual service.")
+
+VM_PATH_REQUIRED=_("Please provide a path to the config file for this virtual service.")
 
 SERVICE_NAME_REQUIRED=_("Please provide a name for this service.")
 
@@ -279,6 +288,18 @@ class ConfigTabController:
     self.glade_xml.get_widget('service_edit_b').connect('clicked',self.on_svc_edit)
     self.glade_xml.get_widget('service_delete_b').connect('clicked',self.on_svc_del)
 
+
+    #VMs and Virtual Services button panels
+    self.vm_props_dlg = self.glade_xml.get_widget('vm_props_dlg')
+    self.vm_props_dlg.connect('delete_event',self.on_vm_props_delete)
+    self.glade_xml.get_widget('okbutton21').connect("clicked",self.on_vm_props_ok)
+    self.glade_xml.get_widget('cancelbutton21').connect("clicked",self.on_vm_props_cancel)
+    self.vm_name = self.glade_xml.get_widget('vm_name')
+    self.vm_name_label = self.glade_xml.get_widget('vm_name_l')
+    self.vm_path = self.glade_xml.get_widget('vm_path')
+    self.glade_xml.get_widget('vm_add_b').connect('clicked',self.on_vm_add)
+    self.glade_xml.get_widget('vm_edit_b').connect('clicked',self.on_vm_edit)
+    self.glade_xml.get_widget('vm_delete_b').connect('clicked',self.on_vm_del)
 
 
     #Fence Devices
@@ -1446,11 +1467,92 @@ class ConfigTabController:
     self.rc_panel.hide()
     self.rc_handler.clear_rc_forms()
 
+  def on_vm_add(self, button):
+    #launch dialog for virtual service creation
+    self.vm_name.set_sensitive(True)
+    self.vm_name.set_text("")
+    self.vm_path.set_text("")
+    self.vm_props_dlg.run()
+
+  def on_vm_edit(self, button):
+    #launch dialog for virtual service editing
+    # find out which virtual service to edit
+    selection = self.treeview.get_selection()
+    model,iter = selection.get_selected()
+    obj = model.get_value(iter, OBJ_COL)
+    self.vm_name.set_text(obj.getName())
+    self.vm_name.set_sensitive(False)
+    path = obj.getAttribute("path")
+    if path != None:
+      self.vm_path.set_text(path)
+    else:
+      self.vm_path.set_text("")
+    self.vm_props_dlg.run()
+
+  def on_vm_del(self, button):
+    selection = self.treeview.get_selection()
+    model,iter = selection.get_selected()
+    obj = model.get_value(iter, OBJ_COL)
+    retval = self.warningMessage(CONFIRM_VM_REMOVE % obj.getName())
+    if (retval == gtk.RESPONSE_NO):
+      return
+    rm_ptr = self.model_builder.getResourceManagerPtr()
+    rm_ptr.removeChild(obj)
+    self.model_builder.setModified()
+    args = list()
+    args.append(VMS_TYPE)
+    apply(self.reset_tree_model, args)
+    
+
   def on_svc_add(self, button):
     #launch dialog for service name field
     self.svc_name.set_text("")
     #self.svc_add_dlg.show()
     self.svc_add_dlg.run()
+
+  def on_vm_props_ok(self, button):
+    vm_name = self.vm_name.get_text().strip()
+    if vm_name == "":
+      self.errorMessage(VM_NAME_REQUIRED)
+      return
+    vm_path = self.vm_path.get_text().strip()
+    if vm_path == "":
+      self.errorMessage(VM_PATH_REQUIRED)
+      return
+
+
+    try:
+      v = self.model_builder.retrieveVMsByName(vm_name)
+    except:
+      v = None  # Does not exist - good
+
+    if self.vm_name.get_property('sensitive') != 0:  #A new VM
+      if v == None: #This is a new VM
+        v = Vm()
+        v.addAttribute("name",vm_name)
+        v.addAttribute("path",vm_path)
+        rm_ptr = self.model_builder.getResourceManagerPtr()
+        rm_ptr.addChild(v)
+      else:  #Name collision
+        self.vm_name.select_region(0, (-1))
+        self.errorMessage(UNIQUE_VM_NAME % vm_name)
+        return
+
+    else:
+      if v != None:
+        v.addAttribute("path",vm_path)
+      else:
+        self.errorMessage(UNABLE_LOCATE_VM % vm_name)
+        return
+
+    self.vm_props_dlg.hide()
+    self.model_builder.setModified()
+    args = list()
+    args.append(VMS_TYPE) 
+    apply(self.reset_tree_model, args)
+
+  def on_vm_props_cancel(self, button):
+    self.vm_props_dlg.hide()
 
   def on_svc_add_ok(self, button):
     svcs = self.model_builder.getServices()
@@ -1515,6 +1617,7 @@ class ConfigTabController:
     args = list()
     args.append(RESOURCE_GROUPS_TYPE)
     apply(self.reset_tree_model, args)
+
 
 
 
@@ -1601,4 +1704,8 @@ class ConfigTabController:
 
   def on_svc_add_delete(self, *args):
     self.svc_add_dlg.hide()
+    return True
+
+  def on_vm_props_delete(self, *args):
+    self.vm_props_dlg.hide()
     return True

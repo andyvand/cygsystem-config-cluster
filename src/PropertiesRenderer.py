@@ -58,6 +58,8 @@ RESOURCES_STR=_("Resources")
 RESOURCE_STR=_("Resource:")
 SERVICES_STR=_("Services")
 SERVICE_STR=_("Service: ")
+VMS_STR=_("Virtual Services")
+VM_STR=_("Virtual Service: ")
                                                                                 
 ##############################################################
 
@@ -141,6 +143,12 @@ class PropertiesRenderer:
 
     elif type == RESOURCE_GROUP_TYPE:
       layout_string = "<span size=\"12000\" foreground=\"" + RESOURCEGROUP_COLOR + "\">" + SERVICE_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
+
+    elif type == VMS_TYPE:
+      layout_string = "<span size=\"12000\" foreground=\"" + VMS_COLOR + "\">" + VMS_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
+
+    elif type == VM_TYPE:
+      layout_string = "<span size=\"12000\" foreground=\"" + VM_COLOR + "\">" + VM_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
 
     elif type == F_LEVEL_TYPE:
       layout_string = "<span size=\"12000\" foreground=\"" + FENCEDEVICES_COLOR + "\">" + FENCE_LEVEL_STR + "</span>" + "<span size=\"12000\">  " + name + "</span>"
@@ -303,3 +311,7 @@ class PropertiesRenderer:
       self.color_type = RESOURCEGROUPS_COLOR
     elif type == RESOURCE_GROUP_TYPE:
       self.color_type = RESOURCEGROUPS_COLOR
+    elif type == VMS_TYPE:
+      self.color_type = VMS_COLOR
+    elif type == VM_TYPE:
+      self.color_type = VMS_COLOR

@@ -511,5 +511,21 @@ class CommandHandler:
         return False
       if line.find("FC6") != (-1):
         return False
+      if line.find("Zod") != (-1):
+        return False
 
     return False  #Guess it is rhel5
+
+  def isVirtualized(self):
+    args = list()
+    args.append("/usr/bin/virsh") 
+    args.append("nodeinfo")
+    try:
+      out,err,res = executil.execWithCaptureErrorStatus("/usr/bin/virsh",args)
+    except RuntimeError, e:
+      return False
+
+    if res != 0:
+      return False
+    else:
+      return True
