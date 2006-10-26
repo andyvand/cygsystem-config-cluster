@@ -49,7 +49,7 @@ Rm.py \
 Script.py \
 TagObject.py \
 QuorumD.py \
-Vm.py \
+Xenvm.py \
 ValidationError.py \
 pixmaps/node.png	\
 pixmaps/fence.png	\
@@ -124,7 +124,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/Rm.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Script.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/QuorumD.py  $(DESTDIR)$(pkgdatadir)/
-	install -m 0640 $(srcdir)/Vm.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Xenvm.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/TagObject.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ValidationError.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/pixmaps/fence.png  $(DESTDIR)$(pkgdatadir)/pixmaps/

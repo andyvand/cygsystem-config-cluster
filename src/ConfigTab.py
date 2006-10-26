@@ -3,7 +3,6 @@ import gobject
 import sys
 import cgi
 from clui_constants import *
-from CommandHandler import CommandHandler
 from PropertiesRenderer import PropertiesRenderer
 
 import gettext
@@ -41,14 +40,9 @@ SERVICE=_("Service")
 RESOURCES=_("Resources")
 RESOURCE=_("Resource")
 IPADDRESS=_("IP Address")
-VIRT_SERVICES=_("Virtual Services")
-VIRT_SERVICE=_("Virtual Service")
 
 ONE_SERVICE=_("One Service is configured \n for this cluster")
 NUM_SERVICES=_("%d Services are configured \n for this cluster")
-
-ONE_VM=_("One Virtual Service is configured \n for this cluster")
-NUM_VMS=_("%d Virtual Services are configured \n for this cluster")
 
 FENCE_CONFIGURATION=_("Fence Configuration for this Cluster Node")
 NO_FDOMS=_("No Failover Domains Currently Configured")
@@ -60,8 +54,6 @@ class ConfigTab:
 
     self.model_builder = model_builder
     self.glade_xml = glade_xml
-    cm = CommandHandler()
-    self.isVirtualized = cm.isVirtualized()
 
     #set up tree structure
     self.treeview = self.glade_xml.get_widget('maintree')
@@ -79,7 +71,6 @@ class ConfigTab:
     self.fencedevices_iter = None
     self.resources_iter = None
     self.services_iter = None
-    self.vms_iter = None
 
     self.controller = ConfigTabController(self.model_builder, 
                                           self.treeview,
@@ -195,22 +186,6 @@ class ConfigTab:
       self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
       self.clear_all_buttonpanels()
       self.service_p.show()
-    elif type == VMS_TYPE:
-      vms_list = self.model_builder.getVMs()
-      num_vms = len(vms_list)
-      if num_vms == 1:
-        props = ONE_VM
-      else:
-        props = NUM_VMS % num_vms
-      self.prop_renderer.render_to_layout_area(props, "",type) 
-      self.clear_all_buttonpanels()
-      self.vms_p.show()
-      vms_str = "<span size=\"10000\" foreground=\"" + "lightgray" + "\"><b>" + VIRT_SERVICES + "</b></span>"
-      model.set_value(self.vms_iter, NAME_COL, vms_str)
-    elif type == VM_TYPE:
-      self.prop_renderer.render_to_layout_area(None, obj.getName(),type) 
-      self.clear_all_buttonpanels()
-      self.vm_p.show()
     elif type == RESOURCES_TYPE:
       if obj == None:
         self.prop_renderer.render_to_layout_area(NO_RCS, RESOURCES,type) 
@@ -244,8 +219,6 @@ class ConfigTab:
     self.service_p.hide()
     self.resources_p.hide()
     self.resource_p.hide()
-    self.vms_p.hide()
-    self.vm_p.hide()
 
   def init_buttonpanels(self):
     self.cluster_p = self.glade_xml.get_widget('cluster_p')
@@ -260,8 +233,6 @@ class ConfigTab:
     self.service_p = self.glade_xml.get_widget('service_p')
     self.resources_p = self.glade_xml.get_widget('resources_p')
     self.resource_p = self.glade_xml.get_widget('resource_p')
-    self.vms_p = self.glade_xml.get_widget('vms_p')
-    self.vm_p = self.glade_xml.get_widget('vm_p')
 
   def reset_tree_model(self, *in_args):
     selection = self.treeview.get_selection()
@@ -294,11 +265,6 @@ class ConfigTab:
 
     services_path = model.get_path(self.services_iter)
     services_exp = self.treeview.row_expanded(services_path)
-
-    if self.isVirtualized == True:
-      vms_path = model.get_path(self.vms_iter)
-      vms_exp = self.treeview.row_expanded(vms_path)
-
     self.prepare_tree()
     self.prop_renderer.clear_layout_area()
 
@@ -317,9 +283,6 @@ class ConfigTab:
       self.treeview.expand_to_path(newmodel.get_path(self.resources_iter))
     if services_exp == True:
       self.treeview.expand_to_path(newmodel.get_path(self.services_iter))
-    if self.isVirtualized == True:
-      if vms_exp == True:
-        self.treeview.expand_to_path(newmodel.get_path(self.vms_iter))
 
 
     if type == CLUSTER_TYPE:
@@ -337,9 +300,6 @@ class ConfigTab:
     elif type == RESOURCE_GROUPS_TYPE:
       selection.select_iter(self.services_iter)
       self.treeview.expand_to_path(newmodel.get_path(self.services_iter))
-    elif type == VMS_TYPE:
-      selection.select_iter(self.vms_iter)
-      self.treeview.expand_to_path(newmodel.get_path(self.vms_iter))
     elif type == RESOURCES_TYPE:
       selection.select_iter(self.resources_iter)
       self.treeview.expand_to_path(newmodel.get_path(self.resources_iter))
@@ -412,8 +372,6 @@ class ConfigTab:
 
     rgroups = self.model_builder.getServices()
 
-    vms = self.model_builder.getVMs()
-
     resources = self.model_builder.getResources()
 
     mr_iter = treemodel.append(cluster_iter)
@@ -475,24 +433,6 @@ class ConfigTab:
                                TYPE_COL, RESOURCE_GROUP_TYPE,
                                OBJ_COL, rgroup)
 
-    ###VMs or Virtual Services
-    if self.isVirtualized == True:
-      vms_iter = treemodel.append(mr_iter)
-      self.vms_iter = vms_iter
-      vms_str = "<span size=\"10000\" foreground=\"" + VMS_COLOR + "\"><b>" + VIRT_SERVICES + "</b></span>"
-      treemodel.set(vms_iter, NAME_COL, vms_str,
-                              TYPE_COL, VMS_TYPE)
-
-      for vm in vms:
-        try:
-          vm_str = "<span>" + VIRT_SERVICE + " " + cgi.escape(vm.getName()) + "</span>"
-        except KeyError, e:
-          continue
-        vm_iter = treemodel.append(vms_iter)
-        treemodel.set(vm_iter, NAME_COL, vm_str,
-                               TYPE_COL, VM_TYPE,
-                               OBJ_COL, vm)
-
     if expand_all != None:
       self.treeview.expand_all()
 
@@ -536,7 +476,3 @@ class ConfigTab:
     model.set_value(self.failoverdomains_iter, NAME_COL, fdoms_str)
     model.set_value(self.resources_iter, NAME_COL, resources_str)
     model.set_value(self.services_iter, NAME_COL, rgrps_str)
-
-    if self.isVirtualized == True:
-      vms_str = "<span size=\"10000\" foreground=\"" + VMS_COLOR + "\"><b>" + VIRT_SERVICES + "</b></span>"
-      model.set_value(self.vms_iter, NAME_COL, vms_str)

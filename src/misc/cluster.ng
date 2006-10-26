@@ -169,7 +169,7 @@
     </element>
    </zeroOrMore>
    <zeroOrMore>
-    <element name="vm">
+    <element name="xenvm">
      <attribute name="name"/>
      <attribute name="path"/>
      <optional>

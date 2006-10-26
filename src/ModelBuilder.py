@@ -31,7 +31,7 @@ from Clusterfs import Clusterfs
 from Resources import Resources
 from Service import Service
 from QuorumD import QuorumD
-from Vm import Vm
+from Xenvm import Xenvm
 from RefObject import RefObject
 from FailoverDomain import FailoverDomain
 from FailoverDomains import FailoverDomains
@@ -66,7 +66,7 @@ TAGNAMES={ 'cluster':Cluster,
            'clusterfs':Clusterfs,
            'netfs':Netfs,
            'quorumd':QuorumD,
-           'vm':Vm,
+           'xenvm':Xenvm,
            'script':Script,
            'nfsexport':NFSExport, 
            'nfsclient':NFSClient,
@@ -85,7 +85,6 @@ SERVICE="service"
 GULM_TAG_STR="gulm"
 MCAST_STR="multicast"
 CMAN_PTR_STR="cman"
-VM="vm"
 ###-----------------------------------
 
 
@@ -467,14 +466,6 @@ class ModelBuilder:
 
     self.isModified = True
 
-  def retrieveVMsByName(self, name):
-    vms = self.getVMs()
-    for v in vms:
-      if v.getName() == name:
-        return v
-                                                                                
-    raise GeneralError('FATAL',"Couldn't find vm name %s in current node list" % name)
-
   def getFenceDevices(self):
     if self.fencedevices_ptr == None:
       return list()
@@ -547,16 +538,6 @@ class ModelBuilder:
         if kid.getTagName() == SERVICE:
           rg_list.append(kid)
 
-    return rg_list
-
-  def getVMs(self):
-    rg_list = list()
-    if self.resourcemanager_ptr != None:
-      kids = self.resourcemanager_ptr.getChildren()
-      for kid in kids:
-        if kid.getTagName() == VM:
-          rg_list.append(kid)
-                                                                                
     return rg_list
         
   def getResources(self):
