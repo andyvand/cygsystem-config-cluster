@@ -376,6 +376,9 @@ class ServiceController:
         if children:
           if item.get_children()[0].get_text() == domain:
             break
+        else:
+          if self.svc_fdom_optionmenu.get_children()[0].get_text() == domain:
+            break
       self.svc_fdom_optionmenu.set_history(y)
     
   def add_tree_children(self, obj, iter):
