@@ -114,6 +114,10 @@ class ResourceHandler:
   def pop_nfsclient(self, attrs):
     self.nfsc_name.set_text(attrs["name"])
     self.nfsc_target.set_text(attrs["target"])
+    try:
+      self.nfsc_path.set_text(attrs["path"])
+    except KeyError, e:
+      self.nfsc_path.set_text("")
     
     options = attrs['options'].strip().split(',')
     if 'ro' in options:
@@ -287,6 +291,7 @@ class ResourceHandler:
 
     self.nfsc_name.set_text("")
     self.nfsc_target.set_text("")
+    self.nfsc_path.set_text("")
     self.nfsc_options.set_text("")
     self.nfsc_rw.set_active(True)
 
@@ -441,6 +446,10 @@ class ResourceHandler:
     fields = {}
     fields["name"] = nfs_name
     fields["target"] = self.nfsc_target.get_text().strip()
+    if self.nfsc_path.get_text().strip() != "":
+      fields["path"] = self.nfsc_path.get_text().strip()
+    else:
+      fields["path"] = ""
     fields["options"] = options_string
 
     return fields
@@ -708,6 +717,7 @@ class ResourceHandler:
     self.nfsc_name = self.rc_xml.get_widget('entry8')
     self.nfsc_target = self.rc_xml.get_widget('entry9')
     self.nfsc_options = self.rc_xml.get_widget('entry23')
+    self.nfsc_path = self.rc_xml.get_widget('entry26')
     self.nfsc_rw = self.rc_xml.get_widget('radiobutton1')
     self.nfsc_ro = self.rc_xml.get_widget('radiobutton2')
 
