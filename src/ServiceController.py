@@ -34,6 +34,8 @@ RELOCATE_STR = "relocate"
 
 DISABLE_STR = "disable"
 
+NFSCLIENT_TAG="nfsclient"
+
 ###YUK! XXX make access to this static in ResourceHandler
 ###This is an awful copy
 RC_OPTS = {"ip":_("IP Address"),
@@ -447,6 +449,14 @@ class ServiceController:
         self.svc_rc_panel.hide()
         for k in returnlist.keys():
           r_obj.addAttribute(k, returnlist[k])
+        if r_obj.getTagName() == NFSCLIENT_TAG:
+          #If path attr has been removed, we need to remove from obj as well
+          try:
+            pth = returnlist["path"]
+            if pth == "":
+              r_obj.removeAttribute("path")
+          except KeyError, e:
+            r_obj.removeAttribute("path")
         self.model_builder.setModified()
         self.prep_service_tree()
                                                                                 
