@@ -51,6 +51,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Jan 10 2007 Jim Parsons <jparsons@redhat.com> 1.0.38-1
+  -  Bump for brew issue -- one more try
 * Wed Jan 10 2007 Jim Parsons <jparsons@redhat.com> 1.0.37-1
   -  Bump for brew issue
 * Wed Jan 10 2007 Jim Parsons <jparsons@redhat.com> 1.0.36-1
