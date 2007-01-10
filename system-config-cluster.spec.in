@@ -51,6 +51,10 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Jan 10 2007 Jim Parsons <jparsons@redhat.com> 1.0.37-1
+  -  Bump for brew issue
+* Wed Jan 10 2007 Jim Parsons <jparsons@redhat.com> 1.0.36-1
+  -  Fix for bz 207482, many schema validation fixes
 * Wed Oct 25 2006 Jim Parsons <jparsons@redhat.com> 1.0.35-1
   -  Fix for bz 211944, no more Xenvm
 * Mon Oct 23 2006 Jim Parsons <jparsons@redhat.com> 1.0.34-1
