@@ -59,6 +59,8 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_egenera":_("Egenera SAN Controller"),
               "fence_bullpap":_("Bull PAP"),
               "fence_drac":_("DRAC"),
+              "fence_xvm":_("Virtual Machine Fencing"),
+              "fence_scsi":_("SCSI Reservation Fencing"),
               "fence_ipmilan":_("IPMI Lan"),
               "fence_manual":_("Manual Fencing") }
 
@@ -78,6 +80,8 @@ FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_ipmilan":["name","ipaddr","login","passwd","auth"],
               "fence_bullpap":["name","ipaddr","login","passwd"],
               "fence_drac":["name","ipaddr","login","passwd"],
+              "fence_xvm":["name"],
+              "fence_scsi":["name"],
               "fence_manual":["name"] }
 
 FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
@@ -96,6 +100,8 @@ FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
               "fence_ipmilan":[],
               "fence_bullpap":["domain"],
               "fence_drac":["modulename"],
+              "fence_xvm":["domain"],
+              "fence_scsi":[],
               "fence_manual":[] }
 
 PRETTY_NAME_ATTRS = {"port":_("Port"),
@@ -183,11 +189,13 @@ class FenceHandler:
               "fence_ilo":self.pop_ilo,
               "fence_rsa":self.pop_rsa,
               "fence_drac":self.pop_drac,
+              "fence_xvm":self.pop_xvm,
               "fence_sanbox2":self.pop_sanbox2,
               "fence_bladecenter":self.pop_bladecenter,
               "fence_mcdata":self.pop_mcdata,
               "fence_egenera":self.pop_egenera,
               "fence_ipmilan":self.pop_ipmilan,
+              "fence_scsi":self.pop_scsi,
               "fence_bullpap":self.pop_bullpap,
               "fence_manual":self.pop_manual }
 
@@ -201,11 +209,13 @@ class FenceHandler:
               "fence_ilo":self.pop_ilo_fd,
               "fence_rsa":self.pop_rsa_fd,
               "fence_drac":self.pop_drac_fd,
+              "fence_xvm":self.pop_xvm_fd,
               "fence_sanbox2":self.pop_sanbox2_fd,
               "fence_bladecenter":self.pop_bladecenter_fd,
               "fence_mcdata":self.pop_mcdata_fd,
               "fence_egenera":self.pop_egenera_fd,
               "fence_ipmilan":self.pop_ipmilan_fd,
+              "fence_scsi":self.pop_scsi_fd,
               "fence_bullpap":self.pop_bullpap_fd,
               "fence_manual":self.pop_manual_fd }
 
@@ -219,11 +229,13 @@ class FenceHandler:
               "fence_ilo":self.val_ilo,
               "fence_rsa":self.val_rsa,
               "fence_drac":self.val_drac,
+              "fence_xvm":self.val_xvm,
               "fence_sanbox2":self.val_sanbox2,
               "fence_bladecenter":self.val_bladecenter,
               "fence_mcdata":self.val_mcdata,
               "fence_egenera":self.val_egenera,
               "fence_ipmilan":self.val_ipmilan,
+              "fence_scsi":self.val_scsi,
               "fence_bullpap":self.val_bullpap,
               "fence_manual":self.val_manual }
 
@@ -237,11 +249,13 @@ class FenceHandler:
               "fence_ilo":self.val_ilo_fd,
               "fence_rsa":self.val_rsa_fd,
               "fence_drac":self.val_drac_fd,
+              "fence_xvm":self.val_xvm_fd,
               "fence_sanbox2":self.val_sanbox2_fd,
               "fence_bladecenter":self.val_bladecenter_fd,
               "fence_mcdata":self.val_mcdata_fd,
               "fence_egenera":self.val_egenera_fd,
               "fence_ipmilan":self.val_ipmilan_fd,
+              "fence_scsi":self.val_scsi_fd,
               "fence_bullpap":self.val_bullpap_fd,
               "fence_manual":self.val_manual_fd }
 
@@ -270,7 +284,13 @@ class FenceHandler:
   def pop_wti(self, attrs):
     self.wti_port.set_text(attrs["port"])
  
+  def pop_xvm(self, attrs):
+    self.xvm_domain.set_text(attrs["domain"])
+ 
   def pop_rps10(self, attrs):
+    pass
+
+  def pop_scsi(self, attrs):
     pass
 
   def pop_brocade(self, attrs):
@@ -326,7 +346,17 @@ class FenceHandler:
     self.bullpap_domain.set_text(attrs["domain"])
 
   def pop_ipmilan(self, attrs):
-    pass
+    try:
+      lanplus_attr = attrs["lanplus"]
+    except KeyError, e:
+      lanplus_attr = None
+
+    if(lanplus_attr == None or lanplus_attr != "1"):
+      self.ipmi_lanplus_cbox.set_active(False)
+
+    else:
+      self.ipmi_lanplus_cbox.set_active(True)
+ 
  
   def clear_fi_forms(self):
     self.apc_port.set_text("") 
@@ -334,6 +364,7 @@ class FenceHandler:
     self.apc_snmp_port.set_text("") 
     self.apc_snmp_switch.set_text("") 
     self.wti_port.set_text("") 
+    self.xvm_domain.set_text("") 
     self.brocade_port.set_text("")
     self.vixel_port.set_text("")
     self.sanbox2_port.set_text("")
@@ -349,6 +380,7 @@ class FenceHandler:
     self.drac_modulename.set_sensitive(False)
     self.drac_modname_label.set_sensitive(False)
 
+    self.ipmi_lanplus_cbox.set_active(False)
 
   def clear_fd_forms(self):
     self.apc_fd_name.set_text("") 
@@ -362,6 +394,7 @@ class FenceHandler:
     self.wti_fd_ip.set_text("")
     self.wti_fd_name.set_text("")
     self.wti_fd_passwd.set_text("")
+    self.xvm_fd_name.set_text("")
     self.rps10_fd_name.set_text("")
     self.rps10_fd_device.set_text("")
     self.rps10_fd_port.set_text("")
@@ -385,6 +418,7 @@ class FenceHandler:
     self.vixel_fd_ip.set_text("")
     self.vixel_fd_passwd.set_text("")
     self.manual_fd_name.set_text("")
+    self.scsi_fd_name.set_text("")
     self.mcdata_fd_name.set_text("")
     self.mcdata_fd_ip.set_text("")
     self.mcdata_fd_login.set_text("")
@@ -476,6 +510,12 @@ class FenceHandler:
   def pop_manual_fd(self, attrs):
     self.manual_fd_name.set_text(attrs["name"])
  
+  def pop_scsi_fd(self, attrs):
+    self.scsi_fd_name.set_text(attrs["name"])
+ 
+  def pop_xvm_fd(self, attrs):
+    self.xvm_fd_name.set_text(attrs["name"])
+ 
   def pop_gnbd_fd(self, attrs):
     self.gnbd_fd_name.set_text(attrs["name"])
     self.gnbd_fd_servers.set_text(attrs["servers"])
@@ -526,6 +566,7 @@ class FenceHandler:
     self.vixel_port = self.fence_xml.get_widget('entry5') 
     self.ilo_port = self.fence_xml.get_widget('entry7') 
     self.rsa_port = self.fence_xml.get_widget('rsa_entry1') 
+    self.xvm_domain = self.fence_xml.get_widget('entry70') 
     self.sanbox2_port = self.fence_xml.get_widget('entry8') 
     self.bladecenter_blade = self.fence_xml.get_widget('entry41') 
     self.mcdata_port = self.fence_xml.get_widget('entry9') 
@@ -536,6 +577,7 @@ class FenceHandler:
     self.drac_modulename = self.fence_xml.get_widget('entry69')
     self.drac_mc_cbox = self.fence_xml.get_widget('drac_mc_cbox')
     self.drac_mc_cbox.connect('toggled',self.on_drac_mc_cbox_changed)
+    self.ipmi_lanplus_cbox = self.fence_xml.get_widget('ipmi_lanplus_cbox')
 
     ##Fence Device Forms
     self.apc_fd_name = self.fence_xml.get_widget('entry12')
@@ -551,6 +593,10 @@ class FenceHandler:
     self.wti_fd_ip = self.fence_xml.get_widget('entry17')
     self.wti_fd_name = self.fence_xml.get_widget('entry16')
     self.wti_fd_passwd = self.fence_xml.get_widget('entry18')
+
+    self.xvm_fd_name = self.fence_xml.get_widget('entry71')
+
+    self.scsi_fd_name = self.fence_xml.get_widget('entry72')
 
     self.rps10_fd_name = self.fence_xml.get_widget('entry61')
     self.rps10_fd_device = self.fence_xml.get_widget('entry62')
@@ -734,6 +780,46 @@ class FenceHandler:
     fields["name"] = self.rps10_fd_name.get_text()
     fields["device"] = self.rps10_fd_device.get_text()
     fields["port"] = self.rps10_fd_port.get_text()
+
+    return fields
+ 
+  def val_xvm_fd(self, name):
+    rectify_fence_name = False
+    if self.xvm_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.xvm_fd_name)
+    if name != self.xvm_fd_name.get_text():
+      res = self.check_unique_fd_name(self.xvm_fd_name.get_text())
+      if res == False:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = True
+
+
+    if rectify_fence_name == True:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.xvm_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.xvm_fd_name.get_text()
+
+    return fields
+ 
+  def val_scsi_fd(self, name):
+    rectify_fence_name = False
+    if self.scsi_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.scsi_fd_name)
+    if name != self.scsi_fd_name.get_text():
+      res = self.check_unique_fd_name(self.scsi_fd_name.get_text())
+      if res == False:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = True
+
+
+    if rectify_fence_name == True:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.scsi_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.scsi_fd_name.get_text()
 
     return fields
  
@@ -1156,6 +1242,15 @@ class FenceHandler:
 
     return fields
 
+  def val_xvm(self):
+    if self.xvm_domain.get_text() == "":
+      raise ValidationError('FATAL', FI_PROVIDE_DOMAIN)
+
+    fields = {}
+    fields["domain"] = self.xvm_domain.get_text()
+
+    return fields
+
   def val_brocade(self):
     if self.brocade_port.get_text() == "":
       raise ValidationError('FATAL', FI_PROVIDE_PORT)
@@ -1186,6 +1281,12 @@ class FenceHandler:
     return fields
 
   def val_rsa(self):
+
+    fields = {}
+
+    return fields
+
+  def val_scsi(self):
 
     fields = {}
 
@@ -1264,6 +1365,14 @@ class FenceHandler:
 
     fields = {}
 
+    if self.ipmi_lanplus_cbox.get_active() == True:
+      fields["lanplus"] = "1"
+    else:
+      fields["lanplus"] = "" #This is done as a signal to ConfigTabController
+                                #code, so that in case a modname WAS set, and
+                                #then user unchecks the checkbox in an edit
+                                #situation, then the modname attr is removed
+                                #from the attrlist of the object in the model.
     return fields
 
   def val_bullpap(self):

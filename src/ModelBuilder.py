@@ -31,6 +31,7 @@ from Clusterfs import Clusterfs
 from Resources import Resources
 from Service import Service
 from QuorumD import QuorumD
+from Heuristic import Heuristic
 from Vm import Vm
 from RefObject import RefObject
 from FailoverDomain import FailoverDomain
@@ -66,6 +67,7 @@ TAGNAMES={ 'cluster':Cluster,
            'clusterfs':Clusterfs,
            'netfs':Netfs,
            'quorumd':QuorumD,
+           'heuristic':Heuristic,
            'vm':Vm,
            'script':Script,
            'nfsexport':NFSExport, 
@@ -85,6 +87,7 @@ SERVICE="service"
 GULM_TAG_STR="gulm"
 MCAST_STR="multicast"
 CMAN_PTR_STR="cman"
+QUORUMD_PTR_STR="quorumd"
 VM="vm"
 ###-----------------------------------
 
@@ -113,6 +116,8 @@ class ModelBuilder:
     self.resourcemanager_ptr = None
     self.resources_ptr = None
     self.fence_daemon_ptr = None
+    self.quorumd_ptr = new_quorumdisk
+    self.unusual_items = list()
     self.command_handler = CommandHandler()
     self.isModified = False
     if mcast_addr == None:
@@ -140,9 +145,10 @@ class ModelBuilder:
       self.purgePCDuplicates()
       self.resolve_references()
       self.check_for_multicast()
+      self.check_for_nodeids()
 
 
-  def buildModel(self, parent_node):
+  def buildModel(self, parent_node, parent_object=None):
 
     if parent_node == None:
       parent_node = self.parent
@@ -160,8 +166,22 @@ class ModelBuilder:
           attrNode = attrs.get(attrName)
           attrValue = attrNode.nodeValue
           new_object.addAttribute(attrName,attrValue)
-      except KeyError, k:
+      except KeyError, k: ##This allows for custom tags
+        new_object = TagObject(parent_node.nodeName)
+        attrs = parent_node.attributes
+        for attrName in attrs.keys():
+          attrNode = attrs.get(attrName)
+          attrValue = attrNode.nodeValue
+          new_object.addAttribute(attrName, attrValue)
+        self.unusual_items.append((parent_object, new_object))
+        for item in parent_node.childNodes:
+          result_object = self.buildModel(item, new_object)
+          if result_object != None:
+            new_object.addChild(result_object)
         return None
+          
+      ######End of unusual item exception
+
       if parent_node.nodeName == CLUSTER_PTR_STR:
         self.cluster_ptr = new_object
       if parent_node.nodeName == CLUSTERNODES_PTR_STR:
@@ -172,6 +192,8 @@ class ModelBuilder:
         self.failoverdomains_ptr = new_object
       elif parent_node.nodeName == RESOURCEMANAGER_PTR_STR:
         self.resourcemanager_ptr = new_object
+      elif parent_node.nodeName == QUORUMD_PTR_STR:
+        self.quorumd_ptr = new_object
       elif parent_node.nodeName == RESOURCES_PTR_STR:
         self.resources_ptr = new_object
       elif parent_node.nodeName == FENCEDAEMON_PTR_STR:
@@ -189,7 +211,7 @@ class ModelBuilder:
 
 
     for item in parent_node.childNodes:
-      result_object = self.buildModel(item)
+      result_object = self.buildModel(item,new_object)
       if result_object != None:
         new_object.addChild(result_object)
 
@@ -381,6 +403,8 @@ class ModelBuilder:
     #check for dual power fences
     self.dual_power_fence_check()
 
+    self.restore_unusual_items()
+
     try:
       if filename == None:
         filename = self.filename
@@ -403,15 +427,46 @@ class ModelBuilder:
       self.filename = filename
 
       self.isModified = False
+      #try:
+      #  self.parent = minidom.parse(self.filename)
+      #except IOError, e:
+      #  print "Terrible error at exportModel in ModelBuilder"
+      #  pass
+      self.parent = doc
+
+      self.object_tree = self.buildModel(None)
+      self.check_empty_ptrs()
+      self.check_fence_daemon()
+      self.resolve_fence_instance_types()
+      self.purgePCDuplicates()
+      self.resolve_references()
+      self.check_for_multicast()
 
     finally:
+      pass
       #dual_power_fence_check() adds extra
       #fence instance entries for dual power controllers
       #These must be removed from the tree before the UI
       #can be used
-      self.purgePCDuplicates()
+      #self.purgePCDuplicates()
 
     return True
+
+  ##This method attempts to restore custom tag objects
+  def restore_unusual_items(self):
+    for item in self.unusual_items:
+      duplicate = False
+      kids = item[0].getChildren()
+      for kid in kids:
+        if kid == item[1]:
+          duplicate = True
+          break
+      if duplicate == True:
+        continue
+      else:
+        item[0].addChild(item[1])
+          
+    
   
   def has_filepath(self):
     if self.filename == None:
@@ -512,6 +567,36 @@ class ModelBuilder:
 
   def getMcastAddr(self):
     return self.mcast_address
+
+  def check_for_nodeids(self):
+    nodes = self.getNodes()
+    for node in nodes:
+      if node.getAttribute('nodeid') == None:
+        new_id = self.getUniqueNodeID()
+        node.addAttribute('nodeid',new_id)
+
+  def getUniqueNodeID(self):
+    nodes = self.getNodes()
+    total_nodes = len(nodes)
+    dex_list = list()
+    for nd_idx in range (1, (total_nodes + 3)):
+      dex_list.append(str(nd_idx))
+
+    for dex in dex_list:
+      found = False
+      for node in nodes:
+        ndid = node.getAttribute('nodeid')
+        if ndid != None:
+          if ndid == dex:
+            found = True
+            break
+        else:
+          continue
+
+      if found == True:
+        continue
+      else:
+        return dex
 
   def check_empty_ptrs(self):
     if self.resourcemanager_ptr == None:
@@ -835,8 +920,14 @@ class ModelBuilder:
     return True
 
   def check_two_node(self):
-    if self.getLockType() == DLM_TYPE:
+    if self.getLockType() == DLM_TYPE and self.quorumd_ptr == None:
       clusternodes_count = len(self.clusternodes_ptr.getChildren())
+      #Make certain that there is a cman tag in the file
+      #If missing, it will not hurt to add it here
+      if self.CMAN_ptr == None:
+        cman = Cman()
+        self.cluster_ptr.addChild(cman)
+        self.CMAN_ptr = cman 
       if clusternodes_count == 2:
         self.CMAN_ptr.addAttribute('two_node', '1')
         self.CMAN_ptr.addAttribute('expected_votes', '1')

@@ -3,10 +3,13 @@ import string
 TAG_NAME = "document"
 
 class TagObject:
-  def __init__(self):
+  def __init__(self, tagname=None):
     self.attr_hash = {}
     self.children = list()
-    self.TAG_NAME = TAG_NAME
+    if tagname == None:
+      self.TAG_NAME = TAG_NAME
+    else:
+      self.TAG_NAME = tagname
 
   def addChild(self, child):
     #print "in AddChild, adding child %s" % child.getName()

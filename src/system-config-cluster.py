@@ -322,7 +322,6 @@ class basecluster:
     self.ip.set_sensitive(False)
     self.mcast_address = None
     self.mcast_addr_label.set_sensitive(False)
-    self.radio_dlm.set_active(True)
     self.qd_cbox.set_sensitive(True)
     self.qd_cbox.set_active(False)
     self.gray_out_qd_frame()
@@ -336,30 +335,26 @@ class basecluster:
   def lock_ok(self, button):
     new_qd = None
     new_cluname = self.newcluname.get_text()
-    if self.radio_dlm.get_active() == True:
-      if self.mcast_cbox.get_active() == True: #User wishes to use multicast
-        if self.ip.isValid() == False:
-          retval = MessageLibrary.errorMessage(NO_MCAST_IP)
-          self.mcast_address = None
-          self.lock_method_dlg.response(gtk.RESPONSE_NO)
-          return True
-        else:
-          self.mcast_address = self.ip.getAddrAsString() 
-      if self.qd_cbox.get_active() == True:   #qdisk is desired
-        if (self.qd_device.get_text().strip() == "" and self.qd_label.get_text().strip() == ""):
-          retval = MessageLibrary.errorMessage(NO_QD_DEVICE)
-          self.lock_method_dlg.response(gtk.RESPONSE_NO)
-          return True
-        if self.qd_h_program.get_text().strip() == "":
-          retval = MessageLibrary.errorMessage(NO_QD_PROGRAM)
-          self.lock_method_dlg.response(gtk.RESPONSE_NO)
-          return True
-        new_qd = self.makeNewQuorumDisk()
-        
-      self.lock_type = DLM_TYPE
-    else:
-      self.lock_type = GULM_TYPE
-      self.mcast_address = None
+    if self.mcast_cbox.get_active() == True: #User wishes to use multicast
+      if self.ip.isValid() == False:
+        retval = MessageLibrary.errorMessage(NO_MCAST_IP)
+        self.mcast_address = None
+        self.lock_method_dlg.response(gtk.RESPONSE_NO)
+        return True
+      else:
+        self.mcast_address = self.ip.getAddrAsString() 
+    if self.qd_cbox.get_active() == True:   #qdisk is desired
+      if (self.qd_device.get_text().strip() == "" and self.qd_label.get_text().strip() == ""):
+        retval = MessageLibrary.errorMessage(NO_QD_DEVICE)
+        self.lock_method_dlg.response(gtk.RESPONSE_NO)
+        return True
+      if self.qd_h_program.get_text().strip() == "":
+        retval = MessageLibrary.errorMessage(NO_QD_PROGRAM)
+        self.lock_method_dlg.response(gtk.RESPONSE_NO)
+        return True
+      new_qd = self.makeNewQuorumDisk()
+      
+    self.lock_type = DLM_TYPE
 
     self.lock_method_dlg.hide()
     self.model_builder = ModelBuilder(self.lock_type, None, self.mcast_address, new_cluname, new_qd)
@@ -424,7 +419,6 @@ class basecluster:
 
   def on_no_conf_create(self, button):
     self.no_conf_dlg.hide()
-    self.radio_dlm.set_active(True)
     self.mcast_cbox.set_sensitive(True)
     self.mcast_cbox.set_active(False)
     self.ip.clear()
@@ -461,21 +455,6 @@ class basecluster:
       #self.qd_frame.show_all()
       self.ungray_qd_frame()
 
-  def on_radio_change(self, *args):
-    if self.radio_dlm.get_active() == False:
-      self.mcast_cbox.set_sensitive(False)
-      self.ip.set_sensitive(False)
-      self.mcast_addr_label.set_sensitive(False)
-      self.qd_cbox.set_sensitive(False)
-      self.gray_out_qd_frame()
-    else:
-      self.mcast_cbox.set_sensitive(True)
-      self.ip.set_sensitive(True)
-      self.mcast_addr_label.set_sensitive(True)
-      self.qd_cbox.set_sensitive(True)
-      self.ungray_qd_frame()
-    
-
   def init_widgets(self):
     self.notebook = self.glade_xml.get_widget('notebook1')
     self.notebook.connect("switch-page",self.on_notebook_change)
@@ -490,8 +469,6 @@ class basecluster:
     mgmtpageidx = self.notebook.page_num(self.nodetree)
     self.mgmt_tab = self.notebook.get_nth_page(mgmtpageidx)
     self.lock_type = DLM_TYPE  #Default Value
-    self.radio_dlm = self.glade_xml.get_widget('radio_dlm')
-    self.radio_dlm.connect('toggled',self.on_radio_change)
     self.lock_method_dlg = self.glade_xml.get_widget('lock_method')
     self.lock_method_dlg.connect("delete_event", self.lock_method_dlg_delete)
     self.glade_xml.get_widget('okbutton17').connect('clicked', self.lock_ok)

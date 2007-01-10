@@ -53,6 +53,7 @@ VM_COLOR="#FF00FF"
 #Attribute Strings
 VOTES_ATTR="votes"
 NAME_ATTR="name"
+NODEID_ATTR="nodeid"
 
 ONE_VOTE=_("1")
 

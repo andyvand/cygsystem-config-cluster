@@ -653,6 +653,8 @@ class ConfigTabController:
         kees = attrlist.keys()
         for k in kees:
           f_obj.addAttribute(k,attrlist[k])
+        if agent_type == "fence_scsi":
+          f_obj.addAttribute("node",nd.getName())
         level_obj.addChild(f_obj)
         self.prep_fence_panel(nd)
         self.fi_panel.hide()
@@ -674,6 +676,15 @@ class ConfigTabController:
             check_var = attrlist["modulename"]
             if check_var == "":
               f_obj.removeAttribute("modulename") #This rm's any old modulename
+          except KeyError, e:
+            pass    #no attr, no worries
+ 
+        #special case for ipmi lanplus...if lanplus cbox is unchecked, attr must be as well
+        if agent_type == "fence_ipmilan":
+          try:
+            check_var = attrlist["lanplus"]
+            if check_var == "":
+              f_obj.removeAttribute("lanplus") #This rm's any old lanplus
           except KeyError, e:
             pass    #no attr, no worries
  
@@ -909,6 +920,8 @@ class ConfigTabController:
       cn = ClusterNode()
       cn.addAttribute(NAME_ATTR,nameattr)
       cn.addAttribute(VOTES_ATTR,votesattr)
+      nodeid = self.model_builder.getUniqueNodeID()
+      cn.addAttribute(NODEID_ATTR,nodeid)
       self.model_builder.addNode(cn)
 
       if self.model_builder.getLockType() == GULM_TYPE:

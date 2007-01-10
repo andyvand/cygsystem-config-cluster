@@ -112,6 +112,9 @@
     <attribute name="log_level"/>
    </optional>
    <optional>
+    <attribute name="statusmax"/>
+   </optional>
+   <optional>
     <attribute name="log_facility"/>
    </optional>
    <interleave>
@@ -162,6 +165,9 @@
      </optional>
      <optional>
       <attribute name="recovery"/>
+     </optional>
+     <optional>
+      <attribute name="nfslock"/>
      </optional>
      <zeroOrMore>
       <ref name="ALLCHILDREN"/>
