@@ -540,7 +540,10 @@ class FenceHandler:
 
   def pop_ipmilan_fd(self, attrs):
     self.ipmilan_fd_name.set_text(attrs["name"])
-    self.ipmilan_fd_login.set_text(attrs["login"])
+    try:
+      self.ipmilan_fd_login.set_text(attrs["login"])
+    except KeyError, e:
+      self.ipmilan_fd_login.set_text("")
     self.ipmilan_fd_passwd.set_text(attrs["passwd"])
     self.ipmilan_fd_ip.set_text(attrs["ipaddr"])
     try:
@@ -1142,8 +1145,9 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
       rectify_fence_name = True
 
-    if self.ipmilan_fd_login.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+    login field is optional for some ipmi
+    #if self.ipmilan_fd_login.get_text() == "":
+    #    raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
     if self.ipmilan_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
     if self.ipmilan_fd_ip.get_text() == "":
