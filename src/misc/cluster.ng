@@ -648,7 +648,19 @@
         <!-- ILO, ipmilan -->
         <group>
          <optional>
-          <empty/>
+          <attribute name="lanplus"/>
+         </optional>
+        </group>
+        <!-- scsi reservations -->
+        <group>
+         <optional>
+          <attribute name="node"/>
+         </optional>
+        </group>
+        <!-- xvm -->
+        <group>
+         <optional>
+          <attribute name="domain"/>
          </optional>
         </group>
        </choice>
