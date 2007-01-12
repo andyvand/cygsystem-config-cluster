@@ -75,15 +75,17 @@ class CommandHandler:
       return True
     else:  #rhel5 or fc6
       args = list()
-      args.append("/sbin/cman_tool")
+      args.append("/usr/sbin/cman_tool")
       args.append("status")
       cmdstr = ' '.join(args)
       try:
-        out, err, res = executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+        out, err, res = executil.execWithCaptureErrorStatus("/usr/sbin/cman_tool",args)
       except RuntimeError, e:
         return False
 
       if res != 0:
+        print "error code res was not 0, it was %d" % res
+        print "error string was %s" % err
         return False
 
       #look for 'Connect Failure' substring
@@ -91,6 +93,7 @@ class CommandHandler:
       for line in lines:
         val = line.find("Connect Failure")
         if val != (-1):
+          print "connect failure exit"
           return False
 
 
@@ -104,6 +107,7 @@ class CommandHandler:
           else:
             return False
 
+      print "executing catchall exit - could not find proper line"
       return False
 
 
@@ -209,11 +213,11 @@ class CommandHandler:
 
   def getNodeName(self):
     args = list()
-    args.append("/sbin/cman_tool")
+    args.append("/usr/sbin/cman_tool")
     args.append("status")
     cmdstr = ' '.join(args)
     try:
-      out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      out,err,res =  executil.execWithCaptureErrorStatus("/usr/sbin/cman_tool",args)
     except RuntimeError, e:
       return ""
 
@@ -232,11 +236,11 @@ class CommandHandler:
 
   def getClusterStatus(self):
     args = list()
-    args.append("/sbin/cman_tool")
+    args.append("/usr/sbin/cman_tool")
     args.append("status")
     cmdstr = ' '.join(args)
     try:
-      out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      out,err,res =  executil.execWithCaptureErrorStatus("/usr/sbin/cman_tool",args)
     except RuntimeError, e:
       return False
 
@@ -277,11 +281,11 @@ class CommandHandler:
       return False
     else: #must be rhel5 or fc6
       args = list()
-      args.append("/sbin/cman_tool")
+      args.append("/usr/sbin/cman_tool")
       args.append("status")
       cmdstr = ' '.join(args)
       try:
-        out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)    
+        out,err,res =  executil.execWithCaptureErrorStatus("/usr/sbin/cman_tool",args)    
       except RuntimeError, e:
         return False
 
@@ -306,11 +310,11 @@ class CommandHandler:
     dataobjs = list()
     if locking_type == DLM_TYPE:
       args = list()
-      args.append("/sbin/cman_tool")
+      args.append("/usr/sbin/cman_tool")
       args.append("nodes")
       cmdstr = ' '.join(args)
       try:
-        out,err,res =  executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+        out,err,res =  executil.execWithCaptureErrorStatus("/usr/sbin/cman_tool",args)
       except RuntimeError, e:
         return dataobjs  #empty list with no nodes
 
@@ -324,8 +328,12 @@ class CommandHandler:
         if y == 0:
           continue
         words = line.split()
-        nd = NodeData(words[1],words[3],words[4])
-        dataobjs.append(nd)
+        if len(words) == 5:
+          nd = NodeData(words[1],words[3],words[4])
+          dataobjs.append(nd)
+        elif len(words) == 4:
+          nd = NodeData(words[1],"Not Joined",words[3])
+          dataobjs.append(nd)
 
       return dataobjs
 
@@ -468,13 +476,13 @@ class CommandHandler:
 
   def propagateCmanConfig(self, version):
     args = list()
-    args.append("/sbin/cman_tool")
+    args.append("/usr/sbin/cman_tool")
     args.append("version")
     args.append("-r")
     args.append(version)
     cmdstr = ' '.join(args)
     try:
-      out,err,res = executil.execWithCaptureErrorStatus("/sbin/cman_tool",args)
+      out,err,res = executil.execWithCaptureErrorStatus("/usr/sbin/cman_tool",args)
     except RuntimeError, e:
       raise CommandError("FATAL",PROPAGATE_ERROR % (version, err))
 
