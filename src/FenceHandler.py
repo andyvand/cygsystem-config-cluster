@@ -1145,7 +1145,7 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
       rectify_fence_name = True
 
-    login field is optional for some ipmi
+    #login field is optional for some ipmi
     #if self.ipmilan_fd_login.get_text() == "":
     #    raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
     if self.ipmilan_fd_passwd.get_text() == "":
