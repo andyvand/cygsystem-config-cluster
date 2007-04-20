@@ -53,7 +53,12 @@
        <group>
         <attribute name="ipaddr"/>
         <attribute name="login"/>
-        <attribute name="passwd"/>
+        <optional>
+          <attribute name="passwd"/>
+        </optional>
+        <optional>
+          <attribute name="passwd_script"/>
+        </optional>
         <optional>
          <attribute name="auth"/>
         </optional>
@@ -64,7 +69,12 @@
        <!-- WTI, Vixel -->
        <group>
         <attribute name="ipaddr"/>
-        <attribute name="passwd"/>
+        <optional>
+          <attribute name="passwd"/>
+        </optional>
+        <optional>
+          <attribute name="passwd_script"/>
+        </optional>
        </group>
        <!-- scsi reservations -->
        <group>
@@ -75,7 +85,12 @@
        <group>
         <attribute name="hostname"/>
         <attribute name="login"/>
-        <attribute name="passwd"/>
+        <optional>
+          <attribute name="passwd"/>
+        </optional>
+        <optional>
+          <attribute name="passwd_script"/>
+        </optional>
         <optional>
          <attribute name="force"/>
         </optional>
@@ -163,13 +178,16 @@
      <optional>
       <attribute name="recovery"/>
      </optional>
+     <optional>
+      <attribute name="nfslock"/>
+     </optional>
      <zeroOrMore>
       <ref name="ALLCHILDREN"/>
      </zeroOrMore>
     </element>
    </zeroOrMore>
    <zeroOrMore>
-    <element name="xenvm">
+    <element name="vm">
      <attribute name="name"/>
      <attribute name="path"/>
      <optional>
@@ -388,6 +406,171 @@
    </element>
   </define>
   
+  <define name="APACHE">
+   <element name="apache">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <optional>
+       <attribute name="config_file"/>
+      </optional>
+      <optional>
+       <attribute name="server_root"/>
+      </optional>
+      <optional>
+       <attribute name="httpd_options"/>
+      </optional>
+      <optional>
+       <attribute name="shutdown_wait"/>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <ref name="CHILDREN"/>
+    </optional>
+   </element>
+  </define>
+  
+  <define name="POSTGRES">
+   <element name="postgres-8">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <optional>
+       <attribute name="config_file"/>
+      </optional>
+      <optional>
+       <attribute name="postmaster_user"/>
+      </optional>
+      <optional>
+       <attribute name="postmaster_options"/>
+      </optional>
+      <optional>
+       <attribute name="shutdown_wait"/>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <ref name="CHILDREN"/>
+    </optional>
+   </element>
+  </define>
+  
+  <define name="TOMCAT">
+   <element name="tomcat-5">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <optional>
+       <attribute name="config_file"/>
+      </optional>
+      <optional>
+       <attribute name="tomcat_user"/>
+      </optional>
+      <optional>
+       <attribute name="catalina_options"/>
+      </optional>
+      <optional>
+       <attribute name="catalina_base"/>
+      </optional>
+      <optional>
+       <attribute name="shutdown_wait"/>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <ref name="CHILDREN"/>
+    </optional>
+   </element>
+  </define>
+  
+  <define name="MYSQL">
+   <element name="mysql">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <optional>
+       <attribute name="config_file"/>
+      </optional>
+      <optional>
+       <attribute name="listen_address"/>
+      </optional>
+      <optional>
+       <attribute name="mysql_options"/>
+      </optional>
+      <optional>
+       <attribute name="shutdown_wait"/>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <ref name="CHILDREN"/>
+    </optional>
+   </element>
+  </define>
+  
+  <define name="LVM">
+   <element name="lvm">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <optional>
+       <attribute name="lv_name"/>
+      </optional>
+      <optional>
+       <attribute name="vg_name"/>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <ref name="CHILDREN"/>
+    </optional>
+   </element>
+  </define>
+  
+  <define name="OPENLDAP">
+   <element name="openldap">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="name"/>
+      <optional>
+       <attribute name="config_file"/>
+      </optional>
+      <optional>
+       <attribute name="url_list"/>
+      </optional>
+      <optional>
+       <attribute name="slapd_options"/>
+      </optional>
+      <optional>
+       <attribute name="shutdown_wait"/>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <ref name="CHILDREN"/>
+    </optional>
+   </element>
+  </define>
+  
   <define name="IP">
    <element name="ip">
     <choice>
@@ -570,6 +753,12 @@
       <ref name="CLUSTERFS"/>
       <ref name="FS"/>
       <ref name="SAMBA"/>
+      <ref name="OPENLDAP"/>
+      <ref name="APACHE"/>
+      <ref name="LVM"/>
+      <ref name="POSTGRES"/>
+      <ref name="TOMCAT"/>
+      <ref name="MYSQL"/>
      </choice>
     </zeroOrMore>
   </define>
@@ -603,6 +792,12 @@
         <data type="IDREF"/>
        </attribute>
        <choice>
+        <!-- DRAC -->
+        <group>
+         <optional>
+          <attribute name="action"/>
+         </optional>
+        </group>
         <!-- WTI, Brocade, Vixel, McData, SANBox2 -->
         <group>
          <attribute name="port"/>
@@ -614,14 +809,23 @@
         <group>
          <attribute name="port"/>
          <attribute name="switch"/>
+         <optional>
+          <attribute name="option"/>
+         </optional>
         </group>
         <!-- BladeCenter -->
         <group>
          <attribute name="blade"/>
+         <optional>
+          <attribute name="option"/>
+         </optional>
         </group>
         <!-- xCAT, manual -->
         <group>
          <attribute name="nodename"/>
+         <optional>
+          <attribute name="option"/>
+         </optional>
         </group>
 	<!-- GNBD -->
         <group>
@@ -629,20 +833,32 @@
 	 <optional>
 	  <attribute name="ipaddr"/>
 	 </optional>
+         <optional>
+          <attribute name="option"/>
+         </optional>
         </group>
         <!-- bullpap -->
         <group>
          <attribute name="domain"/>
+         <optional>
+          <attribute name="option"/>
+         </optional>
         </group>
         <!-- Egenera -->
         <group>
          <attribute name="lpan"/>
          <attribute name="pserver"/>
+         <optional>
+          <attribute name="option"/>
+         </optional>
         </group>
         <!-- ILO, ipmilan -->
         <group>
          <optional>
           <empty/>
+         </optional>
+         <optional>
+          <attribute name="option"/>
          </optional>
         </group>
        </choice>

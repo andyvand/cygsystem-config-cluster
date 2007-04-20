@@ -19,6 +19,12 @@ from Cman import Cman
 from Gulm import Gulm
 from Lockserver import Lockserver
 from Ip import Ip
+from LVM import LVM
+from Apache import Apache
+from Postgres8 import Postgres8
+from MySQL import MySQL
+from Tomcat5 import Tomcat5
+from OpenLDAP import OpenLDAP
 from Script import Script
 from NFSClient import NFSClient
 from NFSExport import NFSExport
@@ -31,7 +37,8 @@ from Clusterfs import Clusterfs
 from Resources import Resources
 from Service import Service
 from QuorumD import QuorumD
-from Xenvm import Xenvm
+from Heuristic import Heuristic
+from Vm import Vm
 from RefObject import RefObject
 from FailoverDomain import FailoverDomain
 from FailoverDomains import FailoverDomains
@@ -59,6 +66,12 @@ TAGNAMES={ 'cluster':Cluster,
            'failoverdomains':FailoverDomains,
            'failoverdomainnode':FailoverDomainNode,
            'ip':Ip,
+           'lvm':LVM,
+           'postgres-8':Postgres8,
+           'tomcat-5':Tomcat5,
+           'openldap':OpenLDAP,
+           'apache':Apache,
+           'mysql':MySQL,
            'fs':Fs,
            'smb':Samba,
            'fence_daemon':FenceDaemon,
@@ -66,7 +79,8 @@ TAGNAMES={ 'cluster':Cluster,
            'clusterfs':Clusterfs,
            'netfs':Netfs,
            'quorumd':QuorumD,
-           'xenvm':Xenvm,
+           'heuristic':Heuristic,
+           'vm':Vm,
            'script':Script,
            'nfsexport':NFSExport, 
            'nfsclient':NFSClient,
@@ -85,6 +99,8 @@ SERVICE="service"
 GULM_TAG_STR="gulm"
 MCAST_STR="multicast"
 CMAN_PTR_STR="cman"
+QUORUMD_PTR_STR="quorumd"
+VM="vm"
 ###-----------------------------------
 
 
@@ -112,8 +128,11 @@ class ModelBuilder:
     self.resourcemanager_ptr = None
     self.resources_ptr = None
     self.fence_daemon_ptr = None
+    self.quorumd_ptr = new_quorumdisk
+    self.unusual_items = list()
     self.command_handler = CommandHandler()
     self.isModified = False
+    self.exportCallback = None  #This is a function ptr that resets tree model
     if mcast_addr == None:
       self.usesMulticast = False
     else:
@@ -141,7 +160,7 @@ class ModelBuilder:
       self.check_for_multicast()
 
 
-  def buildModel(self, parent_node):
+  def buildModel(self, parent_node, parent_object=None):
 
     if parent_node == None:
       parent_node = self.parent
@@ -159,8 +178,22 @@ class ModelBuilder:
           attrNode = attrs.get(attrName)
           attrValue = attrNode.nodeValue
           new_object.addAttribute(attrName,attrValue)
-      except KeyError, k:
+      except KeyError, k: ##This allows for custom tags
+        new_object = TagObject(parent_node.nodeName)
+        attrs = parent_node.attributes
+        for attrName in attrs.keys():
+          attrNode = attrs.get(attrName)
+          attrValue = attrNode.nodeValue
+          new_object.addAttribute(attrName, attrValue)
+        self.unusual_items.append((parent_object, new_object))
+        for item in parent_node.childNodes:
+          result_object = self.buildModel(item, new_object)
+          if result_object != None:
+            new_object.addChild(result_object)
         return None
+
+      ######End of unusual item exception
+
       if parent_node.nodeName == CLUSTER_PTR_STR:
         self.cluster_ptr = new_object
       if parent_node.nodeName == CLUSTERNODES_PTR_STR:
@@ -171,6 +204,8 @@ class ModelBuilder:
         self.failoverdomains_ptr = new_object
       elif parent_node.nodeName == RESOURCEMANAGER_PTR_STR:
         self.resourcemanager_ptr = new_object
+      elif parent_node.nodeName == QUORUMD_PTR_STR:
+        self.quorumd_ptr = new_object
       elif parent_node.nodeName == RESOURCES_PTR_STR:
         self.resources_ptr = new_object
       elif parent_node.nodeName == FENCEDAEMON_PTR_STR:
@@ -188,7 +223,7 @@ class ModelBuilder:
 
 
     for item in parent_node.childNodes:
-      result_object = self.buildModel(item)
+      result_object = self.buildModel(item, new_object)
       if result_object != None:
         new_object.addChild(result_object)
 
@@ -380,6 +415,8 @@ class ModelBuilder:
     #check for dual power fences
     self.dual_power_fence_check()
 
+    self.restore_unusual_items()
+
     try:
       if filename == None:
         filename = self.filename
@@ -402,15 +439,42 @@ class ModelBuilder:
       self.filename = filename
 
       self.isModified = False
+      self.parent = doc
+                                                                                
+      self.object_tree = self.buildModel(None)
+      self.check_empty_ptrs()
+      self.check_fence_daemon()
+      self.resolve_fence_instance_types()
+      self.purgePCDuplicates()
+      self.resolve_references()
+      self.check_for_multicast()
+      args = list()
+      args.append(CLUSTER_TYPE)
+      apply(self.exportCallback, args)
 
     finally:
+      pass
       #dual_power_fence_check() adds extra
       #fence instance entries for dual power controllers
       #These must be removed from the tree before the UI
       #can be used
-      self.purgePCDuplicates()
+      #self.purgePCDuplicates()
 
     return True
+
+  ##This method attempts to restore custom tag objects
+  def restore_unusual_items(self):
+    for item in self.unusual_items:
+      duplicate = False
+      kids = item[0].getChildren()
+      for kid in kids:
+        if kid == item[1]:
+          duplicate = True
+          break
+      if duplicate == True:
+        continue
+      else:
+        item[0].addChild(item[1])
   
   def has_filepath(self):
     if self.filename == None:
@@ -465,6 +529,14 @@ class ModelBuilder:
           self.removeLockserver(clusternode)
 
     self.isModified = True
+
+  def retrieveVMsByName(self, name):
+    vms = self.getVMs()
+    for v in vms:
+      if v.getName() == name:
+        return v
+                                                                                
+    raise GeneralError('FATAL',"Couldn't find vm name %s in current node list" % name)
 
   def getFenceDevices(self):
     if self.fencedevices_ptr == None:
@@ -538,6 +610,16 @@ class ModelBuilder:
         if kid.getTagName() == SERVICE:
           rg_list.append(kid)
 
+    return rg_list
+
+  def getVMs(self):
+    rg_list = list()
+    if self.resourcemanager_ptr != None:
+      kids = self.resourcemanager_ptr.getChildren()
+      for kid in kids:
+        if kid.getTagName() == VM:
+          rg_list.append(kid)
+                                                                                
     return rg_list
         
   def getResources(self):
@@ -816,8 +898,14 @@ class ModelBuilder:
     return True
 
   def check_two_node(self):
-    if self.getLockType() == DLM_TYPE:
+    if self.getLockType() == DLM_TYPE and self.quorumd_ptr == None:
       clusternodes_count = len(self.clusternodes_ptr.getChildren())
+      #Make certain that there is a cman tag in the file
+      #If missing, it will not hurt to add it here
+      if self.CMAN_ptr == None:
+        cman = Cman()
+        self.cluster_ptr.addChild(cman)
+        self.CMAN_ptr = cman
       if clusternodes_count == 2:
         self.CMAN_ptr.addAttribute('two_node', '1')
         self.CMAN_ptr.addAttribute('expected_votes', '1')
@@ -879,7 +967,9 @@ class ModelBuilder:
                 break
         if found_one == True:
           break
-          
+
+  def setExportCallback(self, method):
+    self.exportCallback = method          
     
   def searchObjectTree(self, tagtype):
     objlist = list()

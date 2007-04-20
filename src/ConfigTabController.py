@@ -37,6 +37,7 @@ from ServiceController import ServiceController
 from Service import Service
 from FailoverDomain import FailoverDomain
 from Device import Device
+from Vm import Vm
 from Method import Method
 from Fence import Fence
 from Lockserver import Lockserver
@@ -91,6 +92,8 @@ CONFIRM_FD_DELETE=_("Are you certain that you wish to delete Fence Device %s?")
 
 ADD_FENCE=_("Add a New Fence")
 
+UNABLE_LOCATE_VM=_("The Virtual Server to be edited, %s, can not be located")
+
 EDIT_FENCE=_("Edit Properties for Fence: %s")
 
 SELECT_LEVEL_FOR_FENCE=_("Please select a fence level for the new fence first.")
@@ -122,6 +125,12 @@ CONFIRM_FAILDOM_REMOVE=_("Are you certain that you wish to remove Failover Domai
 CONFIRM_RC_REMOVE=_("Are you certain that you wish to remove resource %s ?")
 
 CONFIRM_SVC_REMOVE=_("Are you certain that you wish to remove service %s ?")
+
+CONFIRM_VM_REMOVE=_("Are you certain that you wish to remove virtual service %s ?")
+
+VM_NAME_REQUIRED=_("Please provide a name for this virtual service.")
+
+VM_PATH_REQUIRED=_("Please provide a path to the config file for this virtual service.")
 
 SERVICE_NAME_REQUIRED=_("Please provide a name for this service.")
 
@@ -155,6 +164,9 @@ class ConfigTabController:
     self.treeview = treeview
     self.glade_xml = glade_xml
     self.reset_tree_model = reset_tree_model
+
+    #Should this happen here, or upstairs? I'm choosing controller code...
+    self.model_builder.setExportCallback(reset_tree_model) 
 
     self.faildom_controller = FaildomController(self.glade_xml,self.model_builder,reset_tree_model)
     self.service_controller = ServiceController(self.glade_xml,self.model_builder,reset_tree_model)
@@ -632,6 +644,8 @@ class ConfigTabController:
         kees = attrlist.keys()
         for k in kees:
           f_obj.addAttribute(k,attrlist[k])
+        if agent_type == "fence_scsi":
+          f_obj.addAttribute("node",nd.getName())
         level_obj.addChild(f_obj)
         self.prep_fence_panel(nd)
         self.fi_panel.hide()
@@ -653,6 +667,15 @@ class ConfigTabController:
             check_var = attrlist["modulename"]
             if check_var == "":
               f_obj.removeAttribute("modulename") #This rm's any old modulename
+          except KeyError, e:
+            pass    #no attr, no worries
+
+        #special case for ipmi lanplus...if lanplus cbox is unchecked, attr must be as well
+        if agent_type == "fence_ipmilan":
+          try:
+            check_var = attrlist["lanplus"]
+            if check_var == "":
+              f_obj.removeAttribute("lanplus") #This rm's any old lanplus
           except KeyError, e:
             pass    #no attr, no worries
  

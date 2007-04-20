@@ -97,6 +97,8 @@ class CommandHandler:
       #look for 'Cluster Member' substring
       for line in lines:
         val = line.find("Cluster Member")
+        if val == (-1):
+          val = line.find("Cluster-Member")
         if val != (-1):
           dex = line.find("Yes")
           if dex != (-1):

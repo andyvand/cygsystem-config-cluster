@@ -11,6 +11,7 @@ BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires: /sbin/chkconfig
 Requires: gnome-python2, pygtk2, pygtk2-libglade, gnome-python2-canvas 
+Requires: fonts-xorg-base
 Requires: rhpl >= 0.148.2
 Requires: python >= 2.3
 BuildRequires: perl(XML::Parser) gettext
@@ -51,6 +52,12 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Fri Apr 20 2007 Jim Parsons <jparsons@redhat.com> 1.0.45-1
+  -  clui.glade was EMPTY in last build...an unsettling mystery :(
+* Fri Apr 20 2007 Jim Parsons <jparsons@redhat.com> 1.0.44-1
+  -  Better fix for bz 200040
+* Tue Mar 20 2007 Jim Parsons <jparsons@redhat.com> 1.0.41-1
+  -  Fix for bz 219504, 200040
 * Mon Oct 23 2006 Jim Parsons <jparsons@redhat.com> 1.0.34-1
   -  Fix for bz 211641
 * Mon Oct 16 2006 Jim Parsons <jparsons@redhat.com> 1.0.33-1

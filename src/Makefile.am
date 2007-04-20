@@ -38,6 +38,12 @@ NFSExport.py \
 NodeData.py	\
 PropertiesRenderer.py \
 Samba.py \
+LVM.py \
+Apache.py \
+MySQL.py \
+Tomcat5.py \
+OpenLDAP.py \
+Postgres8.py \
 Service.py	\
 ServiceController.py	\
 ServiceData.py	\
@@ -49,7 +55,7 @@ Rm.py \
 Script.py \
 TagObject.py \
 QuorumD.py \
-Xenvm.py \
+Vm.py \
 ValidationError.py \
 pixmaps/node.png	\
 pixmaps/fence.png	\
@@ -114,6 +120,12 @@ install-exec-local:
 	install -m 0640 $(srcdir)/NFSExport.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NodeData.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Samba.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Apache.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Postgres8.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/OpenLDAP.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/MySQL.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Tomcat5.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/LVM.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Service.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ServiceController.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ServiceData.py  $(DESTDIR)$(pkgdatadir)/
@@ -124,7 +136,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/Rm.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Script.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/QuorumD.py  $(DESTDIR)$(pkgdatadir)/
-	install -m 0640 $(srcdir)/Xenvm.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Vm.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/TagObject.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ValidationError.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/pixmaps/fence.png  $(DESTDIR)$(pkgdatadir)/pixmaps/

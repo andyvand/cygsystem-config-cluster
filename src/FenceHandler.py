@@ -17,6 +17,7 @@ FD_PROVIDE_CSERVER = _("A cserver address must be provided for this Egenera Fenc
 FD_PROVIDE_IP = _("An IP address must be provided for this Fence Device")
 FD_PROVIDE_LOGIN = _("A login name must be provided for this Fence Device")
 FD_PROVIDE_PASSWD = _("A password must be provided for this Fence Device")
+FD_PROVIDE_PASSWD_OR_SCRIPT = _("Either a password or a password script location must be provided for this Fence Device")
 FD_PROVIDE_DEVICE = _("A device path must be provided for this Fence Device")
 FI_PROVIDE_XCATNODENAME = _("An xCAT Nodename must be provided for this Fence")
 FI_PROVIDE_SWITCH = _("A switch address must be provided for this Fence")
@@ -59,6 +60,8 @@ FENCE_OPTS = {"fence_apc":_("APC Power Device"),
               "fence_egenera":_("Egenera SAN Controller"),
               "fence_bullpap":_("Bull PAP"),
               "fence_drac":_("DRAC"),
+              "fence_xvm":_("Virtual Machine Fencing"),
+              "fence_scsi":_("SCSI Reservation Fencing"),
               "fence_ipmilan":_("IPMI Lan"),
               "fence_manual":_("Manual Fencing") }
 
@@ -77,6 +80,8 @@ FENCE_FD_ATTRS = {"fence_apc":["name","ipaddr","login","passwd"],
               "fence_egenera":["name","cserver"],
               "fence_ipmilan":["name","ipaddr","login","passwd","auth"],
               "fence_bullpap":["name","ipaddr","login","passwd"],
+              "fence_xvm":["name"],
+              "fence_scsi":["name"],
               "fence_drac":["name","ipaddr","login","passwd"],
               "fence_manual":["name"] }
 
@@ -96,6 +101,8 @@ FENCE_FI_ATTRS = {"fence_apc":["port","switch"],
               "fence_ipmilan":[],
               "fence_bullpap":["domain"],
               "fence_drac":["modulename"],
+              "fence_xvm":["domain"],
+              "fence_scsi":[],
               "fence_manual":[] }
 
 PRETTY_NAME_ATTRS = {"port":_("Port"),
@@ -160,6 +167,11 @@ class FenceHandler:
     for child in children2:
       child.reparent(self.fi_proxy_widget)
     
+    self.fi_container3 = self.fence_xml.get_widget('fence_instance_container3')
+    children3 = self.fi_container3.get_children()
+    for child in children3:
+      child.reparent(self.fi_proxy_widget)
+    
     self.fd_container = self.fence_xml.get_widget('fence_device_container')
     children = self.fd_container.get_children()
     for child in children:
@@ -168,6 +180,11 @@ class FenceHandler:
     self.fd_container2 = self.fence_xml.get_widget('fence_device_container2')
     children2 = self.fd_container2.get_children()
     for child in children2:
+      child.reparent(self.fd_proxy_widget)
+    
+    self.fd_container3 = self.fence_xml.get_widget('fence_device_container3')
+    children3 = self.fd_container3.get_children()
+    for child in children3:
       child.reparent(self.fd_proxy_widget)
     
     #For testing...
@@ -183,11 +200,13 @@ class FenceHandler:
               "fence_ilo":self.pop_ilo,
               "fence_rsa":self.pop_rsa,
               "fence_drac":self.pop_drac,
+              "fence_xvm":self.pop_xvm,
               "fence_sanbox2":self.pop_sanbox2,
               "fence_bladecenter":self.pop_bladecenter,
               "fence_mcdata":self.pop_mcdata,
               "fence_egenera":self.pop_egenera,
               "fence_ipmilan":self.pop_ipmilan,
+              "fence_scsi":self.pop_scsi,
               "fence_bullpap":self.pop_bullpap,
               "fence_manual":self.pop_manual }
 
@@ -201,11 +220,13 @@ class FenceHandler:
               "fence_ilo":self.pop_ilo_fd,
               "fence_rsa":self.pop_rsa_fd,
               "fence_drac":self.pop_drac_fd,
+              "fence_xvm":self.pop_xvm_fd,
               "fence_sanbox2":self.pop_sanbox2_fd,
               "fence_bladecenter":self.pop_bladecenter_fd,
               "fence_mcdata":self.pop_mcdata_fd,
               "fence_egenera":self.pop_egenera_fd,
               "fence_ipmilan":self.pop_ipmilan_fd,
+              "fence_scsi":self.pop_scsi_fd,
               "fence_bullpap":self.pop_bullpap_fd,
               "fence_manual":self.pop_manual_fd }
 
@@ -219,11 +240,13 @@ class FenceHandler:
               "fence_ilo":self.val_ilo,
               "fence_rsa":self.val_rsa,
               "fence_drac":self.val_drac,
+              "fence_xvm":self.val_xvm,
               "fence_sanbox2":self.val_sanbox2,
               "fence_bladecenter":self.val_bladecenter,
               "fence_mcdata":self.val_mcdata,
               "fence_egenera":self.val_egenera,
               "fence_ipmilan":self.val_ipmilan,
+              "fence_scsi":self.val_scsi,
               "fence_bullpap":self.val_bullpap,
               "fence_manual":self.val_manual }
 
@@ -237,11 +260,13 @@ class FenceHandler:
               "fence_ilo":self.val_ilo_fd,
               "fence_rsa":self.val_rsa_fd,
               "fence_drac":self.val_drac_fd,
+              "fence_xvm":self.val_xvm_fd,
               "fence_sanbox2":self.val_sanbox2_fd,
               "fence_bladecenter":self.val_bladecenter_fd,
               "fence_mcdata":self.val_mcdata_fd,
               "fence_egenera":self.val_egenera_fd,
               "fence_ipmilan":self.val_ipmilan_fd,
+              "fence_scsi":self.val_scsi_fd,
               "fence_bullpap":self.val_bullpap_fd,
               "fence_manual":self.val_manual_fd }
 
@@ -269,8 +294,14 @@ class FenceHandler:
  
   def pop_wti(self, attrs):
     self.wti_port.set_text(attrs["port"])
+
+  def pop_xvm(self, attrs):
+    self.xvm_domain.set_text(attrs["domain"])
  
   def pop_rps10(self, attrs):
+    pass
+
+  def pop_scsi(self, attrs):
     pass
 
   def pop_brocade(self, attrs):
@@ -326,7 +357,16 @@ class FenceHandler:
     self.bullpap_domain.set_text(attrs["domain"])
 
   def pop_ipmilan(self, attrs):
-    pass
+    try:
+      lanplus_attr = attrs["lanplus"]
+    except KeyError, e:
+      lanplus_attr = None
+
+    if(lanplus_attr == None or lanplus_attr != "1"):
+      self.ipmi_lanplus_cbox.set_active(False)
+
+    else:
+      self.ipmi_lanplus_cbox.set_active(True)
  
   def clear_fi_forms(self):
     self.apc_port.set_text("") 
@@ -334,6 +374,7 @@ class FenceHandler:
     self.apc_snmp_port.set_text("") 
     self.apc_snmp_switch.set_text("") 
     self.wti_port.set_text("") 
+    self.xvm_domain.set_text("") 
     self.brocade_port.set_text("")
     self.vixel_port.set_text("")
     self.sanbox2_port.set_text("")
@@ -349,6 +390,8 @@ class FenceHandler:
     self.drac_modulename.set_sensitive(False)
     self.drac_modname_label.set_sensitive(False)
 
+    self.ipmi_lanplus_cbox.set_active(False)
+
 
   def clear_fd_forms(self):
     self.apc_fd_name.set_text("") 
@@ -359,9 +402,12 @@ class FenceHandler:
     self.apc_snmp_fd_ip.set_text("")
     self.apc_snmp_fd_login.set_text("")
     self.apc_snmp_fd_passwd.set_text("")
+    self.apc_snmp_fd_passwdscr.set_text("")
     self.wti_fd_ip.set_text("")
     self.wti_fd_name.set_text("")
     self.wti_fd_passwd.set_text("")
+    self.wti_fd_passwdscr.set_text("")
+    self.xvm_fd_name.set_text("")
     self.rps10_fd_name.set_text("")
     self.rps10_fd_device.set_text("")
     self.rps10_fd_port.set_text("")
@@ -369,26 +415,33 @@ class FenceHandler:
     self.brocade_fd_ip.set_text("")
     self.brocade_fd_login.set_text("")
     self.brocade_fd_passwd.set_text("")
+    self.brocade_fd_passwdscr.set_text("")
     self.ilo_fd_name.set_text("")
     self.ilo_fd_login.set_text("")
     self.ilo_fd_passwd.set_text("")
+    self.ilo_fd_passwdscr.set_text("")
     self.ilo_fd_hostname.set_text("")
     self.rsa_fd_name.set_text("")
     self.rsa_fd_login.set_text("")
     self.rsa_fd_passwd.set_text("")
+    self.rsa_fd_passwdscr.set_text("")
     self.rsa_fd_ip.set_text("")
     self.drac_fd_name.set_text("")
     self.drac_fd_login.set_text("")
     self.drac_fd_passwd.set_text("")
+    self.drac_fd_passwdscr.set_text("")
     self.drac_fd_ip.set_text("")
     self.vixel_fd_name.set_text("")
     self.vixel_fd_ip.set_text("")
     self.vixel_fd_passwd.set_text("")
+    self.vixel_fd_passwdscr.set_text("")
     self.manual_fd_name.set_text("")
+    self.scsi_fd_name.set_text("")
     self.mcdata_fd_name.set_text("")
     self.mcdata_fd_ip.set_text("")
     self.mcdata_fd_login.set_text("")
     self.mcdata_fd_passwd.set_text("")
+    self.mcdata_fd_passwdscr.set_text("")
     self.gnbd_fd_name.set_text("")
     self.gnbd_fd_servers.set_text("")
     self.egenera_fd_name.set_text("")
@@ -397,18 +450,22 @@ class FenceHandler:
     self.sanbox2_fd_ip.set_text("")
     self.sanbox2_fd_login.set_text("")
     self.sanbox2_fd_passwd.set_text("")
+    self.sanbox2_fd_passwdscr.set_text("")
     self.bladecenter_fd_name.set_text("")
     self.bladecenter_fd_ip.set_text("")
     self.bladecenter_fd_login.set_text("")
     self.bladecenter_fd_passwd.set_text("")
+    self.bladecenter_fd_passwdscr.set_text("")
     self.ipmilan_fd_name.set_text("")
     self.ipmilan_fd_login.set_text("")
     self.ipmilan_fd_passwd.set_text("")
+    self.ipmilan_fd_passwdscr.set_text("")
     self.ipmilan_fd_ip.set_text("")
     self.ipmilan_fd_auth.set_text("none")
     self.bullpap_fd_name.set_text("")
     self.bullpap_fd_login.set_text("")
     self.bullpap_fd_passwd.set_text("")
+    self.bullpap_fd_passwdscr.set_text("")
     self.bullpap_fd_ip.set_text("")
 
   #Populate form methods for Fence Devices
@@ -416,18 +473,44 @@ class FenceHandler:
     self.apc_fd_name.set_text(attrs["name"]) 
     self.apc_fd_ip.set_text(attrs["ipaddr"])
     self.apc_fd_login.set_text(attrs["login"])
-    self.apc_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.apc_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.apc_fd_passwd.set_text("")
+
+    try:
+      self.apc_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.apc_fd_passwdscr.set_text("")
 
   def pop_apc_snmp_fd(self, attrs):
     self.apc_snmp_fd_name.set_text(attrs["name"]) 
     self.apc_snmp_fd_ip.set_text(attrs["ipaddr"])
     self.apc_snmp_fd_login.set_text(attrs["login"])
-    self.apc_snmp_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.apc_snmp_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.apc_snmp_fd_passwd.set_text("")
+
+    try:
+      self.apc_snmp_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.apc_snmp_fd_passwdscr.set_text("")
+
 
   def pop_wti_fd(self, attrs):
     self.wti_fd_ip.set_text(attrs["ipaddr"])
     self.wti_fd_name.set_text(attrs["name"])
-    self.wti_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.wti_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.wti_fd_passwd.set_text("")
+
+    try:
+      self.wti_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.wti_fd_passwdscr.set_text("")
+
  
   def pop_rps10_fd(self, attrs):
     self.rps10_fd_name.set_text(attrs["name"])
@@ -439,42 +522,104 @@ class FenceHandler:
     self.brocade_fd_name.set_text(attrs["name"])
     self.brocade_fd_ip.set_text(attrs["ipaddr"])
     self.brocade_fd_login.set_text(attrs["login"])
-    self.brocade_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.brocade_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.brocade_fd_passwd.set_text("")
+
+    try:
+      self.brocade_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.brocade_fd_passwdscr.set_text("")
+
 
  
   def pop_ilo_fd(self, attrs):
     self.ilo_fd_name.set_text(attrs["name"])
     self.ilo_fd_login.set_text(attrs["login"])
-    self.ilo_fd_passwd.set_text(attrs["passwd"])
     self.ilo_fd_hostname.set_text(attrs["hostname"])
+    try:
+      self.ilo_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.ilo_fd_passwd.set_text("")
+
+    try:
+      self.ilo_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.ilo_fd_passwdscr.set_text("")
+
 
   def pop_rsa_fd(self, attrs):
     self.rsa_fd_name.set_text(attrs["name"])
     self.rsa_fd_login.set_text(attrs["login"])
-    self.rsa_fd_passwd.set_text(attrs["passwd"])
     self.rsa_fd_ip.set_text(attrs["ipaddr"])
+
+    try:
+      self.rsa_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.rsa_fd_passwd.set_text("")
+
+    try:
+      self.rsa_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.rsa_fd_passwdscr.set_text("")
+
 
   def pop_drac_fd(self, attrs):
     self.drac_fd_name.set_text(attrs["name"])
     self.drac_fd_login.set_text(attrs["login"])
-    self.drac_fd_passwd.set_text(attrs["passwd"])
+
+    try:
+      self.drac_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.drac_fd_passwd.set_text("")
+
+    try:
+      self.drac_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.drac_fd_passwdscr.set_text("")
+
     self.drac_fd_ip.set_text(attrs["ipaddr"])
 
   def pop_vixel_fd(self, attrs):
     self.vixel_fd_name.set_text(attrs["name"])
     self.vixel_fd_ip.set_text(attrs["ipaddr"])
-    self.vixel_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.vixel_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.vixel_fd_passwd.set_text("")
+
+    try:
+      self.vixel_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.vixel_fd_passwdscr.set_text("")
+
 
  
   def pop_mcdata_fd(self, attrs):
     self.mcdata_fd_name.set_text(attrs["name"])
     self.mcdata_fd_ip.set_text(attrs["ipaddr"])
     self.mcdata_fd_login.set_text(attrs["login"])
-    self.mcdata_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.mcdata_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.mcdata_fd_passwd.set_text("")
+
+    try:
+      self.mcdata_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.mcdata_fd_passwdscr.set_text("")
+
 
  
   def pop_manual_fd(self, attrs):
     self.manual_fd_name.set_text(attrs["name"])
+
+  def pop_scsi_fd(self, attrs):
+    self.scsi_fd_name.set_text(attrs["name"])
+
+  def pop_xvm_fd(self, attrs):
+    self.xvm_fd_name.set_text(attrs["name"])
  
   def pop_gnbd_fd(self, attrs):
     self.gnbd_fd_name.set_text(attrs["name"])
@@ -490,18 +635,49 @@ class FenceHandler:
     self.sanbox2_fd_name.set_text(attrs["name"])
     self.sanbox2_fd_ip.set_text(attrs["ipaddr"])
     self.sanbox2_fd_login.set_text(attrs["login"])
-    self.sanbox2_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.sanbox2_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.sanbox2_fd_passwd.set_text("")
+
+    try:
+      self.sanbox2_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.sanbox2_fd_passwdscr.set_text("")
+
 
   def pop_bladecenter_fd(self, attrs):
     self.bladecenter_fd_name.set_text(attrs["name"])
     self.bladecenter_fd_ip.set_text(attrs["ipaddr"])
     self.bladecenter_fd_login.set_text(attrs["login"])
-    self.bladecenter_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.bladecenter_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.bladecenter_fd_passwd.set_text("")
+
+    try:
+      self.bladecenter_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.bladecenter_fd_passwdscr.set_text("")
+
 
   def pop_ipmilan_fd(self, attrs):
     self.ipmilan_fd_name.set_text(attrs["name"])
-    self.ipmilan_fd_login.set_text(attrs["login"])
-    self.ipmilan_fd_passwd.set_text(attrs["passwd"])
+    try:
+      self.ipmilan_fd_login.set_text(attrs["login"])
+    except KeyError, e:
+      self.ipmilan_fd_login.set_text("")
+
+    try:
+      self.ipmilan_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.ipmilan_fd_passwd.set_text("")
+
+    try:
+      self.ipmilan_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.ipmilan_fd_passwdscr.set_text("")
+
     self.ipmilan_fd_ip.set_text(attrs["ipaddr"])
     try:
       self.ipmilan_fd_auth.set_text(attrs["auth"])
@@ -511,7 +687,17 @@ class FenceHandler:
   def pop_bullpap_fd(self, attrs):
     self.bullpap_fd_name.set_text(attrs["name"])
     self.bullpap_fd_login.set_text(attrs["login"])
-    self.bullpap_fd_passwd.set_text(attrs["passwd"])
+
+    try:
+      self.bullpap_fd_passwd.set_text(attrs["passwd"])
+    except KeyError, e:
+      self.bullpap_fd_passwd.set_text("")
+
+    try:
+      self.bullpap_fd_passwdscr.set_text(attrs["passwd_script"])
+    except KeyError, e:
+      self.bullpap_fd_passwdscr.set_text("")
+
     self.bullpap_fd_ip.set_text(attrs["ipaddr"])
 
 
@@ -526,6 +712,7 @@ class FenceHandler:
     self.vixel_port = self.fence_xml.get_widget('entry5') 
     self.ilo_port = self.fence_xml.get_widget('entry7') 
     self.rsa_port = self.fence_xml.get_widget('rsa_entry1') 
+    self.xvm_domain = self.fence_xml.get_widget('entry70')
     self.sanbox2_port = self.fence_xml.get_widget('entry8') 
     self.bladecenter_blade = self.fence_xml.get_widget('entry41') 
     self.mcdata_port = self.fence_xml.get_widget('entry9') 
@@ -536,21 +723,29 @@ class FenceHandler:
     self.drac_modulename = self.fence_xml.get_widget('entry69')
     self.drac_mc_cbox = self.fence_xml.get_widget('drac_mc_cbox')
     self.drac_mc_cbox.connect('toggled',self.on_drac_mc_cbox_changed)
+    self.ipmi_lanplus_cbox = self.fence_xml.get_widget('ipmi_lanplus_cbox')
 
     ##Fence Device Forms
     self.apc_fd_name = self.fence_xml.get_widget('entry12')
     self.apc_fd_ip = self.fence_xml.get_widget('entry13')
     self.apc_fd_login = self.fence_xml.get_widget('entry14')
     self.apc_fd_passwd = self.fence_xml.get_widget('entry15')
+    self.apc_fd_passwdscr = self.fence_xml.get_widget('entry81')
 
     self.apc_snmp_fd_name = self.fence_xml.get_widget('apc_snmp_entry3')
     self.apc_snmp_fd_ip = self.fence_xml.get_widget('apc_snmp_entry4')
     self.apc_snmp_fd_login = self.fence_xml.get_widget('apc_snmp_entry5')
     self.apc_snmp_fd_passwd = self.fence_xml.get_widget('apc_snmp_entry6')
+    self.apc_snmp_fd_passwdscr = self.fence_xml.get_widget('entry82')
 
     self.wti_fd_ip = self.fence_xml.get_widget('entry17')
     self.wti_fd_name = self.fence_xml.get_widget('entry16')
     self.wti_fd_passwd = self.fence_xml.get_widget('entry18')
+    self.wti_fd_passwdscr = self.fence_xml.get_widget('entry83')
+
+    self.xvm_fd_name = self.fence_xml.get_widget('entry71')
+
+    self.scsi_fd_name = self.fence_xml.get_widget('entry72')
 
     self.rps10_fd_name = self.fence_xml.get_widget('entry61')
     self.rps10_fd_device = self.fence_xml.get_widget('entry62')
@@ -560,10 +755,12 @@ class FenceHandler:
     self.brocade_fd_ip = self.fence_xml.get_widget('entry20')
     self.brocade_fd_login = self.fence_xml.get_widget('entry21')
     self.brocade_fd_passwd = self.fence_xml.get_widget('entry22')
+    self.brocade_fd_passwdscr = self.fence_xml.get_widget('entry84')
 
     self.vixel_fd_name = self.fence_xml.get_widget('entry23')
     self.vixel_fd_ip = self.fence_xml.get_widget('entry24')
     self.vixel_fd_passwd = self.fence_xml.get_widget('entry25')
+    self.vixel_fd_passwdscr = self.fence_xml.get_widget('entry85')
 
     self.gnbd_fd_name = self.fence_xml.get_widget('entry26')
     self.gnbd_fd_servers = self.fence_xml.get_widget('entry27')
@@ -571,32 +768,38 @@ class FenceHandler:
     self.ilo_fd_name = self.fence_xml.get_widget('entry28')
     self.ilo_fd_login = self.fence_xml.get_widget('entry29')
     self.ilo_fd_passwd = self.fence_xml.get_widget('entry30')
+    self.ilo_fd_passwdscr = self.fence_xml.get_widget('entry73')
     self.ilo_fd_hostname = self.fence_xml.get_widget('entry31')
 
     self.rsa_fd_name = self.fence_xml.get_widget('rsa_entry2')
     self.rsa_fd_login = self.fence_xml.get_widget('rsa_entry3')
     self.rsa_fd_passwd = self.fence_xml.get_widget('rsa_entry4')
+    self.rsa_fd_passwdscr = self.fence_xml.get_widget('entry74')
     self.rsa_fd_ip = self.fence_xml.get_widget('rsa_entry5')
 
     self.drac_fd_name = self.fence_xml.get_widget('entry57')
     self.drac_fd_login = self.fence_xml.get_widget('entry59')
     self.drac_fd_passwd = self.fence_xml.get_widget('entry60')
+    self.drac_fd_passwdscr = self.fence_xml.get_widget('entry80')
     self.drac_fd_ip = self.fence_xml.get_widget('entry58')
 
     self.sanbox2_fd_name = self.fence_xml.get_widget('entry32')
     self.sanbox2_fd_ip = self.fence_xml.get_widget('entry33')
     self.sanbox2_fd_login = self.fence_xml.get_widget('entry46')
     self.sanbox2_fd_passwd = self.fence_xml.get_widget('entry47')
+    self.sanbox2_fd_passwdscr = self.fence_xml.get_widget('entry75')
 
     self.bladecenter_fd_name = self.fence_xml.get_widget('entry42')
     self.bladecenter_fd_ip = self.fence_xml.get_widget('entry43')
     self.bladecenter_fd_login = self.fence_xml.get_widget('entry44')
     self.bladecenter_fd_passwd = self.fence_xml.get_widget('entry45')
+    self.bladecenter_fd_passwdscr = self.fence_xml.get_widget('entry76')
 
     self.mcdata_fd_name = self.fence_xml.get_widget('entry34')
     self.mcdata_fd_ip = self.fence_xml.get_widget('entry35')
     self.mcdata_fd_login = self.fence_xml.get_widget('entry36')
     self.mcdata_fd_passwd = self.fence_xml.get_widget('entry37')
+    self.mcdata_fd_passwdscr = self.fence_xml.get_widget('entry77')
 
     self.egenera_fd_name = self.fence_xml.get_widget('entry38')
     self.egenera_fd_cserver = self.fence_xml.get_widget('entry39')
@@ -607,12 +810,14 @@ class FenceHandler:
     self.ipmilan_fd_ip = self.fence_xml.get_widget('entry48')
     self.ipmilan_fd_login = self.fence_xml.get_widget('entry49')
     self.ipmilan_fd_passwd = self.fence_xml.get_widget('entry50')
+    self.ipmilan_fd_passwdscr = self.fence_xml.get_widget('entry78')
     self.ipmilan_fd_auth = self.fence_xml.get_widget('entry68')
 
     self.bullpap_fd_name = self.fence_xml.get_widget('entry56')
     self.bullpap_fd_ip = self.fence_xml.get_widget('entry52')
     self.bullpap_fd_login = self.fence_xml.get_widget('entry53')
     self.bullpap_fd_passwd = self.fence_xml.get_widget('entry54')
+    self.bullpap_fd_passwdscr = self.fence_xml.get_widget('entry79')
 
   #####  Validation Methods
   def validate_fencedevice(self, agent_type, name=None):
@@ -642,8 +847,12 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_IP)
     if self.apc_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.apc_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.apc_fd_passwd.get_text().strip()
+    password_script = self.apc_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.apc_fd_name.get_text())
@@ -652,7 +861,10 @@ class FenceHandler:
     fields["name"] = self.apc_fd_name.get_text()
     fields["ipaddr"] = self.apc_fd_ip.get_text()
     fields["login"] = self.apc_fd_login.get_text()
-    fields["passwd"] = self.apc_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
  
@@ -671,8 +883,16 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_IP)
     if self.apc_snmp_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+
     if self.apc_snmp_fd_passwd.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.apc_snmp_fd_passwd.get_text().strip()
+    password_script = self.apc_snmp_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.apc_snmp_fd_name.get_text())
@@ -681,7 +901,10 @@ class FenceHandler:
     fields["name"] = self.apc_snmp_fd_name.get_text()
     fields["ipaddr"] = self.apc_snmp_fd_ip.get_text()
     fields["login"] = self.apc_snmp_fd_login.get_text()
-    fields["passwd"] = self.apc_snmp_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
  
@@ -698,8 +921,13 @@ class FenceHandler:
 
     if self.wti_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
-    if self.wti_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.wti_fd_passwd.get_text().strip()
+    password_script = self.wti_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.wti_fd_name.get_text())
@@ -707,7 +935,10 @@ class FenceHandler:
     fields = {}
     fields["name"] = self.wti_fd_name.get_text()
     fields["ipaddr"] = self.wti_fd_ip.get_text()
-    fields["passwd"] = self.wti_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
  
@@ -736,7 +967,46 @@ class FenceHandler:
     fields["port"] = self.rps10_fd_port.get_text()
 
     return fields
- 
+
+  def val_xvm_fd(self, name):
+    rectify_fence_name = False
+    if self.xvm_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.xvm_fd_name)
+    if name != self.xvm_fd_name.get_text():
+      res = self.check_unique_fd_name(self.xvm_fd_name.get_text())
+      if res == False:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = True
+
+
+    if rectify_fence_name == True:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.xvm_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.xvm_fd_name.get_text()
+
+    return fields
+
+  def val_scsi_fd(self, name):
+    rectify_fence_name = False
+    if self.scsi_fd_name.get_text() == "":
+      raise ValidationError('FATAL', FD_PROVIDE_NAME)
+    self.validateNCName(self.scsi_fd_name)
+    if name != self.scsi_fd_name.get_text():
+      res = self.check_unique_fd_name(self.scsi_fd_name.get_text())
+      if res == False:  #name is already used
+        raise ValidationError('FATAL', FD_PROVIDE_NAME)
+      rectify_fence_name = True
+
+
+    if rectify_fence_name == True:
+      self.model_builder.rectifyNewFencedevicenameWithFences(name,self.scsi_fd_name.get_text())
+
+    fields = {}
+    fields["name"] = self.scsi_fd_name.get_text()
+
+    return fields 
  
   def val_brocade_fd(self, name):
     rectify_fence_name = False
@@ -753,8 +1023,13 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_IP)
     if self.brocade_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.brocade_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.brocade_fd_passwd.get_text().strip()
+    password_script = self.brocade_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.brocade_fd_name.get_text())
@@ -763,7 +1038,10 @@ class FenceHandler:
     fields["name"] = self.brocade_fd_name.get_text()
     fields["ipaddr"] = self.brocade_fd_ip.get_text()
     fields["login"] = self.brocade_fd_login.get_text()
-    fields["passwd"] = self.brocade_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
  
@@ -781,8 +1059,13 @@ class FenceHandler:
 
     if self.ilo_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.ilo_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.ilo_fd_passwd.get_text().strip()
+    password_script = self.ilo_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
     if self.ilo_fd_hostname.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_HOSTNAME)
 
@@ -793,7 +1076,10 @@ class FenceHandler:
     fields["name"] = self.ilo_fd_name.get_text()
     fields["hostname"] = self.ilo_fd_hostname.get_text()
     fields["login"] = self.ilo_fd_login.get_text()
-    fields["passwd"] = self.ilo_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
  
@@ -810,8 +1096,13 @@ class FenceHandler:
 
     if self.rsa_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.rsa_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.rsa_fd_passwd.get_text().strip()
+    password_script = self.rsa_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
     if self.rsa_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
 
@@ -822,7 +1113,10 @@ class FenceHandler:
     fields["name"] = self.rsa_fd_name.get_text()
     fields["ipaddr"] = self.rsa_fd_ip.get_text()
     fields["login"] = self.rsa_fd_login.get_text()
-    fields["passwd"] = self.rsa_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
  
@@ -840,8 +1134,13 @@ class FenceHandler:
 
     if self.drac_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.drac_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.drac_fd_passwd.get_text().strip()
+    password_script = self.drac_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
     if self.drac_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
 
@@ -852,7 +1151,11 @@ class FenceHandler:
     fields["name"] = self.drac_fd_name.get_text()
     fields["ipaddr"] = self.drac_fd_ip.get_text()
     fields["login"] = self.drac_fd_login.get_text()
-    fields["passwd"] = self.drac_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
+
 
     return fields
  
@@ -869,8 +1172,13 @@ class FenceHandler:
 
     if self.vixel_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
-    if self.vixel_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.vixel_fd_passwd.get_text().strip()
+    password_script = self.vixel_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.vixel_fd_name.get_text())
@@ -878,7 +1186,11 @@ class FenceHandler:
     fields = {}
     fields["name"] = self.vixel_fd_name.get_text()
     fields["ipaddr"] = self.vixel_fd_ip.get_text()
-    fields["passwd"] = self.vixel_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
+
 
     return fields
  
@@ -898,8 +1210,13 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_IP)
     if self.mcdata_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.mcdata_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+
+    password = self.mcdata_fd_passwd.get_text().strip()
+    password_script = self.mcdata_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.mcdata_fd_name.get_text())
@@ -908,7 +1225,10 @@ class FenceHandler:
     fields["name"] = self.mcdata_fd_name.get_text()
     fields["ipaddr"] = self.mcdata_fd_ip.get_text()
     fields["login"] = self.mcdata_fd_login.get_text()
-    fields["passwd"] = self.mcdata_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
  
@@ -1000,8 +1320,12 @@ class FenceHandler:
     if self.sanbox2_fd_login.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
 
-    if self.sanbox2_fd_passwd.get_text() == "":
-      raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+    password = self.sanbox2_fd_passwd.get_text().strip()
+    password_script = self.sanbox2_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.sanbox2_fd_name.get_text())
@@ -1010,7 +1334,11 @@ class FenceHandler:
     fields["name"] = self.sanbox2_fd_name.get_text()
     fields["ipaddr"] = self.sanbox2_fd_ip.get_text()
     fields["login"] = self.sanbox2_fd_login.get_text()
-    fields["passwd"] = self.sanbox2_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
+
 
     return fields
 
@@ -1031,8 +1359,12 @@ class FenceHandler:
     if self.bladecenter_fd_login.get_text() == "":
       raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
 
-    if self.bladecenter_fd_passwd.get_text() == "":
-      raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+    password = self.bladecenter_fd_passwd.get_text().strip()
+    password_script = self.bladecenter_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
 
     if rectify_fence_name == True:
       self.model_builder.rectifyNewFencedevicenameWithFences(name,self.bladecenter_fd_name.get_text())
@@ -1041,7 +1373,10 @@ class FenceHandler:
     fields["name"] = self.bladecenter_fd_name.get_text()
     fields["ipaddr"] = self.bladecenter_fd_ip.get_text()
     fields["login"] = self.bladecenter_fd_login.get_text()
-    fields["passwd"] = self.bladecenter_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
 
@@ -1056,10 +1391,15 @@ class FenceHandler:
         raise ValidationError('FATAL', FD_PROVIDE_NAME)
       rectify_fence_name = True
 
-    if self.ipmilan_fd_login.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.ipmilan_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+    #login field is optional for some ipmi
+    #if self.ipmilan_fd_login.get_text() == "":
+    #    raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
+    password = self.ipmilan_fd_passwd.get_text().strip()
+    password_script = self.ipmilan_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
     if self.ipmilan_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
 
@@ -1070,7 +1410,10 @@ class FenceHandler:
     fields["name"] = self.ipmilan_fd_name.get_text()
     fields["ipaddr"] = self.ipmilan_fd_ip.get_text()
     fields["login"] = self.ipmilan_fd_login.get_text()
-    fields["passwd"] = self.ipmilan_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
     if self.ipmilan_fd_auth != "":
       fields["auth"] = self.ipmilan_fd_auth.get_text()
 
@@ -1090,8 +1433,12 @@ class FenceHandler:
 
     if self.bullpap_fd_login.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_LOGIN)
-    if self.bullpap_fd_passwd.get_text() == "":
-        raise ValidationError('FATAL', FD_PROVIDE_PASSWD)
+    password = self.bullpap_fd_passwd.get_text().strip()
+    password_script = self.bullpap_fd_passwdscr.get_text().strip()
+
+    if password=="" and password_script=="":
+        raise ValidationError('FATAL', FD_PROVIDE_PASSWD_OR_SCRIPT)
+
     if self.bullpap_fd_ip.get_text() == "":
         raise ValidationError('FATAL', FD_PROVIDE_IP)
 
@@ -1102,7 +1449,10 @@ class FenceHandler:
     fields["name"] = self.bullpap_fd_name.get_text()
     fields["ipaddr"] = self.bullpap_fd_ip.get_text()
     fields["login"] = self.bullpap_fd_login.get_text()
-    fields["passwd"] = self.bullpap_fd_passwd.get_text()
+    if password != "":
+      fields["passwd"] = password
+    if password_script != "":
+      fields["passwd_script"] = password_script
 
     return fields
  
@@ -1156,6 +1506,16 @@ class FenceHandler:
 
     return fields
 
+  def val_xvm(self):
+    if self.xvm_domain.get_text() == "":
+      raise ValidationError('FATAL', FI_PROVIDE_DOMAIN)
+
+    fields = {}
+    fields["domain"] = self.xvm_domain.get_text()
+
+    return fields
+
+
   def val_brocade(self):
     if self.brocade_port.get_text() == "":
       raise ValidationError('FATAL', FI_PROVIDE_PORT)
@@ -1190,6 +1550,13 @@ class FenceHandler:
     fields = {}
 
     return fields
+
+  def val_scsi(self):
+
+    fields = {}
+
+    return fields
+
 
   def val_drac(self):
 
@@ -1263,6 +1630,15 @@ class FenceHandler:
   def val_ipmilan(self):
 
     fields = {}
+
+    if self.ipmi_lanplus_cbox.get_active() == True:
+      fields["lanplus"] = "1"
+    else:
+      fields["lanplus"] = "" #This is done as a signal to ConfigTabController
+                                #code, so that in case a modname WAS set, and
+                                #then user unchecks the checkbox in an edit
+                                #situation, then the modname attr is removed
+
 
     return fields
 
