@@ -427,6 +427,9 @@
       <optional>
        <attribute name="workgroup"/>
       </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
     <optional>
@@ -455,6 +458,9 @@
       <optional>
        <attribute name="shutdown_wait"/>
       </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
     <optional>
@@ -482,6 +488,9 @@
       </optional>
       <optional>
        <attribute name="shutdown_wait"/>
+      </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
       </optional>
      </group>
     </choice>
@@ -514,6 +523,9 @@
       <optional>
        <attribute name="shutdown_wait"/>
       </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
     <optional>
@@ -542,6 +554,9 @@
       <optional>
        <attribute name="shutdown_wait"/>
       </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
     <optional>
@@ -563,6 +578,9 @@
       </optional>
       <optional>
        <attribute name="vg_name"/>
+      </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
       </optional>
      </group>
     </choice>
@@ -592,6 +610,9 @@
       <optional>
        <attribute name="shutdown_wait"/>
       </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
     <optional>
@@ -613,6 +634,9 @@
       </optional>
       <optional>
        <attribute name="family"/>
+      </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
       </optional>
      </group>
     </choice>
@@ -650,6 +674,9 @@
       <optional>
        <attribute name="options"/>
       </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
     <zeroOrMore>
@@ -680,6 +707,9 @@
       </optional>
       <optional>
        <attribute name="options"/>
+      </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
       </optional>
      </group>
     </choice>
@@ -712,6 +742,9 @@
       <optional>
        <attribute name="options"/>
       </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
     <optional>
@@ -725,6 +758,9 @@
     <choice>
       <attribute name="ref"/>
       <attribute name="name"/>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
     </choice>
     <zeroOrMore>
      <ref name="ALLCHILDREN"/>
@@ -750,6 +786,9 @@
       <optional>
        <attribute name="fsid"/>
       </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
    </element>
@@ -764,6 +803,9 @@
      <group>
       <attribute name="name"/>
       <attribute name="file"/>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
      </group>
     </choice>
     <optional>
