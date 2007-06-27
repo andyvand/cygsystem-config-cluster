@@ -21,6 +21,7 @@ FenceDevice.py \
 FenceDevices.py \
 FenceHandler.py \
 Fence.py \
+FenceXVMd.py \
 Heuristic.py \
 ForkedCommand.py	\
 executil.py \
@@ -38,6 +39,8 @@ NFSExport.py \
 NodeData.py	\
 PropertiesRenderer.py \
 Samba.py \
+SAPDatabase.py \
+SAPInstance.py \
 Service.py	\
 ServiceController.py	\
 ServiceData.py	\
@@ -97,6 +100,7 @@ install-exec-local:
 	install -m 0640 $(srcdir)/FenceDevices.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/FenceHandler.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Fence.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/FenceXVMd.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Heuristic.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ForkedCommand.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/executil.py  $(DESTDIR)$(pkgdatadir)/
@@ -114,6 +118,8 @@ install-exec-local:
 	install -m 0640 $(srcdir)/NFSExport.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NodeData.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Samba.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/SAPDatabase.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/SAPInstance.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Service.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ServiceController.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/ServiceData.py  $(DESTDIR)$(pkgdatadir)/

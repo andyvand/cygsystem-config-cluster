@@ -39,6 +39,14 @@ RC_OPTS = {"ip":_("IP Address"),
            "netfs":_("NFS Mount"),
            "clusterfs":_("GFS"),
            "smb":_("Samba Service"),
+           "lvm":_("LVM"),
+           "mysql":_("MySQL Server"),
+           "apache":_("Apache Server"),
+           "openldap":_("Open LDAP Server"),
+           "tomcat-5":_("Tomcat 5 Server"),
+           "postgres-8":_("PostgreSQL 8 Server"),
+           "SAPDatabase":_("SAP Database"),
+           "SAPInstance":_("SAP Instance"),
            "fs":_("File System") }
 
 class ResourceHandler:
@@ -69,6 +77,11 @@ class ResourceHandler:
     for child in children2:
       child.reparent(self.rc_proxy_widget)
 
+    self.rc_container3 = self.rc_xml.get_widget('rc_container3')
+    children3 = self.rc_container3.get_children()
+    for child in children3:
+      child.reparent(self.rc_proxy_widget)
+
     self.rc_populate_hash = {"ip":self.pop_ip,
                              "script":self.pop_script,
                              "nfsclient":self.pop_nfsclient,
@@ -76,6 +89,14 @@ class ResourceHandler:
                              "netfs":self.pop_netfs,
                              "clusterfs":self.pop_clusterfs,
                              "smb":self.pop_smb,
+                             "apache":self.pop_apache,
+                             "postgres-8":self.pop_postgres8,
+                             "tomcat-5":self.pop_tomcat5,
+                             "mysql":self.pop_mysql,
+                             "lvm":self.pop_lvm,
+                             "SAPDatabase":self.pop_sapdb
+                             "SAPInstance":self.pop_sap,
+                             "openldap":self.pop_openldap,
                              "fs":self.pop_fs }
 
     self.rc_validate_hash = {"ip":self.val_ip,
@@ -85,6 +106,14 @@ class ResourceHandler:
                              "netfs":self.val_netfs,
                              "clusterfs":self.val_clusterfs,
                              "smb":self.val_smb,
+                             "apache":self.val_apache,
+                             "postgres-8":self.val_postgres8,
+                             "tomcat-5":self.val_tomcat5,
+                             "mysql":self.val_mysql,
+                             "lvm":self.val_lvm,
+                             "SAPDatabase":self.val_sapdb
+                             "SAPInstance":self.val_sap,
+                             "openldap":self.val_openldap,
                              "fs":self.val_fs }
 
     self.process_widgets()
@@ -277,8 +306,209 @@ class ResourceHandler:
       self.fs_options.set_text(attrs["options"])
     except KeyError, e:
       self.fs_options.set_text("")
-    
-  
+   
+  def pop_apache(self, attrs):
+    self.ap_name.set_text(attrs["name"])
+
+    try:
+      self.ap_sroot.set_text(attrs["server_root"])
+    except KeyError, e:
+      self.ap_sroot.set_text("")
+
+    try:
+      self.ap_cfg.set_text(attrs["config_file"])
+    except KeyError, e:
+      self.ap_cfg.set_text("")
+
+    try:
+      self.ap_hopt.set_text(attrs["httpd_options"])
+    except KeyError, e:
+      self.ap_hopt.set_text("")
+
+    try:
+      self.ap_wait.set_text(attrs["shutdown_wait"])
+    except KeyError, e:
+      self.ap_wait.set_text("")
+
+
+  def pop_postgres8(self, attrs):
+    self.pg_name.set_text(attrs["name"])
+
+    try:
+      self.pg_cfg.set_text(attrs["config_file"])
+    except KeyError, e:
+      self.pg_cfg.set_text("")
+
+    try:
+      self.pg_pmuser.set_text(attrs["postmaster_user"])
+    except KeyError, e:
+      self.pg_pmuser.set_text("")
+
+    try:
+      self.pg_pmopt.set_text(attrs["postmaster_options"])
+    except KeyError, e:
+      self.pg_pmopt.set_text("")
+
+    try:
+      self.pg_wait.set_text(attrs["shutdown_wait"])
+    except KeyError, e:
+      self.pg_wait.set_text("")
+
+  def pop_tomcat5(self, attrs):
+    self.tc_name.set_text(attrs["name"])
+
+    try:
+      self.tc_cfg.set_text(attrs["config_file"])
+    except KeyError, e:
+      self.tc_cfg.set_text("")
+
+    try:
+      self.tc_tcuser.set_text(attrs["tomcat_user"])
+    except KeyError, e:
+      self.tc_tcuser.set_text("")
+
+    try:
+      self.tc_copt.set_text(attrs["catalina_options"])
+    except KeyError, e:
+      self.tc_copt.set_text("")
+
+    try:
+      self.tc_cbase.set_text(attrs["catalina_base"])
+    except KeyError, e:
+      self.tc_cbase.set_text("")
+
+    try:
+      self.tc_wait.set_text(attrs["shutdown_wait"])
+    except KeyError, e:
+      self.tc_wait.set_text("")
+
+  def pop_mysql(self, attrs):
+    self.mq_name.set_text(attrs["name"])
+
+    try:
+      self.mq_cfg.set_text(attrs["config_file"])
+    except KeyError, e:
+      self.mq_cfg.set_text("")
+
+    try:
+      self.mq_laddr.set_text(attrs["listen_address"])
+    except KeyError, e:
+      self.mq_laddr.set_text("")
+
+    try:
+      self.mq_mdopt.set_text(attrs["mysql_options"])
+    except KeyError, e:
+      self.mq_mdopt.set_text("")
+
+    try:
+      self.mq_wait.set_text(attrs["shutdown_wait"])
+    except KeyError, e:
+      self.mq_wait.set_text("")
+
+
+  def pop_lvm(self, attrs):
+    self.lv_name.set_text(attrs["name"])
+
+    try:
+      self.lv_vgname.set_text(attrs["vg_name"])
+    except KeyError, e:
+      self.lv_vgname.set_text("")
+
+    try:
+      self.lv_lvname.set_text(attrs["lv_name"])
+    except KeyError, e:
+      self.lv_lvname.set_text("")
+
+  def pop_sapdb(self, attrs):
+    try:
+      self.sapdb_name.set_text(attrs["name"])
+    except KeyError, e:
+      self.sapdb_name.set_text("")
+
+    try:
+      self.sapdb_execdir.set_text(attrs["DIR_EXECUTABLE"])
+    except KeyError, e:
+      self.sapdb_execdir.set_text("")
+
+    try:
+      dbtype = attrs["DBTYPE"]
+      if dbtype == "ADA":
+        self.sapdb_adaradio.set_active(True)
+      elif dbtype == "DB6":
+        self.sapdb_db6radio.set_active(True)
+      else:
+        self.sapdb_oraradio.set_active(True)
+    except KeyError, e:
+      self.sapdb_oraradio.set_active(True)
+
+    try:
+      j2ee = attrs["DBJ2EE_ONLY"]
+      if j2ee == "TRUE" or j2ee == "1" or j2ee == "True":
+        self.sapdb_abap_cbox.set_active(True)
+      else:
+        self.sapdb_abap_cbox.set_active(False)
+    except KeyError, e:
+      self.sapdb_abap_cbox.set_active(False)
+
+    try:
+      self.sapdb_bootstrap.set_text(attrs["DIR_BOOTSTRAP"])
+    except KeyError, e:
+      self.sapdb_bootstrap.set_text("")
+
+    try:
+      self.sapdb_store.set_text(attrs["DIR_SECSTORE"])
+    except KeyError, e:
+      self.sapdb_store.set_text("")
+
+    try:
+      self.sapdb_tns.set_text(attrs["NETSERVICENAME"])
+    except KeyError, e:
+      self.sapdb_tns.set_text("")
+
+  def pop_sap(self, attrs):
+    try:
+      self.sap_name.set_text(attrs["name"])
+    except KeyError, e:
+      self.sap_name.set_text("")
+
+    try:
+      self.sap_execdir.set_text(attrs["DIR_EXECUTABLE"])
+    except KeyError, e:
+      self.sap_execdir.set_text("")
+
+    try:
+      self.sap_profdir.set_text(attrs["DIR_PROFILE"])
+    except KeyError, e:
+      self.sap_profdir.set_text("")
+
+    try:
+      self.sap_profname.set_text(attrs["START_PROFILE"])
+    except KeyError, e:
+      self.sap_profname.set_text("")
+
+  def pop_openldap(self, attrs):
+    self.ld_name.set_text(attrs["name"])
+
+    try:
+      self.ld_cfg.set_text(attrs["config_file"])
+    except KeyError, e:
+      self.ld_cfg.set_text("")
+
+    try:
+      self.ld_urllist.set_text(attrs["url_list"])
+    except KeyError, e:
+      self.ld_urllist.set_text("")
+
+    try:
+      self.ld_sdopt.set_text(attrs["slapd_options"])
+    except KeyError, e:
+      self.ld_sdopt.set_text("")
+
+    try:
+      self.ld_wait.set_text(attrs["shutdown_wait"])
+    except KeyError, e:
+      self.ld_wait.set_text("")
+
   def clear_rc_forms(self):
 
     self.ip.clear()
@@ -322,6 +552,54 @@ class ResourceHandler:
     self.gfs_force_unmount.set_active(False)
     self.gfs_options.set_text("")
     self.gfs_id.set_text("")
+
+    self.ap_name.set_text("")
+    self.ap_sroot.set_text("")
+    self.ap_cfg.set_text("")
+    self.ap_hopt.set_text("")
+    self.ap_wait.set_text("")
+
+    self.lv_name.set_text("")
+    self.lv_vgname.set_text("")
+    self.lv_lvname.set_text("")
+
+    self.mq_name.set_text("")
+    self.mq_cfg.set_text("")
+    self.mq_laddr.set_text("")
+    self.mq_mdopt.set_text("")
+    self.mq_wait.set_text("")
+
+    self.ld_name.set_text("")
+    self.ld_cfg.set_text("")
+    self.ld_urllist.set_text("")
+    self.ld_sdopt.set_text("")
+    self.ld_wait.set_text("")
+
+    self.pg_name.set_text("")
+    self.pg_cfg.set_text("")
+    self.pg_pmuser.set_text("")
+    self.pg_pmopt.set_text("")
+    self.pg_wait.set_text("")
+
+    self.tc_name.set_text("")
+    self.tc_cfg.set_text("")
+    self.tc_tcuser.set_text("")
+    self.tc_copt.set_text("")
+    self.tc_cbase.set_text("")
+    self.tc_wait.set_text("")
+
+    self.sapdb_name.set_text("")
+    self.sapdb_execdir.set_text("")
+    self.sapdb_tns.set_text("")
+    self.sapdb_oraradio.set_active(True)
+    self.sapdb_abap_cbox.set_active(False)
+    self.sapdb_bootstrap.set_text("")
+    self.sapdb_store.set_text("")
+
+    self.sap_name.set_text("")
+    self.sap_execdir.set_text("")
+    self.sap_profname.set_text("")
+    self.sap_profdir.set_text("")
 
 
   #### Validation Methods
@@ -614,6 +892,255 @@ class ResourceHandler:
     
     return fields
 
+  def val_tomcat5(self, *argname):
+    name = argname[0]
+    tc_name = self.tc_name.get_text().strip()
+    if tc_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name == None: #New resource...
+      res = self.check_unique_resource_name(tc_name)
+      if res == False:  #name already used for a resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    else:
+       if name != tc_name:
+        res = self.check_unique_resource_name(tc_name)
+        if res == False:  #name already used for a resource
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    fields = {}
+    fields["name"] = tc_name
+    cfg = self.tc_cfg.get_text()
+    fields["config_file"] = cfg
+    tcuser = self.tc_tcuser.get_text()
+    fields["tomcat_user"] = tcuser
+    copt = self.tc_copt.get_text()
+    fields["catalina_options"] = copt
+    cbase = self.tc_cbase.get_text()
+    fields["catalina_base"] = cbase
+    wait = self.tc_wait.get_text()
+    fields["shutdown_wait"] = wait
+
+    return fields
+
+  def val_apache(self, *argname):
+    name = argname[0]
+    ap_name = self.ap_name.get_text().strip()
+    if ap_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name == None: #New resource...
+      res = self.check_unique_resource_name(ap_name)
+      if res == False:  #name already used for a resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    else:
+       if name != ap_name:
+        res = self.check_unique_resource_name(ap_name)
+        if res == False:  #name already used for a resource
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    fields = {}
+    fields["name"] = ap_name
+    cfg = self.ap_cfg.get_text()
+    fields["config_file"] = cfg
+    sroot = self.ap_sroot.get_text()
+    fields["server_root"] = sroot
+    hopt = self.ap_hopt.get_text()
+    fields["httpd_options"] = hopt
+    wait = self.ap_wait.get_text()
+    fields["shutdown_wait"] = wait
+
+    return fields
+
+  def val_postgres8(self, *argname):
+    name = argname[0]
+    pg_name = self.pg_name.get_text().strip()
+    if pg_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name == None: #New resource...
+      res = self.check_unique_resource_name(pg_name)
+      if res == False:  #name already used for a resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    else:
+       if name != pg_name:
+        res = self.check_unique_resource_name(pg_name)
+        if res == False:  #name already used for a resource
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    fields = {}
+    fields["name"] = pg_name
+    cfg = self.pg_cfg.get_text()
+    fields["config_file"] = cfg
+    pmuser = self.pg_pmuser.get_text()
+    fields["postmaster_user"] = pmuser
+    pmopt = self.pg_pmopt.get_text()
+    fields["postmaster_options"] = pmopt
+    wait = self.pg_wait.get_text()
+    fields["shutdown_wait"] = wait
+
+    return fields
+
+  def val_mysql(self, *argname):
+    name = argname[0]
+    mq_name = self.mq_name.get_text().strip()
+    if mq_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name == None: #New resource...
+      res = self.check_unique_resource_name(mq_name)
+      if res == False:  #name already used for a resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    else:
+       if name != mq_name:
+        res = self.check_unique_resource_name(mq_name)
+        if res == False:  #name already used for a resource
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    fields = {}
+    fields["name"] = mq_name
+    cfg = self.mq_cfg.get_text()
+    fields["config_file"] = cfg
+    laddr = self.mq_laddr.get_text()
+    fields["listen_address"] = laddr
+    mdopt = self.mq_mdopt.get_text()
+    fields["mysql_options"] = mdopt
+    wait = self.mq_wait.get_text()
+    fields["shutdown_wait"] = wait
+
+    return fields
+
+  def val_openldap(self, *argname):
+    name = argname[0]
+    ld_name = self.ld_name.get_text().strip()
+    if ld_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name == None: #New resource...
+      res = self.check_unique_resource_name(ld_name)
+      if res == False:  #name already used for a resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    else:
+       if name != ld_name:
+        res = self.check_unique_resource_name(ld_name)
+        if res == False:  #name already used for a resource
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    fields = {}
+    fields["name"] = ld_name
+    cfg = self.ld_cfg.get_text()
+    fields["config_file"] = cfg
+    urllist = self.ld_urllist.get_text()
+    fields["url_list"] = urllist
+    sdopt = self.ld_sdopt.get_text()
+    fields["slapd_options"] = sdopt
+    wait = self.ld_wait.get_text()
+    fields["shutdown_wait"] = wait
+
+    return fields
+
+  def val_lvm(self, *argname):
+    name = argname[0]
+    lv_name = self.lv_name.get_text().strip()
+    if lv_name == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name == None: #New resource...
+      res = self.check_unique_resource_name(lv_name)
+      if res == False:  #name already used for a resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    else:
+       if name != lv_name:
+        res = self.check_unique_resource_name(lv_name)
+        if res == False:  #name already used for a resource
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    fields = {}
+    fields["name"] = lv_name
+    vgname = self.lv_vgname.get_text()
+    fields["vg_name"] = vgname
+    lvname = self.lv_lvname.get_text()
+    fields["lv_name"] = lvname
+
+    return fields
+
+  def val_sapdb(self, *argname):
+    name = argname[0]
+    sname = self.sapdb_name.get_text().strip()
+    if sname == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name == None: #New resource...
+      res = self.check_unique_resource_name(sname)
+      if res == False:  #name already used for a resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    else:
+       if name != sname:
+        res = self.check_unique_resource_name(sname)
+        if res == False:  #name already used for a resource
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    fields = {}
+    fields["SID"] = sname
+    execdir = self.sapdb_execdir.get_text()
+    fields["DIR_EXECUTABLE"] = execdir
+    tns = self.sapdb_tns.get_text()
+    fields["NETSERVICENAME"] = tns
+    bstrap = self.sapdb_bootstrap.get_text()
+    fields["DIR_BOOTSTRAP"] = bstrap
+    store = self.sapdb_store.get_text()
+    fields["DIR_SECSTORE"] = store
+    jval = self.sapdb_abap_cbox.get_active()
+    if jval == True:
+      fields["DBJ2EE_ONLY"] = "TRUE"
+    else:
+      fields["DBJ2EE"] = "FALSE"
+
+    dbtype = None
+    if self.sapdb_adaradio.get_active() == True:
+      dbtype = "ADA"
+    elif self.sapdb_db2radio.get_active() == True:
+      dbtype = "DB2"
+    else:
+      dbtype = "ORA"
+    fields["DBTYPE"] = dbtype
+
+    return fields
+
+  def val_sap(self, *argname):
+    name = argname[0]
+    sname = self.sap_name.get_text().strip()
+    if sname == "":
+      raise ValidationError('FATAL', RESOURCE_PROVIDE_NAME)
+
+    if name == None: #New resource...
+      res = self.check_unique_resource_name(sname)
+      if res == False:  #name already used for a resource
+        raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    else:
+       if name != sname:
+        res = self.check_unique_resource_name(sname)
+        if res == False:  #name already used for a resource
+          raise ValidationError('FATAL',RESOURCE_PROVIDE_UNIQUE_NAME)
+
+    fields = {}
+    fields["InstanceName"] = sname
+    execdir = self.sap_execdir.get_text()
+    fields["DIR_EXECUTABLE"] = execdir
+    profdir = self.sap_profdir.get_text()
+    fields["DIR_PROFILE"] = profdir
+    profname = self.sap_profname.get_text()
+    fields["START_PROFILE"] = profname
+
+    return fields
 
   def val_fs(self, *argname):
     name = argname[0]
@@ -747,6 +1274,57 @@ class ResourceHandler:
     self.fs_options = self.rc_xml.get_widget('fs_options')
     self.fs_id_container = self.rc_xml.get_widget('fs_id_container')
     self.fs_id = self.rc_xml.get_widget('fs_id')
+
+    self.ap_name = self.rc_xml.get_widget('entry27')
+    self.ap_sroot = self.rc_xml.get_widget('entry28')
+    self.ap_cfg = self.rc_xml.get_widget('entry29')
+    self.ap_hopt = self.rc_xml.get_widget('entry30')
+    self.ap_wait = self.rc_xml.get_widget('entry31')
+
+    self.lv_name = self.rc_xml.get_widget('entry32')
+    self.lv_vgname = self.rc_xml.get_widget('entry33')
+    self.lv_lvname = self.rc_xml.get_widget('entry34')
+
+    self.mq_name = self.rc_xml.get_widget('entry36')
+    self.mq_cfg = self.rc_xml.get_widget('entry37')
+    self.mq_laddr = self.rc_xml.get_widget('entry38')
+    self.mq_mdopt = self.rc_xml.get_widget('entry39')
+    self.mq_wait = self.rc_xml.get_widget('entry35')
+
+    self.ld_name = self.rc_xml.get_widget('entry40')
+    self.ld_cfg = self.rc_xml.get_widget('entry41')
+    self.ld_urllist = self.rc_xml.get_widget('entry42')
+    self.ld_sdopt = self.rc_xml.get_widget('entry43')
+    self.ld_wait = self.rc_xml.get_widget('entry44')
+
+    self.pg_name = self.rc_xml.get_widget('entry45')
+    self.pg_cfg = self.rc_xml.get_widget('entry46')
+    self.pg_pmuser = self.rc_xml.get_widget('entry47')
+    self.pg_pmopt = self.rc_xml.get_widget('entry48')
+    self.pg_wait = self.rc_xml.get_widget('entry49')
+
+    self.tc_name = self.rc_xml.get_widget('entry51')
+    self.tc_cfg = self.rc_xml.get_widget('entry52')
+    self.tc_tcuser = self.rc_xml.get_widget('entry53')
+    self.tc_copt = self.rc_xml.get_widget('entry55')
+    self.tc_cbase = self.rc_xml.get_widget('entry54')
+    self.tc_wait = self.rc_xml.get_widget('entry50')
+
+    self.sapdb_name = self.rc_xml.get_widget('sapdb_name')
+    self.sapdb_execdir = self.rc_xml.get_widget('sapdb_execdir')
+    self.sapdb_tns = self.rc_xml.get_widget('sapdb_tns')
+    self.sapdb_oraradio = self.rc_xml.get_widget('radiobutton5')
+    self.sapdb_db6radio = self.rc_xml.get_widget('radiobutton6')
+    self.sapdb_adaradio = self.rc_xml.get_widget('radiobutton7')
+    self.sapdb_abap_cbox = self.rc_xml.get_widget('abap_cbox')
+    self.sapdb_bootstrap = self.rc_xml.get_widget('sapdb_bootstrap')
+    self.sapdb_store = self.rc_xml.get_widget('sapdb_store')
+
+    self.sap_name = self.rc_xml.get_widget('sap_name')
+    self.sap_execdir = self.rc_xml.get_widget('sap_execdir')
+    self.sap_profname = self.rc_xml.get_widget('sap_profname')
+    self.sap_profdir = self.rc_xml.get_widget('sap_profdir')
+
   
   def set_model(self, model_builder):
     self.model_builder = model_builder
@@ -824,3 +1402,10 @@ class ResourceHandler:
 
     return True
 
+  def check_unique_resource_name(self,name):
+    rcs = self.model_builder.getResources()
+    for rc in rcs:
+      if rc.getName() == name:
+        return False
+
+    return True

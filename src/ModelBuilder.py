@@ -26,10 +26,13 @@ from Fs import Fs
 from Samba import Samba
 from Multicast import Multicast
 from FenceDaemon import FenceDaemon
+from FenceXVMd import FenceXVMd
 from Netfs import Netfs
 from Clusterfs import Clusterfs
 from Resources import Resources
 from Service import Service
+from SAPDatabase import SAPDatabase
+from SAPInstance import SAPInstance
 from QuorumD import QuorumD
 from Heuristic import Heuristic
 from Vm import Vm
@@ -55,6 +58,8 @@ TAGNAMES={ 'cluster':Cluster,
            'lockserver':Lockserver,
            'rm':Rm,
            'service':Service,
+           'SAPDatabase':SAPDatabase,
+           'SAPInstance':SAPInstance,
            'resources':Resources,
            'failoverdomain':FailoverDomain,
            'failoverdomains':FailoverDomains,
@@ -63,6 +68,7 @@ TAGNAMES={ 'cluster':Cluster,
            'fs':Fs,
            'smb':Samba,
            'fence_daemon':FenceDaemon,
+           'fence_xvmd':FenceXVMd,
            'multicast':Multicast,
            'clusterfs':Clusterfs,
            'netfs':Netfs,
@@ -83,6 +89,7 @@ FENCEDEVICES_PTR_STR="fencedevices"
 RESOURCEMANAGER_PTR_STR="rm"
 RESOURCES_PTR_STR="resources"
 FENCEDAEMON_PTR_STR="fence_daemon"
+FENCEXVMD_PTR_STR="fence_xvmd"
 SERVICE="service"
 GULM_TAG_STR="gulm"
 MCAST_STR="multicast"
@@ -116,6 +123,7 @@ class ModelBuilder:
     self.resourcemanager_ptr = None
     self.resources_ptr = None
     self.fence_daemon_ptr = None
+    self.fence_xvmd_ptr = None
     self.quorumd_ptr = new_quorumdisk
     self.unusual_items = list()
     self.command_handler = CommandHandler()
@@ -205,6 +213,8 @@ class ModelBuilder:
         self.CMAN_ptr = new_object
       elif parent_node.nodeName == MCAST_STR:
         self.usesMulticast = True
+      elif parent_node.nodeName == FENCEXVMD_PTR_STR:
+        self.fence_xvmd_ptr = new_object
 
     else:
       return None
@@ -538,6 +548,9 @@ class ModelBuilder:
 
   def getFenceDevicePtr(self):
     return self.fencedevices_ptr
+
+  def getFenceXVMdPtr(self):
+    return self.fence_xvmd_ptr
 
   def getFailoverDomains(self):
     if self.failoverdomains_ptr == None:

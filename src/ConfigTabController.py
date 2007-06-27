@@ -32,6 +32,7 @@ import gnome.ui
 from clui_constants import *
 from FenceHandler import FenceHandler
 from FenceDevice import FenceDevice
+from FenceXVMd import FenceXVMd
 from FaildomController import FaildomController
 from ServiceController import ServiceController
 from Service import Service
@@ -255,6 +256,7 @@ class ConfigTabController:
     self.post_fail = self.glade_xml.get_widget('post_fail')
     self.mcast_interface = self.glade_xml.get_widget('mcast_interface')
     self.mcast_interface_entry = self.glade_xml.get_widget('mcast_interface_entry')
+    self.xvmd_cbox = self.glade_xml.get_widget('xvmd_cbox')
 
     ##Node Fields
     #Node Props
@@ -389,6 +391,7 @@ class ConfigTabController:
   def on_cluster_props_edit(self, button):
     cptr = self.model_builder.getClusterPtr()
     fptr = self.model_builder.getFenceDaemonPtr()
+    xptr = self.model_builder.getFenceXVMdPtr()
 
     #set fields for edit
     name = cptr.getNameAlias()
@@ -400,6 +403,10 @@ class ConfigTabController:
     #set fence daemon fields
     self.post_join.set_text(fptr.getPostJoinDelay())
     self.post_fail.set_text(fptr.getPostFailDelay())
+    if xptr == None:
+      self.xvmd_cbox.set_active(False)
+    else:
+      self.xvmd_cbox.set_active(True)
     self.cluster_props_dlg.show()
 
   def on_cluster_props_edit_ok(self, button):
@@ -470,6 +477,17 @@ class ConfigTabController:
       fdptr.addAttribute("post_fail_delay",postfail)
     else:
       fdptr.addAttribute("post_fail_delay",POST_FAIL_DEFAULT)
+
+    xptr = self.model_builder.getFenceXVMdPtr()
+    if self.xvmd_cbox.get_active() == True:
+      if xptr == None:
+        xvmd = FenceXVMd()
+        xptr = xvmd
+        cptr.addChild(xvmd)
+    else:
+      if xptr != None:
+        cptr.removeChild(xptr)
+        xptr = None
 
 
     self.model_builder.setModified()
@@ -1449,6 +1467,10 @@ class ConfigTabController:
       tagname = r_obj.getTagName()
       if tagname == "ip":
         returnlist = self.rc_handler.validate_resource(tagname, r_obj.getAttribute("address"))
+      elif tagname == "SAPDatabase":
+        returnlist = self.rc_handler.validate_resource(tagname, r_obj.getAttribute("SID"))
+      elif tagname == "SAPInstance":
+        returnlist = self.rc_handler.validate_resource(tagname, r_obj.getAttribute("InstanceName"))
       else:
         returnlist = self.rc_handler.validate_resource(tagname, r_obj.getName())
       if returnlist != None:
@@ -1463,6 +1485,14 @@ class ConfigTabController:
               r_obj.removeAttribute("path")
           except KeyError, e:
             r_obj.removeAttribute("path")
+        if r_obj.getTagName() == "SAPDatabase":
+          #If dbj2ee_only attr has been removed, we need to remove from obj as well
+          try:
+            jonly = returnlist["DBJ2EE_ONLY"]
+            if jonly == "FALSE":
+              r_obj.removeAttribute("DBJ2EE_ONLY")
+          except KeyError, e:
+            r_obj.removeAttribute("DBJ2EE_ONLY")
         self.model_builder.updateReferences()
         self.model_builder.setModified()
         args = list()
