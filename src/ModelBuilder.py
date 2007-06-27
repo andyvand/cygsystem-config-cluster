@@ -19,6 +19,12 @@ from Cman import Cman
 from Gulm import Gulm
 from Lockserver import Lockserver
 from Ip import Ip
+from LVM import LVM
+from Apache import Apache
+from Postgres8 import Postgres8
+from MySQL import MySQL
+from Tomcat5 import Tomcat5
+from OpenLDAP import OpenLDAP
 from Script import Script
 from NFSClient import NFSClient
 from NFSExport import NFSExport
@@ -65,6 +71,12 @@ TAGNAMES={ 'cluster':Cluster,
            'failoverdomains':FailoverDomains,
            'failoverdomainnode':FailoverDomainNode,
            'ip':Ip,
+           'lvm':LVM,
+           'postgres-8':Postgres8,
+           'tomcat-5':Tomcat5,
+           'openldap':OpenLDAP,
+           'apache':Apache,
+           'mysql':MySQL,
            'fs':Fs,
            'smb':Samba,
            'fence_daemon':FenceDaemon,
