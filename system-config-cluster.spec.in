@@ -51,7 +51,11 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
-* Fri Jan 12 2007 Jim Parsons <jparsons@redhat.com> 1.0.46-1
+* Tue Jun 26 2007 Jim Parsons <jparsons@redhat.com> 1.0.50-1
+  - SAP support and new resource agents as well as bz225441 and bz239594 
+* Tue Apr 24 2007 Jim Parsons <jparsons@redhat.com> 1.0.47-1
+  -  Version bump for zstream build
+* Fri Apr 20 2007 Jim Parsons <jparsons@redhat.com> 1.0.46-1
   -  Fixes for 236057 and 236058
 * Fri Jan 12 2007 Jim Parsons <jparsons@redhat.com> 1.0.39-1
   -  comment without a hash sign - sheesh

@@ -94,7 +94,7 @@ class ResourceHandler:
                              "tomcat-5":self.pop_tomcat5,
                              "mysql":self.pop_mysql,
                              "lvm":self.pop_lvm,
-                             "SAPDatabase":self.pop_sapdb
+                             "SAPDatabase":self.pop_sapdb,
                              "SAPInstance":self.pop_sap,
                              "openldap":self.pop_openldap,
                              "fs":self.pop_fs }
@@ -111,7 +111,7 @@ class ResourceHandler:
                              "tomcat-5":self.val_tomcat5,
                              "mysql":self.val_mysql,
                              "lvm":self.val_lvm,
-                             "SAPDatabase":self.val_sapdb
+                             "SAPDatabase":self.val_sapdb,
                              "SAPInstance":self.val_sap,
                              "openldap":self.val_openldap,
                              "fs":self.val_fs }
@@ -421,7 +421,7 @@ class ResourceHandler:
 
   def pop_sapdb(self, attrs):
     try:
-      self.sapdb_name.set_text(attrs["name"])
+      self.sapdb_name.set_text(attrs["SID"])
     except KeyError, e:
       self.sapdb_name.set_text("")
 
@@ -467,7 +467,7 @@ class ResourceHandler:
 
   def pop_sap(self, attrs):
     try:
-      self.sap_name.set_text(attrs["name"])
+      self.sap_name.set_text(attrs["InstanceName"])
     except KeyError, e:
       self.sap_name.set_text("")
 
@@ -1101,13 +1101,13 @@ class ResourceHandler:
     if jval == True:
       fields["DBJ2EE_ONLY"] = "TRUE"
     else:
-      fields["DBJ2EE"] = "FALSE"
+      fields["DBJ2EE_ONLY"] = "FALSE"
 
     dbtype = None
     if self.sapdb_adaradio.get_active() == True:
       dbtype = "ADA"
-    elif self.sapdb_db2radio.get_active() == True:
-      dbtype = "DB2"
+    elif self.sapdb_db6radio.get_active() == True:
+      dbtype = "DB6"
     else:
       dbtype = "ORA"
     fields["DBTYPE"] = dbtype

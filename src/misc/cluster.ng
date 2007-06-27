@@ -590,6 +590,71 @@
    </element>
   </define>
 
+  <define name="SAPDB">
+   <element name="SAPDatabase">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="SID"/>
+      <optional>
+       <attribute name="DIR_EXECUTABLE"/>
+      </optional>
+      <optional>
+       <attribute name="NETSERVICENAME"/>
+      </optional>
+      <optional>
+       <attribute name="DIR_BOOTSTRAP"/>
+      </optional>
+      <optional>
+       <attribute name="DIR_SECSTORE"/>
+      </optional>
+      <optional>
+       <attribute name="DBJ2EE_ONLY"/>
+      </optional>
+      <optional>
+       <attribute name="DBTYPE"/>
+      </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <ref name="CHILDREN"/>
+    </optional>
+   </element>
+  </define>
+
+  <define name="SAP">
+   <element name="SAPInstance">
+    <choice>
+     <group>
+      <attribute name="ref"/>
+     </group>
+     <group>
+      <attribute name="InstanceName"/>
+      <optional>
+       <attribute name="DIR_EXECUTABLE"/>
+      </optional>
+      <optional>
+       <attribute name="DIR_PROFILE"/>
+      </optional>
+      <optional>
+       <attribute name="START_PROFILE"/>
+      </optional>
+      <optional>
+       <attribute name="__independent_subtree"/>
+      </optional>
+     </group>
+    </choice>
+    <optional>
+     <ref name="CHILDREN"/>
+    </optional>
+   </element>
+  </define>
+
   <define name="OPENLDAP">
    <element name="openldap">
     <choice>
@@ -830,6 +895,8 @@
       <ref name="POSTGRES"/>
       <ref name="TOMCAT"/>
       <ref name="MYSQL"/>
+      <ref name="SAP"/>
+      <ref name="SAPDB"/>
      </choice>
     </zeroOrMore>
   </define>
