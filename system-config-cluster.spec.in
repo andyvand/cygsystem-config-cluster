@@ -2,7 +2,7 @@
 Summary: system-config-cluster is a utility which allows you to manage cluster configuration in a graphical setting.
 Name: @PACKAGE@
 Version: @VERSION@
-Release: 1.0
+Release: 1.1
 URL: http://www.redhat.com/ 
 Source0: %{name}-%{version}.tar.gz
 License: GPL
@@ -51,6 +51,8 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Wed Jun 27 2007 Jim Parsons <jparsons@redhat.com> 1.0.50-2
+  - bumping minor for missing files 
 * Tue Jun 26 2007 Jim Parsons <jparsons@redhat.com> 1.0.50-1
   - SAP support and new resource agents as well as bz225441 and bz239594 
 * Tue Apr 24 2007 Jim Parsons <jparsons@redhat.com> 1.0.47-1
