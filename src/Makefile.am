@@ -124,12 +124,12 @@ install-exec-local:
 	install -m 0640 $(srcdir)/NFSExport.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/NodeData.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Samba.py  $(DESTDIR)$(pkgdatadir)/
-  install -m 0640 $(srcdir)/Apache.py  $(DESTDIR)$(pkgdatadir)/
-  install -m 0640 $(srcdir)/Postgres8.py  $(DESTDIR)$(pkgdatadir)/
-  install -m 0640 $(srcdir)/OpenLDAP.py  $(DESTDIR)$(pkgdatadir)/
-  install -m 0640 $(srcdir)/MySQL.py  $(DESTDIR)$(pkgdatadir)/
-  install -m 0640 $(srcdir)/Tomcat5.py  $(DESTDIR)$(pkgdatadir)/
-  install -m 0640 $(srcdir)/LVM.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Apache.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Postgres8.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/OpenLDAP.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/MySQL.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/Tomcat5.py  $(DESTDIR)$(pkgdatadir)/
+	install -m 0640 $(srcdir)/LVM.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/SAPDatabase.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/SAPInstance.py  $(DESTDIR)$(pkgdatadir)/
 	install -m 0640 $(srcdir)/Service.py  $(DESTDIR)$(pkgdatadir)/
