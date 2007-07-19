@@ -935,6 +935,9 @@
          <optional>
           <attribute name="action"/>
          </optional>
+         <optional>
+          <attribute name="modulename"/>
+         </optional>
         </group>
         <!-- WTI, Brocade, Vixel, McData, SANBox2 -->
         <group>
