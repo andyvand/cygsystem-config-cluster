@@ -45,7 +45,7 @@ NODEINFO_ERROR=_("Node information is temporarily unavailable. Here is the error
 PATIENCE_MESSAGE=_("Please be patient.\n Starting and Stopping Services\n can sometimes take a minute or two.")
 
 T_NAME=_("Name")
-T_VOTES=_("Votes")
+T_NODEID=_("Node ID")
 T_STATUS=_("Status")
 
 S_NAME=_("Service Name")
@@ -55,7 +55,7 @@ S_LASTOWNER=_("Previous Owner")
 S_RESTARTS=_("Restarts")
 
 TITLE_COL = 0
-VOTES_COL = 1
+NODEID_COL = 1
 STATUS_COL = 2
 NAME_COL = 3
 
@@ -103,7 +103,7 @@ class MgmtTab:
     self.nodetree.append_column(column1)
 
     renderer2 = gtk.CellRendererText()
-    column2 = gtk.TreeViewColumn(T_VOTES,renderer2,text=1)
+    column2 = gtk.TreeViewColumn(T_NODEID,renderer2,text=1)
     self.nodetree.append_column(column2)
 
     renderer3 = gtk.CellRendererText()
@@ -191,10 +191,10 @@ class MgmtTab:
 
     for node in nodes:
       iter = treemodel.append(None)
-      name, votes, status = node.getNodeProps()
+      name, nodeid, status = node.getNodeProps()
       name_str = "<span size=\"10000\"><b>" + cgi.escape(name) + "</b></span>"
       treemodel.set(iter, TITLE_COL, name_str,
-                          VOTES_COL, votes,
+                          NODEID_COL, nodeid,
                           STATUS_COL, status,
                           NAME_COL, name) 
 

@@ -323,16 +323,16 @@ class CommandHandler:
 
       lines = out.splitlines()
       y = (-1)
-      for line in lines:
+      for line in lines:  #for each node...
         y = y + 1
         if y == 0:
           continue
         words = line.split()
-        if len(words) == 5:
-          nd = NodeData(words[1],words[3],words[4])
+        if words[1].strip() == 'M': #Node is a member...
+          nd = NodeData(True, words[0],words[1],words[2],words[3],words[4],words[5])
           dataobjs.append(nd)
-        elif len(words) == 4:
-          nd = NodeData(words[1],"Not Joined",words[3])
+        else:
+          nd = NodeData(False,words[0], words[1],words[2],None, None, words[3])
           dataobjs.append(nd)
 
       return dataobjs
