@@ -978,6 +978,8 @@ class ModelBuilder:
         kids = level.getChildren()
         l = list()
         for kid in kids:
+          if kid.hasNativeOptionSet() == True:
+            continue
           if kid.isPowerController() == True:
             l.append(kid)
         if len(l) > 1:  #Means we found multiple PCs in the same level
@@ -1004,6 +1006,13 @@ class ModelBuilder:
         for level in levels:
           kids = level.getChildren()
           for kid in kids: #kids are actual fence instance objects
+            #Need to pass over this device if:
+            ##1) It is not a power controller, or
+            ##2) It had an initial option attr when the model was constructed
+            if not kid.isPowerController():
+              continue
+            if kid.hasNativeOptionSet():
+              continue
             res = kid.getAttribute("option")
             if res != None:
               if res == "off":

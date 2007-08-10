@@ -4,6 +4,7 @@ import cgi
 from TagObject import TagObject
 
 TAG_NAME = "device"
+OPTION = "option"
 
 import gettext
 _ = gettext.gettext
@@ -19,6 +20,7 @@ class Device(TagObject):
     TagObject.__init__(self)
     self.TAG_NAME = TAG_NAME
     self.agent_type = ""
+    self.has_native_option_set = False
     self.fi_attrs = FenceHandler.FENCE_FI_ATTRS
     self.pretty_fence_names = FenceHandler.FENCE_OPTS
     self.pretty_name_attrs = FenceHandler.PRETTY_NAME_ATTRS
@@ -29,12 +31,20 @@ class Device(TagObject):
   def setAgentType(self, agent_type):
     self.agent_type = agent_type
 
+  def hasNativeOptionSet(self):
+    return self.has_native_option_set
+
   def isPowerController(self):
     for item in power_controller_list:
       if self.agent_type == item:
         return True
 
     return False
+
+  def addAttribute(self, name, value):
+    if name == OPTION:
+      self.has_native_option_set = True
+    self.attr_hash[name] = value
 
   def getProperties(self):
     stringbuf = ""
