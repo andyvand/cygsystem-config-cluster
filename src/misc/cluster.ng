@@ -251,6 +251,15 @@
     <attribute name="tko"/>
    </optional>
    <optional>
+    <attribute name="tko_up"/>
+   </optional>
+   <optional>
+    <attribute name="upgrade_wait"/>
+   </optional>
+   <optional>
+    <attribute name="master_wait"/>
+   </optional>
+   <optional>
     <attribute name="votes"/>
    </optional>
    <optional>
@@ -262,6 +271,36 @@
    <optional>
     <attribute name="label"/>
    </optional>
+   <optional>
+    <attribute name="reboot"/>
+   </optional>
+   <optional>
+    <attribute name="allow_kill"/>
+   </optional>
+   <optional>
+    <attribute name="paranoid"/>
+   </optional>
+   <optional>
+    <attribute name="priority"/>
+   </optional>
+   <optional>
+    <attribute name="stop_cman"/>
+   </optional>
+   <optional>
+    <attribute name="use_uptime"/>
+   </optional>
+   <optional>
+    <attribute name="scheduler"/>
+   </optional>
+   <optional>
+    <attribute name="status_file"/>
+   </optional>
+   <optional>
+    <attribute name="log_level"/>
+   </optional>
+   <optional>
+    <attribute name="log_facility"/>
+   </optional>
    <oneOrMore>
     <element name="heuristic">
      <attribute name="program"/>
@@ -270,6 +309,9 @@
      </optional>
      <optional>
       <attribute name="interval"/>
+     </optional>
+     <optional>
+      <attribute name="tko"/>
      </optional>
     </element>
    </oneOrMore>
