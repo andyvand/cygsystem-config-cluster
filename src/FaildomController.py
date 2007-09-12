@@ -210,7 +210,7 @@ class FaildomController:
       #Set checkboxes for restricted and prioritized
       val = self.current_faildom.getAttribute("restricted")
       if val != None:
-        if int(val) > 0:
+        if val == "Yes" or val == "yes" or val="1":
           self.restricted_cbox.set_active(True)
         else:
           self.restricted_cbox.set_active(False)
@@ -220,7 +220,7 @@ class FaildomController:
 
       val = self.current_faildom.getAttribute("ordered")
       if val != None:
-        if int(val) > 0:
+        if val == "Yes" or val == "yes" or val == "1":
           self.priority_cbox.set_active(True)
         else:
           self.priority_cbox.set_active(False)
