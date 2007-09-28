@@ -152,6 +152,12 @@ class ModelBuilder:
         pass
 
       self.object_tree = self.buildModel(None)
+      #If this file has 'bak1','bak2', or 'bak3' in its title, it is
+      #a restored backup file then. The config_version should be incremented.
+      #This increment amount must be at least 3 (as there are 3 backups
+      #maintained) but should be even more just for safety sake.
+      if filename.find(".bak") != (-1):
+        self.cluster_ptr.incrementConfigVersion(4) 
       self.check_empty_ptrs()
       self.check_fence_daemon()
       self.resolve_fence_instance_types()

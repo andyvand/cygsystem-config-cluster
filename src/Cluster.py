@@ -113,10 +113,10 @@ class Cluster(TagObject):
     self.addAttribute("config_version", version)
     self.is_cfg_version_dirty = True
 
-  def incrementConfigVersion(self):
+  def incrementConfigVersion(self, increment_value = 1):
     version = self.getAttribute("config_version")
     intversion = int(version)
-    intversion = intversion + 1
+    intversion = intversion + increment_value
     self.addAttribute("config_version", str(intversion))
     #self.is_cfg_version_dirty = True
 
