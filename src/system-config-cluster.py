@@ -223,6 +223,8 @@ class basecluster:
             else:
                 continue
         self.model_builder = ModelBuilder(DLM_TYPE, filepath)
+        #Patch from wm - thanks
+        self.model_builder.setExportCallback(self.configtab.reset_tree_model)
         self.configtab.set_model(self.model_builder)
         break
     popup.destroy()
