@@ -170,6 +170,9 @@
        <optional>
         <attribute name="restricted"/>
        </optional>
+       <optional>
+        <attribute name="nofailback"/>
+       </optional>
        <zeroOrMore>
         <element name="failoverdomainnode">
          <optional>
@@ -219,8 +222,18 @@
     <element name="vm">
      <attribute name="name"/>
      <attribute name="path"/>
+     <attribute name="domain"/>
      <optional>
       <attribute name="autostart"/>
+     </optional>
+     <optional>
+      <attribute name="exclusive"/>
+     </optional>
+     <optional>
+      <attribute name="recovery"/>
+     </optional>
+     <optional>
+      <attribute name="migration"/>
      </optional>
     </element>
    </zeroOrMore>
