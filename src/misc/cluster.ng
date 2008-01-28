@@ -314,7 +314,7 @@
    <optional>
     <attribute name="log_facility"/>
    </optional>
-   <oneOrMore>
+   <optional>
     <element name="heuristic">
      <attribute name="program"/>
      <optional>
@@ -327,7 +327,7 @@
       <attribute name="tko"/>
      </optional>
     </element>
-   </oneOrMore>
+   </optional>
   </element>
  </optional>
 
