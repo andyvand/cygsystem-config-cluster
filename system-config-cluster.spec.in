@@ -2,7 +2,7 @@
 Summary: system-config-cluster is a utility which allows you to manage cluster configuration in a graphical setting.
 Name: @PACKAGE@
 Version: @VERSION@
-Release: 1.0
+Release: 3.0
 URL: http://www.redhat.com/ 
 Source0: %{name}-%{version}.tar.gz
 License: GPL
@@ -52,6 +52,12 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/security/console.apps/system-config-cluster
 
 %changelog
+* Tue Mar 25 2007 Ryan McCabe <rmccabe@redhat.com> 1.0.51-3
+  - Fix bz435143
+* Mon Nov 05 2007 Jim Parsons <jparsons@redhat.com> 1.0.51-2
+  -  Version bump for check build
+* Fri Sep 28 2007 Jim Parsons <jparsons@redhat.com> 1.0.51-1
+  -  Fixes for 160130 and bz253145
 * Fri Apr 20 2007 Jim Parsons <jparsons@redhat.com> 1.0.45-1
   -  clui.glade was EMPTY in last build...an unsettling mystery :(
 * Fri Apr 20 2007 Jim Parsons <jparsons@redhat.com> 1.0.44-1
